@@ -1,0 +1,18 @@
+-- Figure a better API for C++ serializer field access.
+-- Finish binary decoder (Python, C++)
+-- analyzer should check for invalid package names
+-- Implement extension fields
+-- Base classes need to declare a type id - make code consistent
+-- NULL defaults
+-- Mutation unit test
+-- Add source line numbers to C++ descriptors
+-- use shared_ptr
+-- specify the type of the typeid function (should be implicit from base initializer.)
+-- equals() should shortcut reference comparison for objects
+-- option for python generator to generate pydev type hints
+-- option for python generator to generate additional convenience methods for collections types.
+-- visitors need to handle graph cycles. Transformers need to handle shared objects.
+
+Command to create eclipse project:
+
+   cmake -G "Eclipse CDT4 - Ninja" -D CMAKE_BUILD_TYPE=Debug -D_ECLIPSE_VERSION=4.3 ../src

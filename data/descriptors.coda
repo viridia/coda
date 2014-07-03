@@ -1,0 +1,426 @@
+# Definitions for CODA descriptors
+
+package coda.descriptors;
+
+options {
+  package:cpp = 'coda::descriptors';
+  package:python = 'coda.runtime.descdata';
+  package:java = 'coda.descriptors';
+  outerClass:java = 'Descriptors';
+  filepath:cpp = 'coda/runtime/descriptors_generated';
+
+  imports:cpp = [
+    "coda/runtime/descriptors_mixin.h"
+  ];
+}
+
+# ============================================================================
+# Values - used for both options and constants
+# ============================================================================
+
+# Base type for values
+struct Value = 0 {}
+
+# Boolean values
+struct BoolValue(Value) = 1 {
+  value : bool = 1;
+}
+
+# Integer values
+struct IntegerValue(Value) = 2 {
+  value : i32 = 1;
+}
+
+# String values
+struct StringValue(Value) = 3 {
+  value : string = 1;
+}
+
+# List values
+struct ListValue(Value) = 4 {
+  value : list[Value] = 1;
+}
+
+# ============================================================================
+# Options
+# ============================================================================
+
+struct Options = 0 {
+  options { allowSubtypes = true; }
+}
+
+struct FileOptions(Options) = 1 {
+  # Package declaration for a given target language
+  'package' : map[string, string] = 1;
+
+  # Name of the outer class (for languages that require it).
+  outerClass : map[string, string] = 3;
+
+  # Override the output file path
+  filepath : map[string, string] = 4;
+
+  # Additional import or include files that need to come before generated type definitions.
+  # This is typically used to import mixin class definitions.
+  imports : map[string, list[string]] = 5;
+
+  extensions 1000 to max;
+}
+
+struct StructOptions(Options) = 2 {
+  # Whether this type allows subtyping.
+  allowSubtypes : bool = 1;
+
+  # This option allows a user-supplied "implementation class" to be used in place of the generated
+  # class for this struct type.
+  #
+  # The value of the option determines the class name of the generated class for this struct. This
+  # does not affect any references to this class (such as field types), which will continue to
+  # use the original name to refer to the implementation class. It also makes the generated class
+  # abstract, if applicable for the target language.
+  #
+  # The implementation class must be provided. It must inherit from the abstract generated class
+  # and must use the original, unmodified name that would have been given to the generated class
+  # had this option not been specified.
+  genClassName : map[string, string] = 2;
+
+  # Indicates a mixin class to use when generating the class for this struct.
+  # Only valid in target languages which support mixins.
+  mixin : map[string, string] = 3;
+
+  # When generating the equals and hash methods for this type, use compare by reference instead
+  # of compare by value. This also means that the objects being pointed to need not be immutable
+  # in order to be hashed, since only the pointer is hashed. (Because of this, the 'freeze' method
+  # will skip over reference fields.)
+  reference: bool = 4;
+
+  # Causes the compiler to generate shared references for all references to this type.
+  # This option can only be specified on root classes.
+  'shared': bool = 5;
+
+  extensions 1000 to max;
+}
+
+struct FieldOptions(Options) = 3 {
+  # Whether field is allowed to be undefined
+  nullable : bool = 1;
+
+  # If true, causes field not to be written out
+  deprecated : bool = 3;
+
+  # For numeric types, whether to serialize as fixed-length
+  fixed : bool = 4;
+
+  # If true, causes field not to be written out
+  transient : bool = 5;
+
+  # Indicates that this field should be omitted for a given target language
+  ignore : map[string, bool] = 6;
+
+  # Default value of the field
+  default : Value = 7 [nullable];
+
+  # Disables the visitor generator from visiting this field.
+  novisit : bool = 8;
+
+  extensions 1000 to max;
+}
+
+struct MethodOptions(Options) = 4 {
+  # Whether or not this method modifies the object (used to generate 'const' in C++).
+  'const' : bool = 4;
+
+  extensions 1000 to max;
+}
+
+struct EnumOptions(Options) = 5 {
+  extensions 1000 to max;
+}
+
+# ============================================================================
+# Type descriptors
+# ============================================================================
+
+enum TypeKind {
+  TYPE = 0,
+  # Scalar types
+  BOOL = 1,
+  INTEGER,
+  FLOAT,
+  DOUBLE,
+
+  # String types
+  STRING,
+  BYTES,
+
+  # Derived types
+  LIST = 20,
+  SET,
+  MAP,
+  MODIFIED,
+
+  # User-defined types
+  STRUCT = 30,
+  ENUM,
+
+  # Type defined in another module
+  EXTERN,
+
+  # Abstract types
+  COLLECTION = 40,
+  DECL,
+}
+
+# ============================================================================
+# Base type for type descriptors
+# ============================================================================
+
+struct Type = TypeKind.TYPE {
+  options {
+    mixin:python.python3 = 'coda.runtime.typemixins.TypeMixin';
+    mixin:cpp = 'coda::descriptors::TypeMixin';
+    shared = true;
+  }
+}
+
+# ============================================================================
+# Built-in type descriptors
+# ============================================================================
+
+# Boolean type descriptor
+struct BooleanType(Type) = TypeKind.BOOL {
+  options { mixin:python.python3 = 'coda.runtime.typemixins.BooleanTypeMixin'; }
+}
+
+# Integer type descriptor
+struct IntegerType(Type) = TypeKind.INTEGER {
+  options { mixin:python.python3 = 'coda.runtime.typemixins.IntegerTypeMixin'; }
+  bits: i32 = 1;
+}
+
+# Float type descriptor
+struct FloatType(Type) = TypeKind.FLOAT {
+  options { mixin:python.python3 = 'coda.runtime.typemixins.FloatTypeMixin'; }
+}
+
+# Double type descriptor
+struct DoubleType(Type) = TypeKind.DOUBLE {
+  options { mixin:python.python3 = 'coda.runtime.typemixins.DoubleTypeMixin'; }
+}
+
+# String type descriptor
+struct StringType(Type) = TypeKind.STRING {
+  options { mixin:python.python3 = 'coda.runtime.typemixins.StringTypeMixin'; }
+}
+
+# Bytes type descriptor
+struct BytesType(Type) = TypeKind.BYTES {
+  options { mixin:python.python3 = 'coda.runtime.typemixins.BytesTypeMixin'; }
+}
+
+# Collection types descriptor
+struct CollectionType(Type) = TypeKind.COLLECTION {}
+
+# List type descriptor
+struct ListType(CollectionType) = TypeKind.LIST {
+  options { mixin:python.python3 = 'coda.runtime.typemixins.ListTypeMixin'; }
+  elementType: shared Type = 1;
+}
+
+# Set type descriptor
+struct SetType(CollectionType) = TypeKind.SET {
+  options { mixin:python.python3 = 'coda.runtime.typemixins.SetTypeMixin'; }
+  elementType : shared Type = 1;
+}
+
+# Map type descriptor
+struct MapType(CollectionType) = TypeKind.MAP {
+  options { mixin:python.python3 = 'coda.runtime.typemixins.MapTypeMixin'; }
+  keyType : shared Type = 1;
+  valueType : shared Type = 2;
+}
+
+# Const type modifier
+struct ModifiedType(Type) = TypeKind.MODIFIED {
+  options { mixin:python.python3 = 'coda.runtime.typemixins.ModifiedTypeMixin'; }
+  elementType : shared Type = 1;
+  'const' : bool = 2;
+  'shared' : bool = 3;
+}
+
+# ============================================================================
+# User-declared type descriptors
+# ============================================================================
+
+# Abstract base class for declared types (structs and enums)
+struct DeclType(Type) = TypeKind.DECL {
+  options {
+    mixin:python.python3 = 'coda.runtime.typemixins.DeclTypeMixin';
+    mixin:cpp = 'coda::descriptors::DeclTypeMixin';
+  }
+
+  # File in which this descriptor was defined
+  file : shared FileDescriptor = 2 [nullable];
+
+  # Enclosing type in which this descriptor was defined
+  enclosingType : shared StructType = 3 [nullable];
+
+  # Name of this type.
+  name : string = 4;
+
+  # Source line where this type was declared
+  sourceLine : i32 = 5;
+
+  # Method to return the full name of the type.
+  # getFullName : () -> (string) = 100 [const];
+}
+
+# Structure type descriptor
+struct StructType(DeclType) = TypeKind.STRUCT {
+  struct Field {
+    # Field name
+    name : string = 1;
+
+    # Field type
+    type : shared Type = 2;
+
+    # Numeric field identifier
+    id : i32 = 3;
+
+    # Field options
+    'options' : shared FieldOptions = 4;
+  }
+
+  struct Param {
+    # Parameter name
+    name: string = 1;
+
+    # Parameter type
+    type: shared Type = 2;
+  }
+
+  struct Method {
+    # Field name
+    name : string = 1;
+
+    # Parameter type
+    params : list[Param] = 2;
+
+    # Return type
+    returnType : shared Type = 3;
+
+    # Numeric method identifier
+    id : i32 = 4;
+
+    # Method options
+    'options' : shared MethodOptions = 5;
+  }
+
+  # Options for this type
+  'options' : shared StructOptions = 1;
+
+  # Base type (for subtypes)
+  baseType : shared StructType = 3 [nullable];
+
+  # ID for subtypes and extensions
+  typeId : i32 = 4;
+
+  # List of fields
+  fields : list[Field] = 5;
+
+  # List of struct types defined within this scope
+  structs : list[shared StructType] = 6;
+
+  # List of enum types defined within this scope
+  enums : list[shared EnumType] = 7;
+
+  # List of extensions defined within this scope
+  'extensions' : list[ExtensionField] = 8;
+
+  # Min extension ID allowed for this struct type
+  minExtension : i32 = 9;
+
+  # Max extension ID allowed for this struct type
+  maxExtension : i32 = 10;
+
+  # TODO: Constants
+}
+
+# Enum type descriptor
+struct EnumType(DeclType) = TypeKind.ENUM {
+  struct Value {
+    name : string = 1;
+    value : i32 = 2;
+  }
+
+  # Options for this type
+  'options' : shared EnumOptions = 1;
+
+  # List of members
+  values : list[Value] = 2;
+}
+
+# ============================================================================
+# Extension field descriptor
+# ============================================================================
+
+struct ExtensionField {
+  # File in which this extension was defined
+  file : shared FileDescriptor = 1 [nullable];
+
+  # Enclosing type in which this extension was defined
+  enclosingType : StructType = 2;
+
+  # Source line where this type was declared
+  sourceLine : i32 = 3;
+
+  # The type we're extending
+  extends : shared StructType = 4;
+
+  # Name of this extension field.
+  name : string = 5;
+
+  # Numeric extension field identifier
+  id : i32 = 6;
+
+  # Extension field type
+  type : shared Type = 7;
+}
+
+# ============================================================================
+# File descriptor
+# ============================================================================
+
+struct FileDescriptor {
+  # Information about an imported file.
+  struct Import {
+    # Path name of the import
+    path : string = 1;
+
+    # Package declaration for a given target language
+    'package' : map[string, string] = 2;
+  }
+
+  # File name of the IDL file (with extension)
+  name : string = 1;
+
+  # Directory of the IDL file (relative to base directory)
+  directory : string = 2;
+
+  # Declared namespace
+  'package' : string = 3;
+
+  # List of file-level options (keyed by scope)
+  'options' : FileOptions = 4;
+
+  # List of top-level struct types defined within this file
+  structs : list[shared StructType] = 5;
+
+  # List of top-level enum types defined within this file
+  enums : list[shared EnumType] = 6;
+
+  # List of extensions defined within this file
+  'extensions' : list[shared ExtensionField] = 7;
+
+  # List of imported files
+  imports : list[Import] = 8;
+}
