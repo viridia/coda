@@ -9,6 +9,9 @@
   #include "coda/io/codec.h"
 #endif
 
+#include <unordered_map>
+#include <unordered_set>
+
 namespace coda {
 namespace io {
 

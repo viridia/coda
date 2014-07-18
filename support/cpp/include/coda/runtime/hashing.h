@@ -17,6 +17,10 @@
   #include <math.h>
 #endif
 
+#if CODA_HAVE_STDINT_H
+  #include <stdint.h>
+#endif
+
 #include <string>
 #include <unordered_map>
 #include <unordered_set>
