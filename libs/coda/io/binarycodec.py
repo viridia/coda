@@ -570,7 +570,7 @@ class BinaryDecoder(coda.io.AbstractDecoder):
                   self.__instance.descriptor().getName(), field.getName()), fieldType)
         field.setValue(self.__instance, value)
     if self.__instance is None:
-      self.__instance = self.expectedType.new()
+      self.__instance = expectedType.new()
       if shared:
         index = self.addShared(self.__instance)
         if self.__debug:

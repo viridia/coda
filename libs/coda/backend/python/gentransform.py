@@ -128,7 +128,7 @@ class Python3TransformGenerator(genvisitor.Python3VisitorGenerator):
       if visitKeys and visitValues:
         self.indent()
         self.writeLn('newMap = {}')
-        self.writeLnFmt('for k, v in {value}.get{field}():', **fmtParams)
+        self.writeLnFmt('for k, v in {value}.get{field}().items():', **fmtParams)
         self.indent()
         self.writeLnFmt(
             'newMap[self.traverse{struct}(k, *args)] = self.traverse{struct}(v, *args)', **fmtParams)
@@ -138,7 +138,7 @@ class Python3TransformGenerator(genvisitor.Python3VisitorGenerator):
       elif visitKeys:
         self.indent()
         self.writeLn('newMap = {}')
-        self.writeLnFmt('for k, v in {value}.get{field}():', **fmtParams)
+        self.writeLnFmt('for k, v in {value}.get{field}().items():', **fmtParams)
         self.indent()
         self.writeLnFmt('newMap[self.traverse{struct}(k, *args)] = v', **fmtParams)
         self.unindent()
@@ -147,7 +147,7 @@ class Python3TransformGenerator(genvisitor.Python3VisitorGenerator):
       elif visitValues:
         self.indent()
         self.writeLn('newMap = {}')
-        self.writeLnFmt('for k, v in {value}.get{field}():', **fmtParams)
+        self.writeLnFmt('for k, v in {value}.get{field}().items():', **fmtParams)
         self.indent()
         self.writeLnFmt('newMap[k] = self.traverse{struct}(v, *args)', **fmtParams)
         self.unindent()

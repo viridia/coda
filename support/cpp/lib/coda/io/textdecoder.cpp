@@ -7,6 +7,7 @@
 
 #include <strstream>
 #include <assert.h>
+#include <cstdlib>
 
 #include <iostream>
 
