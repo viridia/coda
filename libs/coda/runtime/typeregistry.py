@@ -39,8 +39,8 @@ class TypeRegistry:
     def addStruct(struct):
       if struct.getBaseType() is not None:
         self.addSubtype(struct)
-        for st in struct.getStructs():
-          addStruct(st)
+      for st in struct.getStructs():
+        addStruct(st)
     for struct in file.getStructs():
       addStruct(struct)
 

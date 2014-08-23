@@ -71,6 +71,10 @@ def createFile(name, path, package, structs=(), enums=(), extensions=(),
           cls.DESCRIPTOR.setTypeId(cls.TYPE_ID)
         createStructDescriptors(cls.__structs__, cls.DESCRIPTOR)
         createEnumDescriptors(cls.__enums__, cls.DESCRIPTOR)
+        if cls.__structs__:
+          cls.DESCRIPTOR.setStructs([st.DESCRIPTOR for st in cls.__structs__])
+        if cls.__enums__:
+          cls.DESCRIPTOR.setEnums([en.DESCRIPTOR for en in cls.__enums__])
     def createFieldDescriptors(classes):
       for cls in classes:
         struct = cls.DESCRIPTOR
