@@ -13,3 +13,7 @@ Some of Coda's features:
 * Pluggable codecs allow serialization in various formats.
 * Highly-compact binary encoding format.
 * Supports schema evolution, so older/newer object formats can be processed without losing information.
+* Facilitiates interoperability between different programming languages.
+* Language plugins are written in Python 3 and are fairly easy to write. Adding support for a new language involves subclassing `coda.compiler.genbase.CodeGenerator`.
+
+(Note: Currently only the Python code generator is complete, although the C++ code generator is partly done.)
