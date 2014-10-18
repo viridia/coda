@@ -586,6 +586,7 @@ class Python3Generator(genbase.CodeGenerator):
       return
     self.writeLn('def merge(self, src):')
     self.indent()
+    self.writeLnFmt('"""@return {0}"""', self.formatTypeName(struct))
     if struct.getBaseType():
       self.writeLn('super().merge(src)')
     for field in struct.getFields():
@@ -642,6 +643,8 @@ class Python3Generator(genbase.CodeGenerator):
     else:
       self.writeLnFmt('def get{0}(self):', self.capitalize(field.getName()))
     self.indent()
+    if field.getType().typeId() == types.TypeKind.STRUCT:
+      self.writeLnFmt('"""@return {0}"""', self.formatTypeName(field.getType()))
     self.writeLnFmt('return self._{0}', field.getName())
     self.unindent()
     self.writeLn()
@@ -653,6 +656,8 @@ class Python3Generator(genbase.CodeGenerator):
     self.writeLnFmt('def getMutable{0}(self):',
         self.capitalize(field.getName()))
     self.indent()
+    if field.getType().typeId() == types.TypeKind.STRUCT:
+      self.writeLnFmt('"""@return {0}"""', self.formatTypeName(field.getType()))
     self.writeLn('self.checkMutable()')
 #    if field.getOptions().?? (nullable? shared?)
     defaultValue = self.defaultValueOf(field)
@@ -682,6 +687,7 @@ class Python3Generator(genbase.CodeGenerator):
     varName = self.varName(field.getName())
     self.writeLnFmt('def set{0}(self, {1}):', self.capitalize(field.getName()), varName)
     self.indent()
+    self.writeLnFmt('"""@return {0}"""', self.formatTypeName(struct))
     self.writeLn('self.checkMutable()')
     if self.checkTypes:
       self.genTypeCheck(field, varName)
@@ -700,6 +706,7 @@ class Python3Generator(genbase.CodeGenerator):
     self.writeLnFmt('def clear{0}(self):',
         self.capitalize(field.getName()))
     self.indent()
+    self.writeLnFmt('"""@return {0}"""', self.formatTypeName(struct))
     self.writeLn('self.checkMutable()')
     self.writeLnFmt('self._{0} = {1}',
         field.getName(), self.defaultValueOf(field))
