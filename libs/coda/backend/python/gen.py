@@ -193,7 +193,7 @@ class Python3Generator(genbase.CodeGenerator):
       # Reserved words
       'if', 'else', 'class', 'finally', 'try', 'while', 'for', 'except', 'is', 'in',
       'return', 'break', 'continue',
-      # Built-in types
+      # Built-in types and functions
       'vars', 'iter', 'type', 'id', 'range', 'tuple', 'super',
   ])
 
@@ -278,7 +278,7 @@ class Python3Generator(genbase.CodeGenerator):
       importParts = importParts[1:]
     self.writeLn('try:')
     self.indent()
-    if commonPrefix and importParts[0] not in self.globalNamesUsed and len(importParts) < 2:
+    if commonPrefix and importParts[0] not in self.globalNamesUsed and importParts[0] not in self.RESERVED_WORDS and len(importParts) < 2:
       self.globalNamesUsed.add(importParts[0])
       self.localNames['.'.join(commonPrefix + importParts[0:1])] = importParts[0]
       localName = '.'.join(importParts)

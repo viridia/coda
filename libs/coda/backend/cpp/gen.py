@@ -1,5 +1,3 @@
-__all__ = ['createGenerator']
-
 from coda.compiler import genbase
 from coda import types
 import os
