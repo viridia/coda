@@ -340,11 +340,11 @@ class BinaryDecoder(coda.io.AbstractDecoder):
         value = self.__readVarInt()
         value = self.zigZagDecode(value)
       elif actualType == DataType.FIXED16:
-        value = DataFormat.FIXED16.unpack(self.__readBytes(2))
+        value, = DataFormat.FIXED16.unpack(self.__readBytes(2))
       elif actualType == DataType.FIXED32:
-        value = DataFormat.FIXED16.unpack(self.__readBytes(4))
+        value, = DataFormat.FIXED16.unpack(self.__readBytes(4))
       elif actualType == DataType.FIXED64:
-        value = DataFormat.FIXED16.unpack(self.__readBytes(8))
+        value, = DataFormat.FIXED16.unpack(self.__readBytes(8))
       else:
         assert False
 
@@ -367,9 +367,9 @@ class BinaryDecoder(coda.io.AbstractDecoder):
           'Type error: Expecting {0}, got an integer', expectedType.getName())
     elif actualType in (DataType.FLOAT, DataType.DOUBLE):
       if actualType == DataType.FLOAT:
-        value = DataFormat.FLOAT.unpack(self.__readBytes(4))
+        value, = DataFormat.FLOAT.unpack(self.__readBytes(4))
       else:
-        value = DataFormat.DOUBLE.unpack(self.__readBytes(8))
+        value, = DataFormat.DOUBLE.unpack(self.__readBytes(8))
 
       if expectedKind in (types.TypeKind.FLOAT, types.TypeKind.DOUBLE):
         return value
