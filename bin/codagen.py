@@ -86,6 +86,11 @@ def main(argv=None):
         action='append',
         help="output directory for language LANG", metavar="LANG:DIR")
     parser.add_option(
+        "--headerout",
+        dest="headerout",
+        action='append',
+        help="header output directory for language LANG", metavar="LANG:DIR")
+    parser.add_option(
         "--opt",
         dest="opt",
         action='append',
@@ -119,6 +124,10 @@ def main(argv=None):
         asts.append(ast)
         files[path] = ast
 
+    if not opts.out:
+      sys.stderr.write(program_name + ": No output specified.\n")
+      sys.exit(-1)
+        
     def readImports(file):
       for public, relPath in file.imports:
         importPath = os.path.join(os.path.dirname(file.path), relPath)
@@ -149,6 +158,12 @@ def main(argv=None):
         lang, value = opt.split(':')
         backendOptionMap[lang].parseOptions(value)
 
+    headerDirMap = {}
+    if opts.headerout:
+      for opt in opts.headerout:
+        lang, value = opt.split(':')
+        headerDirMap[lang] = value
+
     # Code Generation phase
     for out in opts.out:
       lang, _, dirpath = out.partition(':')
@@ -168,6 +183,8 @@ def main(argv=None):
           'coda.backend.{0}'.format(lang)).createGenerators(backendOpts)
       for gen in generators:
         gen.setOutputDir(dirpath)
+        if lang in headerDirMap:
+          gen.setHeaderOutputDir(headerDirMap[lang])
         gen.run(fdList)
 
     for lang, backendOpts in backendOptionMap.items():

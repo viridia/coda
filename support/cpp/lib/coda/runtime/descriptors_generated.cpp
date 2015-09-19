@@ -12,7 +12,7 @@ namespace coda {
 namespace descriptors {
 
 coda::descriptors::FieldOptions _options0 = coda::descriptors::freeze(coda::descriptors::FieldOptions().setNullable(true));
-coda::descriptors::FileOptions _options1 = coda::descriptors::freeze(coda::descriptors::FileOptions().putPackage("python", "coda.runtime.descdata").putPackage("java", "coda.descriptors").putPackage("cpp", "coda::descriptors").putOuterClass("java", "Descriptors").putFilepath("cpp", "coda/runtime/descriptors_generated").putImports("cpp", coda::descriptors::StaticListBuilder<std::string>().add("coda/runtime/descriptors_mixin.h").build()));
+coda::descriptors::FileOptions _options1 = coda::descriptors::freeze(coda::descriptors::FileOptions().putPackage("cpp", "coda::descriptors").putPackage("python", "coda.runtime.descdata").putPackage("java", "coda.descriptors").putOuterClass("java", "Descriptors").putFilepath("cpp", "coda/runtime/descriptors_generated").putImports("cpp", coda::descriptors::StaticListBuilder<std::string>().add("coda/runtime/descriptors_mixin.h").build()));
 coda::descriptors::StructOptions _options2 = coda::descriptors::freeze(coda::descriptors::StructOptions().putMixin("python.python3", "coda.runtime.typemixins.BooleanTypeMixin"));
 coda::descriptors::StructOptions _options3 = coda::descriptors::freeze(coda::descriptors::StructOptions().putMixin("python.python3", "coda.runtime.typemixins.BytesTypeMixin"));
 coda::descriptors::StructOptions _options4 = coda::descriptors::freeze(coda::descriptors::StructOptions().putMixin("python.python3", "coda.runtime.typemixins.DeclTypeMixin").putMixin("cpp", "coda::descriptors::DeclTypeMixin"));

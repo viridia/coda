@@ -8,14 +8,19 @@ set(CODA_MAJOR_REVISION 1)
 set(CODA_MINOR_REVISION 0)
 
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake_modules/")
-set(USE_CLANG 1 CACHE BOOL "Whether to use clang to compile C++ files.")
 
 # Macros we'll need
 include(CheckIncludeFile)
 include(CheckIncludeFileCXX)
 include(CheckFunctionExists)
 include(CheckTypeSize)
-#include(FindThreads)
+
+macro(check_required_include_file_cxx INCLUDE VARIABLE)
+  check_include_file_cxx(${INCLUDE} ${VARIABLE} -std=c++11)
+  if(NOT ${VARIABLE})
+    message(FATAL_ERROR "Header '${INCLUDE}' not found.")
+  endif()
+endmacro()
 
 # Check for the existence of include files.
 #check_include_file(assert.h HAVE_ASSERT_H)
@@ -38,11 +43,11 @@ check_include_file(stdint.h CODA_HAVE_STDINT_H)
 #check_include_file(sys/types.h HAVE_SYS_TYPES_H)
 #check_include_file(sys/resource.h HAVE_SYS_RESOURCE_H)
 #check_include_file(libkern/OSAtomic.h HAVE_LIBKERN_OSATOMIC_H)
-check_include_file_cxx(bitset CODA_HAVE_BITSET)
-check_include_file_cxx(functional CODA_HAVE_FUNCTIONAL)
-check_include_file_cxx(functional CODA_HAVE_MEMORY)
-check_include_file_cxx(unordered_map CODA_HAVE_UNORDERED_MAP)
-check_include_file_cxx(unordered_set CODA_HAVE_UNORDERED_SET)
+check_required_include_file_cxx(bitset CODA_HAVE_BITSET)
+check_required_include_file_cxx(functional CODA_HAVE_FUNCTIONAL)
+check_required_include_file_cxx(functional CODA_HAVE_MEMORY)
+check_required_include_file_cxx(unordered_map CODA_HAVE_UNORDERED_MAP)
+check_required_include_file_cxx(unordered_set CODA_HAVE_UNORDERED_SET)
 #check_include_file_cxx(new HAVE_NEW)
 #check_include_file_cxx(ctime HAVE_CTIME)
 #check_include_file_cxx(cxxabi.h HAVE_CXXABI_H)
@@ -60,20 +65,13 @@ check_include_file_cxx(unordered_set CODA_HAVE_UNORDERED_SET)
 #find_program(LLVM_LD llvm-ld PATHS ${LLVM_BIN_DIR})
 #find_program(LLVM_OPT opt PATHS ${LLVM_BIN_DIR})
 #find_program(LLVM_AS llvm-as PATHS ${LLVM_BIN_DIR})
-#find_program(CLANG clang PATHS ${LLVM_BIN_DIR} NO_DEFAULT_PATH)
 find_program(PYTHON3 python3)
-
-# Use clang if it's available
-if (USE_CLANG AND CLANG)
-  set(CMAKE_CXX_COMPILER ${CLANG})
-  set(CMAKE_COMPILER_IS_CLANG true)
-  unset(CMAKE_COMPILER_IS_GNUCXX)
-endif (USE_CLANG AND CLANG)
 
 # Include directory paths
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/support/cpp/include)
 include_directories(${CMAKE_CURRENT_BINARY_DIR}/support/cpp/include)
-include_directories(${gtest_SOURCE_DIR}/include)
+include_directories(third-party/cpp/googletest/googletest/include)
+include_directories(third-party/cpp/googletest/googlemock/include)
 #include_directories(${LLVM_INCLUDE_DIR})
 
 # Definitions needed by LLVM headers
@@ -84,30 +82,31 @@ add_definitions(
 
 # Extra flags for GCC (C++ only)
 if (CMAKE_COMPILER_IS_GNUCXX)
-  add_definitions(
+  set(CMAKE_CXX_FLAGS
       -pipe
-      -Wall -Wextra -Werror -Wcast-align -Wpointer-arith
+      -Wall -Wextra -Werror -Wcast-align -Wpointer-arith -Wno-sign-compare
       -Wno-deprecated -Wno-unused
       -fmessage-length=0
+      -std=c++11
   )
 endif (CMAKE_COMPILER_IS_GNUCXX)
 
 # Extra flags for clang (C++ only)
-if (CMAKE_COMPILER_IS_CLANG)
-  add_definitions(
-      -Wall
-      -Wextra
-      -Werror
-      -Wcast-align
-      -Wpointer-arith
-      -Wno-deprecated
-      -Wno-unused-parameter
-      -fno-rtti
-      -fno-exceptions
-      -fPIC
-  )
+if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+  add_compile_options(
+    -Wall
+    -Wextra
+    -Werror
+    -Wcast-align
+    -Wpointer-arith
+    -Wno-deprecated
+    -Wno-unused-parameter
+    -Wno-sign-compare # googletest won't build without this
+    -fno-rtti
+    -fPIC
+    -std=c++11)
   set(CMAKE_EXE_LINKER_FLAGS -lstdc++)
-endif (CMAKE_COMPILER_IS_CLANG)
+endif ()
 
 # Extra flags for MSVC (C only)
 if (MSVC)
@@ -124,7 +123,7 @@ endif (MSVC)
 
 # Subdirs to compile
 add_subdirectory(support/cpp)
-add_subdirectory(third-party/cpp/gtest-1.7.0)
+add_subdirectory(third-party/cpp)
 add_subdirectory(test/cpp)
 
 add_test(unittest test/cpp/unittest)

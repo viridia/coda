@@ -73,7 +73,7 @@ private:
   bool fieldHeader;
   std::unordered_set<void*> inProgress;
   std::vector<State> states;
-  int32_t maxDepth;
+  size_t maxDepth;
 
   void writeBeginStruct();
   void writeEndStruct();

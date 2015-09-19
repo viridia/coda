@@ -312,8 +312,8 @@ runtime::Object* TextDecoder::readStructFields(const StructDescriptor* expectedT
             "Unknown field '" + fieldName + "' of type " + expectedType->getFullName());
       }
       const Type* fieldType = field->getType();
-      int32_t lineno = tokenLineno;
-      int32_t column = tokenColumn;
+//      int32_t lineno = tokenLineno;
+//      int32_t column = tokenColumn;
       int flags = 0;
       if (field->getOptions()->isNullable()) {
         flags |= TM_NULLABLE;

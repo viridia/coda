@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+HERE=$(dirname $(pwd)/$0)
+LIBS=$(dirname $HERE)/libs:$(dirname $HERE)/third-party/python/ply-3.4
+if [ -n "$PYTHONPATH" ]
+then
+  PYTHONPATH="${PYTHONPATH}:$LIBS"
+else
+  PYTHONPATH="$LIBS"
+fi
+echo $PYTHONPATH
+PYTHONPATH=$PYTHONPATH python3 $HERE/codagen.py $@

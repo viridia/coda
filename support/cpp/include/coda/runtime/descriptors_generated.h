@@ -17,10 +17,10 @@ namespace coda {
 namespace descriptors {
 
 // Forward declarations
-struct EnumType;
-struct ExtensionField;
-struct FileDescriptor;
-struct StructType;
+class EnumType;
+class ExtensionField;
+class FileDescriptor;
+class StructType;
 
 enum TypeKind {
   TYPE_KIND_TYPE = 0,

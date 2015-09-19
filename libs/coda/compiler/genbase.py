@@ -53,7 +53,10 @@ class CodeGenerator(metaclass=ABCMeta):
     self.options = options
 
   def setOutputDir(self, outputDir):
-    self.outputDir = outputDir
+    self.outputDir = self.headerOutputDir = outputDir
+
+  def setHeaderOutputDir(self, outputDir):
+    self.headerOutputDir = outputDir
 
   def run(self, fdList):
     '''Given a list of file descriptors, generate a class for each child
@@ -70,13 +73,16 @@ class CodeGenerator(metaclass=ABCMeta):
     if not fileOptions.package:
       fileOptions.package = self.formatPackage(fd.getPackage())
     self.genFilesForModule(fd, fileOptions)
+    
+  def getFileOutputDir(self):
+    return self.outputDir
 
   def genFilesForModule(self, fd, fileOptions):
     '''Generate the output files for a given input file. The default behavior is to generate
        a single output source file for each input file, however generator classes can override
        this behavior.'''
     path = self.calcSourcePath(fd, fileOptions, None)
-    path = os.path.join(self.outputDir, path)
+    path = os.path.join(self.getFileOutputDir(), path)
     dirname = os.path.dirname(path)
     if not os.path.exists(dirname):
       os.makedirs(dirname)
