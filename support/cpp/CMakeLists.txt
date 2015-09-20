@@ -9,3 +9,4 @@ file(GLOB_RECURSE headers include/*.h)
 file(GLOB_RECURSE sources lib/*.cpp)
 
 add_library(coda_cpp STATIC ${sources} ${headers})
+set_property(TARGET coda_cpp PROPERTY CXX_STANDARD 11)

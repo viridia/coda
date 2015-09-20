@@ -25,8 +25,9 @@ TEST(DescriptorTest, BooleanType) {
   EXPECT_EQ("BooleanType", BooleanType::DESCRIPTOR.getName());
   EXPECT_EQ(coda::descriptors::TYPE_KIND_BOOL, BooleanType::DEFAULT_INSTANCE.typeId());
   EXPECT_EQ(&BooleanType::DESCRIPTOR, BooleanType::DESCRIPTOR.newInstance()->descriptor());
-  EXPECT_EQ(BooleanType::DESCRIPTOR, BooleanType::DESCRIPTOR);
+//  EXPECT_EQ(BooleanType::DESCRIPTOR, BooleanType::DESCRIPTOR);
   EXPECT_FALSE(BooleanType::DESCRIPTOR.isMutable());
+  EXPECT_FALSE(coda::types::Boolean::DESCRIPTOR.isMutable());
   EXPECT_FALSE(BooleanType::DEFAULT_INSTANCE.isMutable());
 
   EXPECT_EQ(BooleanType::DESCRIPTOR.getBaseType(), &Type::DESCRIPTOR);
@@ -128,6 +129,19 @@ TEST(DescriptorTest, IntegerValueEquals) {
   EXPECT_EQ(value0, value1);
   EXPECT_FALSE(value0 == value2);
   EXPECT_TRUE(value0 != value2);
+}
+
+TEST(DescriptorTest, File) {
+  EXPECT_EQ("descriptors.coda", coda::descriptors::FILE.getName());
+  EXPECT_EQ("coda.descriptors", coda::descriptors::FILE.getPackage());
+  EXPECT_EQ("coda::descriptors",
+      coda::descriptors::FILE.getOptions()->getPackage().find("cpp")->second);
+  EXPECT_EQ("coda.runtime.descdata",
+      coda::descriptors::FILE.getOptions()->getPackage().find("python")->second);
+  EXPECT_EQ("coda.descriptors",
+      coda::descriptors::FILE.getOptions()->getPackage().find("java")->second);
+  EXPECT_EQ(28, coda::descriptors::FILE.getStructs().size());
+  EXPECT_EQ(1, coda::descriptors::FILE.getEnums().size());
 }
 
 TEST(DescriptorTest, FileOptions) {

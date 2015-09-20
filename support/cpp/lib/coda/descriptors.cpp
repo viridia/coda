@@ -158,6 +158,42 @@ const FieldDescriptor* StructDescriptor::getField(int32_t fieldId) const {
   return NULL;
 }
 
+void StructDescriptor::freezeLocal() {
+  checkMutable();
+  if (getOptions() != &StructOptions::DEFAULT_INSTANCE) {
+    getMutableOptions()->setImmutable();
+  }
+  for (std::vector<StructType::Field*>::const_iterator it =
+      getMutableFields().begin(), itEnd = getMutableFields().end(); it != itEnd; ++it) {
+    (*it)->setImmutable();
+  }
+  for (std::vector<StructType*>::const_iterator it =
+      getMutableStructs().begin(), itEnd = getMutableStructs().end(); it != itEnd; ++it) {
+    ((StructDescriptor*)(*it))->freezeLocal();
+  }
+  for (std::vector<EnumType*>::const_iterator it =
+      getMutableEnums().begin(), itEnd = getMutableEnums().end(); it != itEnd; ++it) {
+    ((EnumDescriptor*)(*it))->freezeLocal();
+  }
+  defaultInstance->setImmutable();
+  setImmutable();
+//  for (std::vector<ExtensionField*>::const_iterator it = _extensions.begin(), itEnd = _extensions.end(); it != itEnd; ++it) {
+//    (*it)->freeze();
+//  }
+}
+
+void EnumDescriptor::freezeLocal() {
+  checkMutable();
+  if (getOptions() != &EnumOptions::DEFAULT_INSTANCE) {
+    getMutableOptions()->setImmutable();
+  }
+  for (std::vector<EnumType::Value*>::const_iterator it =
+      getMutableValues().begin(), itEnd = getMutableValues().end(); it != itEnd; ++it) {
+    (*it)->setImmutable();
+  }
+  setImmutable();
+}
+
 StaticFileDescriptor::StaticFileDescriptor(
     const char* name,
     const char* package,
@@ -169,8 +205,31 @@ StaticFileDescriptor::StaticFileDescriptor(
   setOptions(&options);
   getMutableStructs().assign(structs.begin(), structs.end());
   getMutableEnums().assign(enums.begin(), enums.end());
-  freeze();
+  freezeLocal();
   runtime::TypeRegistry::getInstance().addFile(this);
+}
+
+void StaticFileDescriptor::freezeLocal() {
+  checkMutable();
+  if (getOptions() != &FileOptions::DEFAULT_INSTANCE) {
+    getMutableOptions()->setImmutable();
+  }
+  for (std::vector<StructType*>::const_iterator it =
+      getMutableStructs().begin(), itEnd = getMutableStructs().end(); it != itEnd; ++it) {
+    ((StructDescriptor*)(*it))->freezeLocal();
+  }
+  for (std::vector<EnumType*>::const_iterator it =
+      getMutableEnums().begin(), itEnd = getMutableEnums().end(); it != itEnd; ++it) {
+    ((EnumDescriptor*)(*it))->freezeLocal();
+  }
+//  for (std::vector<ExtensionField*>::const_iterator it = _extensions.begin(), itEnd = _extensions.end(); it != itEnd; ++it) {
+//    (*it)->freeze();
+//  }
+  for (std::vector<FileDescriptor::Import*>::const_iterator it =
+      getMutableImports().begin(), itEnd = getMutableImports().end(); it != itEnd; ++it) {
+    (*it)->setImmutable();
+  }
+  setImmutable();
 }
 
 void describeType(const Type* type, std::string& out) {

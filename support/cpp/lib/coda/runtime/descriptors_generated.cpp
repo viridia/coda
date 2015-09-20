@@ -13,18 +13,18 @@ namespace descriptors {
 
 coda::descriptors::FieldOptions _options0 = coda::descriptors::freeze(coda::descriptors::FieldOptions().setNullable(true));
 coda::descriptors::FileOptions _options1 = coda::descriptors::freeze(coda::descriptors::FileOptions().putPackage("cpp", "coda::descriptors").putPackage("python", "coda.runtime.descdata").putPackage("java", "coda.descriptors").putOuterClass("java", "Descriptors").putFilepath("cpp", "coda/runtime/descriptors_generated").putImports("cpp", coda::descriptors::StaticListBuilder<std::string>().add("coda/runtime/descriptors_mixin.h").build()));
-coda::descriptors::StructOptions _options2 = coda::descriptors::freeze(coda::descriptors::StructOptions().putMixin("python.python3", "coda.runtime.typemixins.BooleanTypeMixin"));
-coda::descriptors::StructOptions _options3 = coda::descriptors::freeze(coda::descriptors::StructOptions().putMixin("python.python3", "coda.runtime.typemixins.BytesTypeMixin"));
-coda::descriptors::StructOptions _options4 = coda::descriptors::freeze(coda::descriptors::StructOptions().putMixin("python.python3", "coda.runtime.typemixins.DeclTypeMixin").putMixin("cpp", "coda::descriptors::DeclTypeMixin"));
-coda::descriptors::StructOptions _options5 = coda::descriptors::freeze(coda::descriptors::StructOptions().putMixin("python.python3", "coda.runtime.typemixins.DoubleTypeMixin"));
-coda::descriptors::StructOptions _options6 = coda::descriptors::freeze(coda::descriptors::StructOptions().putMixin("python.python3", "coda.runtime.typemixins.FloatTypeMixin"));
-coda::descriptors::StructOptions _options7 = coda::descriptors::freeze(coda::descriptors::StructOptions().putMixin("python.python3", "coda.runtime.typemixins.IntegerTypeMixin"));
-coda::descriptors::StructOptions _options8 = coda::descriptors::freeze(coda::descriptors::StructOptions().putMixin("python.python3", "coda.runtime.typemixins.ListTypeMixin"));
-coda::descriptors::StructOptions _options9 = coda::descriptors::freeze(coda::descriptors::StructOptions().putMixin("python.python3", "coda.runtime.typemixins.MapTypeMixin"));
-coda::descriptors::StructOptions _options10 = coda::descriptors::freeze(coda::descriptors::StructOptions().putMixin("python.python3", "coda.runtime.typemixins.ModifiedTypeMixin"));
-coda::descriptors::StructOptions _options11 = coda::descriptors::freeze(coda::descriptors::StructOptions().putMixin("python.python3", "coda.runtime.typemixins.SetTypeMixin"));
-coda::descriptors::StructOptions _options12 = coda::descriptors::freeze(coda::descriptors::StructOptions().putMixin("python.python3", "coda.runtime.typemixins.StringTypeMixin"));
-coda::descriptors::StructOptions _options13 = coda::descriptors::freeze(coda::descriptors::StructOptions().putMixin("python.python3", "coda.runtime.typemixins.TypeMixin").putMixin("cpp", "coda::descriptors::TypeMixin").setShared(true));
+coda::descriptors::StructOptions _options2 = coda::descriptors::freeze(coda::descriptors::StructOptions().putMixin("cpp", "coda::descriptors::DeclTypeMixin").putMixin("python.python3", "coda.runtime.typemixins.DeclTypeMixin"));
+coda::descriptors::StructOptions _options3 = coda::descriptors::freeze(coda::descriptors::StructOptions().putMixin("cpp", "coda::descriptors::TypeMixin").putMixin("python.python3", "coda.runtime.typemixins.TypeMixin").setShared(true));
+coda::descriptors::StructOptions _options4 = coda::descriptors::freeze(coda::descriptors::StructOptions().putMixin("python.python3", "coda.runtime.typemixins.BooleanTypeMixin"));
+coda::descriptors::StructOptions _options5 = coda::descriptors::freeze(coda::descriptors::StructOptions().putMixin("python.python3", "coda.runtime.typemixins.BytesTypeMixin"));
+coda::descriptors::StructOptions _options6 = coda::descriptors::freeze(coda::descriptors::StructOptions().putMixin("python.python3", "coda.runtime.typemixins.DoubleTypeMixin"));
+coda::descriptors::StructOptions _options7 = coda::descriptors::freeze(coda::descriptors::StructOptions().putMixin("python.python3", "coda.runtime.typemixins.FloatTypeMixin"));
+coda::descriptors::StructOptions _options8 = coda::descriptors::freeze(coda::descriptors::StructOptions().putMixin("python.python3", "coda.runtime.typemixins.IntegerTypeMixin"));
+coda::descriptors::StructOptions _options9 = coda::descriptors::freeze(coda::descriptors::StructOptions().putMixin("python.python3", "coda.runtime.typemixins.ListTypeMixin"));
+coda::descriptors::StructOptions _options10 = coda::descriptors::freeze(coda::descriptors::StructOptions().putMixin("python.python3", "coda.runtime.typemixins.MapTypeMixin"));
+coda::descriptors::StructOptions _options11 = coda::descriptors::freeze(coda::descriptors::StructOptions().putMixin("python.python3", "coda.runtime.typemixins.ModifiedTypeMixin"));
+coda::descriptors::StructOptions _options12 = coda::descriptors::freeze(coda::descriptors::StructOptions().putMixin("python.python3", "coda.runtime.typemixins.SetTypeMixin"));
+coda::descriptors::StructOptions _options13 = coda::descriptors::freeze(coda::descriptors::StructOptions().putMixin("python.python3", "coda.runtime.typemixins.StringTypeMixin"));
 coda::descriptors::StructOptions _options14 = coda::descriptors::freeze(coda::descriptors::StructOptions().setAllowSubtypes(true));
 
 // ============================================================================
@@ -82,6 +82,7 @@ const uint32_t Value::TYPE_ID = 0;
 coda::descriptors::StructDescriptor Value::DESCRIPTOR(
   "Value",
   0,
+  &Value::DEFAULT_INSTANCE,
   FILE,
   NULL,
   NULL,
@@ -113,6 +114,7 @@ const uint32_t BoolValue::TYPE_ID = 1;
 coda::descriptors::StructDescriptor BoolValue::DESCRIPTOR(
   "BoolValue",
   1,
+  &BoolValue::DEFAULT_INSTANCE,
   FILE,
   NULL,
   &Value::DESCRIPTOR,
@@ -170,6 +172,7 @@ const uint32_t IntegerValue::TYPE_ID = 2;
 coda::descriptors::StructDescriptor IntegerValue::DESCRIPTOR(
   "IntegerValue",
   2,
+  &IntegerValue::DEFAULT_INSTANCE,
   FILE,
   NULL,
   &Value::DESCRIPTOR,
@@ -227,6 +230,7 @@ const uint32_t StringValue::TYPE_ID = 3;
 coda::descriptors::StructDescriptor StringValue::DESCRIPTOR(
   "StringValue",
   3,
+  &StringValue::DEFAULT_INSTANCE,
   FILE,
   NULL,
   &Value::DESCRIPTOR,
@@ -284,6 +288,7 @@ const uint32_t ListValue::TYPE_ID = 4;
 coda::descriptors::StructDescriptor ListValue::DESCRIPTOR(
   "ListValue",
   4,
+  &ListValue::DEFAULT_INSTANCE,
   FILE,
   NULL,
   &Value::DESCRIPTOR,
@@ -340,6 +345,7 @@ const uint32_t Options::TYPE_ID = 0;
 coda::descriptors::StructDescriptor Options::DESCRIPTOR(
   "Options",
   0,
+  &Options::DEFAULT_INSTANCE,
   FILE,
   NULL,
   NULL,
@@ -389,6 +395,7 @@ const uint32_t FileOptions::TYPE_ID = 1;
 coda::descriptors::StructDescriptor FileOptions::DESCRIPTOR(
   "FileOptions",
   1,
+  &FileOptions::DEFAULT_INSTANCE,
   FILE,
   NULL,
   &Options::DESCRIPTOR,
@@ -512,6 +519,7 @@ const uint32_t StructOptions::TYPE_ID = 2;
 coda::descriptors::StructDescriptor StructOptions::DESCRIPTOR(
   "StructOptions",
   2,
+  &StructOptions::DEFAULT_INSTANCE,
   FILE,
   NULL,
   &Options::DESCRIPTOR,
@@ -639,6 +647,7 @@ const uint32_t FieldOptions::TYPE_ID = 3;
 coda::descriptors::StructDescriptor FieldOptions::DESCRIPTOR(
   "FieldOptions",
   3,
+  &FieldOptions::DEFAULT_INSTANCE,
   FILE,
   NULL,
   &Options::DESCRIPTOR,
@@ -740,6 +749,7 @@ const uint32_t MethodOptions::TYPE_ID = 4;
 coda::descriptors::StructDescriptor MethodOptions::DESCRIPTOR(
   "MethodOptions",
   4,
+  &MethodOptions::DEFAULT_INSTANCE,
   FILE,
   NULL,
   &Options::DESCRIPTOR,
@@ -787,6 +797,7 @@ const uint32_t EnumOptions::TYPE_ID = 5;
 coda::descriptors::StructDescriptor EnumOptions::DESCRIPTOR(
   "EnumOptions",
   5,
+  &EnumOptions::DEFAULT_INSTANCE,
   FILE,
   NULL,
   &Options::DESCRIPTOR,
@@ -816,10 +827,11 @@ const uint32_t Type::TYPE_ID = 0;
 coda::descriptors::StructDescriptor Type::DESCRIPTOR(
   "Type",
   0,
+  &Type::DEFAULT_INSTANCE,
   FILE,
   NULL,
   NULL,
-  _options13,
+  _options3,
   coda::descriptors::StaticArrayRef<coda::descriptors::StructDescriptor*>(),
   coda::descriptors::StaticArrayRef<coda::descriptors::EnumDescriptor*>(),
   coda::descriptors::StaticArrayRef<coda::descriptors::FieldDescriptor*>(),
@@ -837,10 +849,11 @@ const uint32_t BooleanType::TYPE_ID = 1;
 coda::descriptors::StructDescriptor BooleanType::DESCRIPTOR(
   "BooleanType",
   1,
+  &BooleanType::DEFAULT_INSTANCE,
   FILE,
   NULL,
   &Type::DESCRIPTOR,
-  _options2,
+  _options4,
   coda::descriptors::StaticArrayRef<coda::descriptors::StructDescriptor*>(),
   coda::descriptors::StaticArrayRef<coda::descriptors::EnumDescriptor*>(),
   coda::descriptors::StaticArrayRef<coda::descriptors::FieldDescriptor*>(),
@@ -876,10 +889,11 @@ const uint32_t IntegerType::TYPE_ID = 2;
 coda::descriptors::StructDescriptor IntegerType::DESCRIPTOR(
   "IntegerType",
   2,
+  &IntegerType::DEFAULT_INSTANCE,
   FILE,
   NULL,
   &Type::DESCRIPTOR,
-  _options7,
+  _options8,
   coda::descriptors::StaticArrayRef<coda::descriptors::StructDescriptor*>(),
   coda::descriptors::StaticArrayRef<coda::descriptors::EnumDescriptor*>(),
   IntegerType::Fields,
@@ -923,10 +937,11 @@ const uint32_t FloatType::TYPE_ID = 3;
 coda::descriptors::StructDescriptor FloatType::DESCRIPTOR(
   "FloatType",
   3,
+  &FloatType::DEFAULT_INSTANCE,
   FILE,
   NULL,
   &Type::DESCRIPTOR,
-  _options6,
+  _options7,
   coda::descriptors::StaticArrayRef<coda::descriptors::StructDescriptor*>(),
   coda::descriptors::StaticArrayRef<coda::descriptors::EnumDescriptor*>(),
   coda::descriptors::StaticArrayRef<coda::descriptors::FieldDescriptor*>(),
@@ -952,10 +967,11 @@ const uint32_t DoubleType::TYPE_ID = 4;
 coda::descriptors::StructDescriptor DoubleType::DESCRIPTOR(
   "DoubleType",
   4,
+  &DoubleType::DEFAULT_INSTANCE,
   FILE,
   NULL,
   &Type::DESCRIPTOR,
-  _options5,
+  _options6,
   coda::descriptors::StaticArrayRef<coda::descriptors::StructDescriptor*>(),
   coda::descriptors::StaticArrayRef<coda::descriptors::EnumDescriptor*>(),
   coda::descriptors::StaticArrayRef<coda::descriptors::FieldDescriptor*>(),
@@ -981,10 +997,11 @@ const uint32_t StringType::TYPE_ID = 5;
 coda::descriptors::StructDescriptor StringType::DESCRIPTOR(
   "StringType",
   5,
+  &StringType::DEFAULT_INSTANCE,
   FILE,
   NULL,
   &Type::DESCRIPTOR,
-  _options12,
+  _options13,
   coda::descriptors::StaticArrayRef<coda::descriptors::StructDescriptor*>(),
   coda::descriptors::StaticArrayRef<coda::descriptors::EnumDescriptor*>(),
   coda::descriptors::StaticArrayRef<coda::descriptors::FieldDescriptor*>(),
@@ -1010,10 +1027,11 @@ const uint32_t BytesType::TYPE_ID = 6;
 coda::descriptors::StructDescriptor BytesType::DESCRIPTOR(
   "BytesType",
   6,
+  &BytesType::DEFAULT_INSTANCE,
   FILE,
   NULL,
   &Type::DESCRIPTOR,
-  _options3,
+  _options5,
   coda::descriptors::StaticArrayRef<coda::descriptors::StructDescriptor*>(),
   coda::descriptors::StaticArrayRef<coda::descriptors::EnumDescriptor*>(),
   coda::descriptors::StaticArrayRef<coda::descriptors::FieldDescriptor*>(),
@@ -1039,6 +1057,7 @@ const uint32_t CollectionType::TYPE_ID = 40;
 coda::descriptors::StructDescriptor CollectionType::DESCRIPTOR(
   "CollectionType",
   40,
+  &CollectionType::DEFAULT_INSTANCE,
   FILE,
   NULL,
   &Type::DESCRIPTOR,
@@ -1078,10 +1097,11 @@ const uint32_t ListType::TYPE_ID = 20;
 coda::descriptors::StructDescriptor ListType::DESCRIPTOR(
   "ListType",
   20,
+  &ListType::DEFAULT_INSTANCE,
   FILE,
   NULL,
   &CollectionType::DESCRIPTOR,
-  _options8,
+  _options9,
   coda::descriptors::StaticArrayRef<coda::descriptors::StructDescriptor*>(),
   coda::descriptors::StaticArrayRef<coda::descriptors::EnumDescriptor*>(),
   ListType::Fields,
@@ -1143,10 +1163,11 @@ const uint32_t SetType::TYPE_ID = 21;
 coda::descriptors::StructDescriptor SetType::DESCRIPTOR(
   "SetType",
   21,
+  &SetType::DEFAULT_INSTANCE,
   FILE,
   NULL,
   &CollectionType::DESCRIPTOR,
-  _options11,
+  _options12,
   coda::descriptors::StaticArrayRef<coda::descriptors::StructDescriptor*>(),
   coda::descriptors::StaticArrayRef<coda::descriptors::EnumDescriptor*>(),
   SetType::Fields,
@@ -1214,10 +1235,11 @@ const uint32_t MapType::TYPE_ID = 22;
 coda::descriptors::StructDescriptor MapType::DESCRIPTOR(
   "MapType",
   22,
+  &MapType::DEFAULT_INSTANCE,
   FILE,
   NULL,
   &CollectionType::DESCRIPTOR,
-  _options9,
+  _options10,
   coda::descriptors::StaticArrayRef<coda::descriptors::StructDescriptor*>(),
   coda::descriptors::StaticArrayRef<coda::descriptors::EnumDescriptor*>(),
   MapType::Fields,
@@ -1301,10 +1323,11 @@ const uint32_t ModifiedType::TYPE_ID = 23;
 coda::descriptors::StructDescriptor ModifiedType::DESCRIPTOR(
   "ModifiedType",
   23,
+  &ModifiedType::DEFAULT_INSTANCE,
   FILE,
   NULL,
   &Type::DESCRIPTOR,
-  _options10,
+  _options11,
   coda::descriptors::StaticArrayRef<coda::descriptors::StructDescriptor*>(),
   coda::descriptors::StaticArrayRef<coda::descriptors::EnumDescriptor*>(),
   ModifiedType::Fields,
@@ -1398,10 +1421,11 @@ const uint32_t DeclType::TYPE_ID = 41;
 coda::descriptors::StructDescriptor DeclType::DESCRIPTOR(
   "DeclType",
   41,
+  &DeclType::DEFAULT_INSTANCE,
   FILE,
   NULL,
   &Type::DESCRIPTOR,
-  _options4,
+  _options2,
   coda::descriptors::StaticArrayRef<coda::descriptors::StructDescriptor*>(),
   coda::descriptors::StaticArrayRef<coda::descriptors::EnumDescriptor*>(),
   DeclType::Fields,
@@ -1533,6 +1557,7 @@ const uint32_t StructType::TYPE_ID = 30;
 coda::descriptors::StructDescriptor StructType::DESCRIPTOR(
   "StructType",
   30,
+  &StructType::DEFAULT_INSTANCE,
   FILE,
   NULL,
   &DeclType::DESCRIPTOR,
@@ -1582,6 +1607,7 @@ const uint32_t StructType::Field::TYPE_ID = 0;
 coda::descriptors::StructDescriptor StructType::Field::DESCRIPTOR(
   "StructType::Field",
   0,
+  &StructType::Field::DEFAULT_INSTANCE,
   FILE,
   &StructType::DESCRIPTOR,
   NULL,
@@ -1671,6 +1697,7 @@ const uint32_t StructType::Param::TYPE_ID = 0;
 coda::descriptors::StructDescriptor StructType::Param::DESCRIPTOR(
   "StructType::Param",
   0,
+  &StructType::Param::DEFAULT_INSTANCE,
   FILE,
   &StructType::DESCRIPTOR,
   NULL,
@@ -1761,6 +1788,7 @@ const uint32_t StructType::Method::TYPE_ID = 0;
 coda::descriptors::StructDescriptor StructType::Method::DESCRIPTOR(
   "StructType::Method",
   0,
+  &StructType::Method::DEFAULT_INSTANCE,
   FILE,
   &StructType::DESCRIPTOR,
   NULL,
@@ -1997,6 +2025,7 @@ const uint32_t EnumType::TYPE_ID = 31;
 coda::descriptors::StructDescriptor EnumType::DESCRIPTOR(
   "EnumType",
   31,
+  &EnumType::DEFAULT_INSTANCE,
   FILE,
   NULL,
   &DeclType::DESCRIPTOR,
@@ -2034,6 +2063,7 @@ const uint32_t EnumType::Value::TYPE_ID = 0;
 coda::descriptors::StructDescriptor EnumType::Value::DESCRIPTOR(
   "EnumType::Value",
   0,
+  &EnumType::Value::DEFAULT_INSTANCE,
   FILE,
   &EnumType::DESCRIPTOR,
   NULL,
@@ -2180,6 +2210,7 @@ const uint32_t ExtensionField::TYPE_ID = 0;
 coda::descriptors::StructDescriptor ExtensionField::DESCRIPTOR(
   "ExtensionField",
   0,
+  &ExtensionField::DEFAULT_INSTANCE,
   FILE,
   NULL,
   NULL,
@@ -2336,6 +2367,7 @@ const uint32_t FileDescriptor::TYPE_ID = 0;
 coda::descriptors::StructDescriptor FileDescriptor::DESCRIPTOR(
   "FileDescriptor",
   0,
+  &FileDescriptor::DEFAULT_INSTANCE,
   FILE,
   NULL,
   NULL,
@@ -2373,6 +2405,7 @@ const uint32_t FileDescriptor::Import::TYPE_ID = 0;
 coda::descriptors::StructDescriptor FileDescriptor::Import::DESCRIPTOR(
   "FileDescriptor::Import",
   0,
+  &FileDescriptor::Import::DEFAULT_INSTANCE,
   FILE,
   &FileDescriptor::DESCRIPTOR,
   NULL,

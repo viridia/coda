@@ -84,6 +84,9 @@ public:
       FileOptions& options,
       StaticArrayRef<StructDescriptor*> structs,
       StaticArrayRef<EnumDescriptor*> enums);
+
+private:
+  void freezeLocal();
 };
 
 // ============================================================================

@@ -897,6 +897,7 @@ class CppGenerator(AbstractCppGenerator):
     self.indent()
     self.writeLnFmt('"{0}",', structQualName)
     self.writeLnFmt('{0},', struct.getTypeId())
+    self.writeLnFmt('&{0}::DEFAULT_INSTANCE,', getQualName(struct))
     self.writeLn('FILE,')
     if struct.getEnclosingType():
       self.writeLnFmt('&{0}::DESCRIPTOR,', getQualName(struct.getEnclosingType()))

@@ -73,11 +73,12 @@ private:
 
 class StructDescriptor : public StructType {
 public:
-  StructDescriptor() : create(NULL) {}
+  StructDescriptor() : defaultInstance(NULL), create(NULL) {}
 
   StructDescriptor(
       const char* name,
       uint32_t typeId,
+      runtime::Object* staticDefaultInstance,
       FileDescriptor& file,
       StructDescriptor* enclosingType,
       StructDescriptor* baseType,
@@ -86,7 +87,8 @@ public:
       StaticArrayRef<EnumDescriptor*> enums,
       StaticArrayRef<FieldDescriptor*> fields,
       runtime::Object* (*createFn)())
-    : create(createFn)
+    : defaultInstance(staticDefaultInstance)
+    , create(createFn)
   {
     setName(name);
     setTypeId((uint32_t) typeId);
@@ -106,12 +108,21 @@ public:
   /** Lookup a field by id. Only looks at fields defined in this type, not inherited fields. */
   const FieldDescriptor* getField(int32_t fieldId) const;
 
+  /** The default instance for a struct type. */
+  const runtime::Object* getDefaultInstance() const { return defaultInstance; }
+
   runtime::Object* newInstance() const {
     return (*create)();
   }
 
 private:
+  friend class coda::descriptors::StaticFileDescriptor;
+
+  runtime::Object* defaultInstance;
   runtime::Object* (*create)();
+
+  // Only freeze objects known to be defined in the same file.
+  void freezeLocal();
 
   void buildFieldMaps();
 
@@ -145,6 +156,13 @@ public:
     setOptions(&options);
     getMutableValues().assign(values.begin(), values.end());
   }
+
+private:
+  friend class coda::descriptors::StructDescriptor;
+  friend class coda::descriptors::StaticFileDescriptor;
+
+  // Only freeze objects known to be defined in the same file.
+  void freezeLocal();
 };
 
 // ============================================================================

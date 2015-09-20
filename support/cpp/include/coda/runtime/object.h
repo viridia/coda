@@ -137,6 +137,15 @@ protected:
     assert False and 'Implement'
  */
 private:
+  friend class coda::descriptors::StructDescriptor;
+  friend class coda::descriptors::EnumDescriptor;
+  friend class coda::descriptors::StaticFileDescriptor;
+
+  /** Make only this object immutable. */
+  void setImmutable() {
+    _mutable = false;
+  }
+
   bool _mutable;
 };
 

@@ -3,9 +3,8 @@ HERE=$(dirname $(pwd)/$0)
 LIBS=$(dirname $HERE)/libs:$(dirname $HERE)/third-party/python/ply-3.4
 if [ -n "$PYTHONPATH" ]
 then
-  PYTHONPATH="${PYTHONPATH}:$LIBS"
+  LIBPATH="${PYTHONPATH}:$LIBS"
 else
-  PYTHONPATH="$LIBS"
+  LIBPATH="$LIBS"
 fi
-echo $PYTHONPATH
-PYTHONPATH=$PYTHONPATH python3 $HERE/codagen.py $@
+PYTHONPATH=$LIBPATH python3 $HERE/codagen.py $@

@@ -15,6 +15,7 @@ include(CheckIncludeFileCXX)
 include(CheckFunctionExists)
 include(CheckTypeSize)
 
+# Report an error if a required header file is not found.
 macro(check_required_include_file_cxx INCLUDE VARIABLE)
   check_include_file_cxx(${INCLUDE} ${VARIABLE} -std=c++11)
   if(NOT ${VARIABLE})
