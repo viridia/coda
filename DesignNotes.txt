@@ -15,8 +15,10 @@
 
 Command to create eclipse project:
 
-   cmake -G "Eclipse CDT4 - Ninja" -D CMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER_ARG1=-std=c++11\;-stdlib=libc++ -D_ECLIPSE_VERSION=4.3 ../src
-   
+   cmake -G "Eclipse CDT4 - Ninja" -D CMAKE_BUILD_TYPE=Debug -D CMAKE_ECLIPSE_GENERATE_SOURCE_PROJECT=TRUE -D _ECLIPSE_VERSION=4.3 ../src
+
+   -DCMAKE_CXX_COMPILER_ARG1=-std=c++11\;-stdlib=libc++   
+
 Command to regenerate C++ descriptor files:
 
    bin/codagen data/descriptors.coda -o cpp:support/cpp/lib/ --headerout cpp:support/cpp/include/
