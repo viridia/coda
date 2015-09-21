@@ -2,4 +2,5 @@ parser.out
 tmp/
 .DS_Store
 *.pyc
+.project
 
