@@ -25,16 +25,29 @@ class TextEncoder(coda.io.AbstractEncoder):
     self.__subtypeName = None
     self.__subtypeId = None
 
+  def fileBegin(self):
+    pass
+
+  def fileEnd(self):
+    if self.__state == self.State.SUBTYPE:
+      self.__stream.write("}")
+      self.__indentLevel -= 2
+    self.__state = self.State.CLEAR
+
   def writeSubtypeHeader(self, name, sid):
     self.__subtypeName = name
     self.__subtypeId = sid
-    if self.__state == self.State.STRUCT:
+    # Always write the outermost subtype header.
+    # Omit enclosed subtype headers which have no fields.
+    if self.__state in (self.State.STRUCT, self.State.CLEAR):
       self.__beginSubtype()
     self.__state = self.State.SUBTYPE
 
   def writeFieldHeader(self, name, fid):
     assert not self.__fieldHeader
     assert self.__state in (self.State.CLEAR, self.State.STRUCT, self.State.SUBTYPE)
+    # If this field is inside a subtype whose header has not yet been written, then
+    # write the subtype header before writing the field.
     if self.__subtypeId is not None:
       self.__beginSubtype()
     if not self.__first:
@@ -175,10 +188,10 @@ class TextEncoder(coda.io.AbstractEncoder):
             value.descriptor().getFullName())
       self.__inProgress.add(sid)
       index = self.getShared(value)
-      if index:
-        self.__stream.write("#{0} ".format(index))
       self.__writeBeginStruct()
-      value.write(self)
+      if index:
+        self.__stream.write(" #{0}".format(index))
+      value.writeFields(self)
       self.__writeEndStruct()
       self.__inProgress.remove(sid)
     assert stackLen == len(self.__states)
@@ -218,13 +231,14 @@ class TextEncoder(coda.io.AbstractEncoder):
     self.__stream.write("}")
     self.__state = self.__states.pop()
     self.__first = False
+    self.__subtypeId = None
     return self
 
   def __indent(self):
     self.__stream.write(' ' * self.__indentLevel)
 
   def __beginSubtype(self):
-    assert self.__state in (self.State.STRUCT, self.State.SUBTYPE)
+    assert self.__state in (self.State.STRUCT, self.State.SUBTYPE, self.State.CLEAR)
     if self.__state == self.State.SUBTYPE:
       self.__stream.write("}")
       self.__indentLevel -= 2
@@ -435,7 +449,7 @@ class TextDecoder(coda.io.AbstractDecoder):
 
   tokens = Lexer.tokens
 
-  def read(self, cls):
+  def decode(self, cls):
     assert cls.DESCRIPTOR, 'Missing descriptor for class ' + cls.__name__
     self.__descriptor = self.__getBase(cls.DESCRIPTOR)
     return self.__readStructFields()
@@ -618,14 +632,14 @@ class TextDecoder(coda.io.AbstractDecoder):
           self.fatal(self.__token.lineno, "'{{' expected")
         base = self.__getBase(self.__descriptor)
         subtype = self.__typeRegistry.getSubtype(base, typeid)
-        if subtype:
+        if subtype is not None:
           self.__states.append(self.__descriptor)
           self.__descriptor = subtype
         else:
           # TODO: Create the instance with the descriptor we know, and
           # Store subtype fields in extension field 0
-          print('No subtype id {0} found for base type {1}', typeid,
-              self.__descriptor.getName())
+          print('No subtype id {0} found for base type {1}'.format(typeid,
+              self.__descriptor.getName()))
           self.pushState(None)
           assert False, 'Implement unknown subtypes'
         self.__readStructFields()

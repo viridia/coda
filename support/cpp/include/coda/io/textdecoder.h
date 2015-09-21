@@ -33,15 +33,14 @@ public:
   TextDecoder(std::istream& strm, runtime::TypeRegistry* typeRegistry, const std::string& srcPath)
     : AbstractDecoder(typeRegistry)
     , strm(strm)
+    , instance(NULL)
     , lineno(1)
     , column(1)
     , sourcePath(srcPath)
-    , token(TOKEN_END)
+    , token(TOKEN_UNSET)
     , tokenLineno(1)
     , tokenColumn(1)
   {
-    readch();
-    next();
   }
 
   runtime::Object* readObject(const coda::descriptors::StructDescriptor* descriptor);
@@ -49,6 +48,7 @@ public:
 private:
   enum Token {
     TOKEN_END = 0,
+    TOKEN_UNSET,
     TOKEN_COLON,
     TOKEN_COMMA,
     TOKEN_DOT,

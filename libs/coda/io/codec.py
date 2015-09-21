@@ -19,6 +19,16 @@ class Encoder(metaclass=ABCMeta):
     return self
 
   @abstractmethod
+  def fileBegin(self):
+    raise NotImplementedError()
+    return self
+
+  @abstractmethod
+  def fileEnd(self):
+    raise NotImplementedError()
+    return self
+
+  @abstractmethod
   def writeSubtypeHeader(self, name, sid):
     raise NotImplementedError()
     return self
@@ -115,7 +125,7 @@ class Encoder(metaclass=ABCMeta):
 
 class Decoder(metaclass=ABCMeta):
   @abstractmethod
-  def read(self, cls):
+  def decode(self, cls):
     raise NotImplementedError()
     pass
 

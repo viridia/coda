@@ -42,6 +42,10 @@ bool isHexDigitChar(char ch) {
 using namespace coda::descriptors;
 
 runtime::Object* TextDecoder::readObject(const StructDescriptor* desc) {
+  if (token == TOKEN_UNSET) {
+    readch();
+    next();
+  }
   return readStructFields(desc, 0);
 }
 
@@ -390,7 +394,7 @@ runtime::Object* TextDecoder::readStructFields(const StructDescriptor* expectedT
 }
 
 void TextDecoder::readch() {
-  std::cerr << "[" << ch << "]";
+//  std::cerr << "[" << ch << "]";
   ch = strm.get();
   ++column;
 }
@@ -398,7 +402,7 @@ void TextDecoder::readch() {
 void TextDecoder::newline() {
   lineno += 1;
   column = 1;
-  std::cerr << " nl " << lineno << ":" << column << "\n";
+//  std::cerr << " nl " << lineno << ":" << column << "\n";
 }
 
 void TextDecoder::next() {
@@ -436,7 +440,7 @@ void TextDecoder::next() {
   tokenValue.clear();
   tokenLineno = lineno;
   tokenColumn = column;
-  std::cerr << " tk " << lineno << ":" << column << "\n";
+//  std::cerr << " tk " << lineno << ":" << column << "\n";
 
   // Identifier
   if (isNameStartChar(ch)) {

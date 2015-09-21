@@ -130,3 +130,6 @@ add_subdirectory(test/cpp)
 add_test(unittest test/cpp/unittest)
 
 #add_subdirectory(doc/api)
+
+# Make sure we don't destroy PyDev nature.
+set_property(GLOBAL APPEND PROPERTY ECLIPSE_EXTRA_NATURES "org.python.pydev.pythonNature")

@@ -1,6 +1,6 @@
 '''Unit tests for CODA object class'''
 import unittest
-from coda import types
+from coda import types, descriptors
 
 class TextCodecTest(unittest.TestCase):
   def testBooleanType(self):
@@ -24,3 +24,8 @@ class TextCodecTest(unittest.TestCase):
     self.assertFalse(ty.isAssignable(1.0))
     self.assertFalse(ty.isAssignable([]))
     self.assertTrue(ty.isAssignable({}))
+
+  def testStructType(self):
+    self.assertEquals("StructType", descriptors.StructType.DESCRIPTOR.getName())
+    newStruct = descriptors.StructType.newInstance()
+    self.assertIsInstance(newStruct, descriptors.StructType)

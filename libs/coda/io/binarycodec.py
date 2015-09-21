@@ -92,8 +92,14 @@ class BinaryEncoder(coda.io.AbstractEncoder):
     self.__fieldHeader = False
     self.__inProgress = set()
 
+  def fileBegin(self):
+    self.__state = self.State.STRUCT
+
+  def fileEnd(self):
+    pass
+
   def writeSubtypeHeader(self, name, sid):
-    assert self.__state in (self.State.STRUCT, self.State.SUBTYPE)
+    assert self.__state in (self.State.STRUCT, self.State.SUBTYPE, self.State.CLEAR)
     self.__subtypeId = sid
     if self.__state == self.State.STRUCT:
       self.__beginSubtype()
@@ -211,7 +217,7 @@ class BinaryEncoder(coda.io.AbstractEncoder):
       savedFieldId = self.__lastFieldId
       self.__lastFieldId = 0
       self.__state = self.State.STRUCT
-      value.write(self)
+      value.writeFields(self)
       self.__writeUByte(DataType.END)
       self.__subtypeId = None
       self.__state = savedState
@@ -303,7 +309,7 @@ class BinaryDecoder(coda.io.AbstractDecoder):
   def atEof(self):
     return self.__atEof
 
-  def read(self, cls):
+  def decode(self, cls):
     if self.__atEof is None:
       return None
     assert cls.DESCRIPTOR, 'Missing descriptor for class ' + cls.__name__
@@ -498,7 +504,7 @@ class BinaryDecoder(coda.io.AbstractDecoder):
       dataType = self.__readFieldHeader()
       if dataType is None:
         if first:
-          return None
+          return self.__instance
         else:
           self.fatal(self.__lastReadPos,
               'Unexpected end of file while reading struct: {0}', expectedType.getName())

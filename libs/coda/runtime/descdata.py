@@ -41,9 +41,8 @@ class Value(coda.runtime.Object):
   def __init__(self):
     super().__init__()
 
-  def _writeFields(self, encoder, top=True):
-    if top:
-      encoder.writeBeginSubtype('Value', 0)
+  def _writeFields(self, encoder):
+    encoder.writeSubtypeHeader('Value', 0)
 
 # =============================================================================
 # BoolValue
@@ -74,12 +73,12 @@ class BoolValue(Value):
     return hash((super()._hashImpl(),
       self._value))
 
-  def _writeFields(self, encoder, top=True):
-    encoder.writeBeginSubtype('BoolValue', 1)
+  def _writeFields(self, encoder):
+    encoder.writeSubtypeHeader('BoolValue', 1)
     if self.hasValue():
       encoder.writeFieldHeader('value', 1)
       encoder.writeBoolean(self._value)
-    super()._writeFields(encoder, False)
+    super()._writeFields(encoder)
 
   def merge(self, src):
     super().merge(src)
@@ -134,12 +133,12 @@ class IntegerValue(Value):
     return hash((super()._hashImpl(),
       self._value))
 
-  def _writeFields(self, encoder, top=True):
-    encoder.writeBeginSubtype('IntegerValue', 2)
+  def _writeFields(self, encoder):
+    encoder.writeSubtypeHeader('IntegerValue', 2)
     if self.hasValue():
       encoder.writeFieldHeader('value', 1)
       encoder.writeInteger(self._value)
-    super()._writeFields(encoder, False)
+    super()._writeFields(encoder)
 
   def merge(self, src):
     super().merge(src)
@@ -194,12 +193,12 @@ class StringValue(Value):
     return hash((super()._hashImpl(),
       self._value))
 
-  def _writeFields(self, encoder, top=True):
-    encoder.writeBeginSubtype('StringValue', 3)
+  def _writeFields(self, encoder):
+    encoder.writeSubtypeHeader('StringValue', 3)
     if self.hasValue():
       encoder.writeFieldHeader('value', 1)
       encoder.writeString(self._value)
-    super()._writeFields(encoder, False)
+    super()._writeFields(encoder)
 
   def merge(self, src):
     super().merge(src)
@@ -259,15 +258,15 @@ class ListValue(Value):
     if type(self._value) is not tuple:
       self._value = tuple(self._value)
 
-  def _writeFields(self, encoder, top=True):
-    encoder.writeBeginSubtype('ListValue', 4)
+  def _writeFields(self, encoder):
+    encoder.writeSubtypeHeader('ListValue', 4)
     if len(self._value):
       encoder.writeFieldHeader('value', 1)
       encoder.writeBeginList(30, len(self._value))
       for val in self._value:
         encoder.writeStruct(val)
       encoder.writeEndList()
-    super()._writeFields(encoder, False)
+    super()._writeFields(encoder)
 
   def merge(self, src):
     super().merge(src)
@@ -308,9 +307,8 @@ class Options(coda.runtime.Object):
   def __init__(self):
     super().__init__()
 
-  def _writeFields(self, encoder, top=True):
-    if top:
-      encoder.writeBeginSubtype('Options', 0)
+  def _writeFields(self, encoder):
+    encoder.writeSubtypeHeader('Options', 0)
 
 # =============================================================================
 # FileOptions
@@ -367,8 +365,8 @@ class FileOptions(Options):
     if type(self._imports) is not coda.runtime.FrozenDict:
       self._imports = coda.runtime.FrozenDict(self._imports)
 
-  def _writeFields(self, encoder, top=True):
-    encoder.writeBeginSubtype('FileOptions', 1)
+  def _writeFields(self, encoder):
+    encoder.writeSubtypeHeader('FileOptions', 1)
     if len(self._package):
       encoder.writeFieldHeader('package', 1)
       encoder.writeBeginMap(5, 5, len(self._package))
@@ -400,7 +398,7 @@ class FileOptions(Options):
           encoder.writeString(val)
         encoder.writeEndList()
       encoder.writeEndMap()
-    super()._writeFields(encoder, False)
+    super()._writeFields(encoder)
 
   def merge(self, src):
     super().merge(src)
@@ -542,8 +540,8 @@ class StructOptions(Options):
     if type(self._mixin) is not coda.runtime.FrozenDict:
       self._mixin = coda.runtime.FrozenDict(self._mixin)
 
-  def _writeFields(self, encoder, top=True):
-    encoder.writeBeginSubtype('StructOptions', 2)
+  def _writeFields(self, encoder):
+    encoder.writeSubtypeHeader('StructOptions', 2)
     if self.hasAllowSubtypes():
       encoder.writeFieldHeader('allowSubtypes', 1)
       encoder.writeBoolean(self._allowSubtypes)
@@ -567,7 +565,7 @@ class StructOptions(Options):
     if self.hasShared():
       encoder.writeFieldHeader('shared', 5)
       encoder.writeBoolean(self._shared)
-    super()._writeFields(encoder, False)
+    super()._writeFields(encoder)
 
   def merge(self, src):
     super().merge(src)
@@ -739,8 +737,8 @@ class FieldOptions(Options):
     if deep and self._default and self._default.isMutable():
       self._default.freeze(deep)
 
-  def _writeFields(self, encoder, top=True):
-    encoder.writeBeginSubtype('FieldOptions', 3)
+  def _writeFields(self, encoder):
+    encoder.writeSubtypeHeader('FieldOptions', 3)
     if self.hasNullable():
       encoder.writeFieldHeader('nullable', 1)
       encoder.writeBoolean(self._nullable)
@@ -766,7 +764,7 @@ class FieldOptions(Options):
     if self.hasNovisit():
       encoder.writeFieldHeader('novisit', 8)
       encoder.writeBoolean(self._novisit)
-    super()._writeFields(encoder, False)
+    super()._writeFields(encoder)
 
   def merge(self, src):
     super().merge(src)
@@ -948,12 +946,12 @@ class MethodOptions(Options):
     return hash((super()._hashImpl(),
       self._const))
 
-  def _writeFields(self, encoder, top=True):
-    encoder.writeBeginSubtype('MethodOptions', 4)
+  def _writeFields(self, encoder):
+    encoder.writeSubtypeHeader('MethodOptions', 4)
     if self.hasConst():
       encoder.writeFieldHeader('const', 4)
       encoder.writeBoolean(self._const)
-    super()._writeFields(encoder, False)
+    super()._writeFields(encoder)
 
   def merge(self, src):
     super().merge(src)
@@ -993,10 +991,9 @@ class EnumOptions(Options):
   def __init__(self):
     super().__init__()
 
-  def _writeFields(self, encoder, top=True):
-    if top:
-      encoder.writeBeginSubtype('EnumOptions', 5)
-    super()._writeFields(encoder, False)
+  def _writeFields(self, encoder):
+    encoder.writeSubtypeHeader('EnumOptions', 5)
+    super()._writeFields(encoder)
 
 # =============================================================================
 # Type
@@ -1013,9 +1010,8 @@ class Type(coda.runtime.Object, coda.runtime.typemixins.TypeMixin):
   def __init__(self):
     super().__init__()
 
-  def _writeFields(self, encoder, top=True):
-    if top:
-      encoder.writeBeginSubtype('Type', 0)
+  def _writeFields(self, encoder):
+    encoder.writeSubtypeHeader('Type', 0)
 
 # =============================================================================
 # BooleanType
@@ -1032,10 +1028,9 @@ class BooleanType(Type, coda.runtime.typemixins.BooleanTypeMixin):
   def __init__(self):
     super().__init__()
 
-  def _writeFields(self, encoder, top=True):
-    if top:
-      encoder.writeBeginSubtype('BooleanType', 1)
-    super()._writeFields(encoder, False)
+  def _writeFields(self, encoder):
+    encoder.writeSubtypeHeader('BooleanType', 1)
+    super()._writeFields(encoder)
 
 # =============================================================================
 # IntegerType
@@ -1067,12 +1062,12 @@ class IntegerType(Type, coda.runtime.typemixins.IntegerTypeMixin):
     return hash((super()._hashImpl(),
       self._bits))
 
-  def _writeFields(self, encoder, top=True):
-    encoder.writeBeginSubtype('IntegerType', 2)
+  def _writeFields(self, encoder):
+    encoder.writeSubtypeHeader('IntegerType', 2)
     if self.hasBits():
       encoder.writeFieldHeader('bits', 1)
       encoder.writeInteger(self._bits)
-    super()._writeFields(encoder, False)
+    super()._writeFields(encoder)
 
   def merge(self, src):
     super().merge(src)
@@ -1113,10 +1108,9 @@ class FloatType(Type, coda.runtime.typemixins.FloatTypeMixin):
   def __init__(self):
     super().__init__()
 
-  def _writeFields(self, encoder, top=True):
-    if top:
-      encoder.writeBeginSubtype('FloatType', 3)
-    super()._writeFields(encoder, False)
+  def _writeFields(self, encoder):
+    encoder.writeSubtypeHeader('FloatType', 3)
+    super()._writeFields(encoder)
 
 # =============================================================================
 # DoubleType
@@ -1133,10 +1127,9 @@ class DoubleType(Type, coda.runtime.typemixins.DoubleTypeMixin):
   def __init__(self):
     super().__init__()
 
-  def _writeFields(self, encoder, top=True):
-    if top:
-      encoder.writeBeginSubtype('DoubleType', 4)
-    super()._writeFields(encoder, False)
+  def _writeFields(self, encoder):
+    encoder.writeSubtypeHeader('DoubleType', 4)
+    super()._writeFields(encoder)
 
 # =============================================================================
 # StringType
@@ -1153,10 +1146,9 @@ class StringType(Type, coda.runtime.typemixins.StringTypeMixin):
   def __init__(self):
     super().__init__()
 
-  def _writeFields(self, encoder, top=True):
-    if top:
-      encoder.writeBeginSubtype('StringType', 5)
-    super()._writeFields(encoder, False)
+  def _writeFields(self, encoder):
+    encoder.writeSubtypeHeader('StringType', 5)
+    super()._writeFields(encoder)
 
 # =============================================================================
 # BytesType
@@ -1173,10 +1165,9 @@ class BytesType(Type, coda.runtime.typemixins.BytesTypeMixin):
   def __init__(self):
     super().__init__()
 
-  def _writeFields(self, encoder, top=True):
-    if top:
-      encoder.writeBeginSubtype('BytesType', 6)
-    super()._writeFields(encoder, False)
+  def _writeFields(self, encoder):
+    encoder.writeSubtypeHeader('BytesType', 6)
+    super()._writeFields(encoder)
 
 # =============================================================================
 # CollectionType
@@ -1192,10 +1183,9 @@ class CollectionType(Type):
   def __init__(self):
     super().__init__()
 
-  def _writeFields(self, encoder, top=True):
-    if top:
-      encoder.writeBeginSubtype('CollectionType', 40)
-    super()._writeFields(encoder, False)
+  def _writeFields(self, encoder):
+    encoder.writeSubtypeHeader('CollectionType', 40)
+    super()._writeFields(encoder)
 
 # =============================================================================
 # ListType
@@ -1232,12 +1222,12 @@ class ListType(CollectionType, coda.runtime.typemixins.ListTypeMixin):
     if deep and self._elementType and self._elementType.isMutable():
       self._elementType.freeze(deep)
 
-  def _writeFields(self, encoder, top=True):
-    encoder.writeBeginSubtype('ListType', 20)
+  def _writeFields(self, encoder):
+    encoder.writeSubtypeHeader('ListType', 20)
     if self.hasElementType():
       encoder.writeFieldHeader('elementType', 1)
       encoder.writeSharedStruct(self._elementType)
-    super()._writeFields(encoder, False)
+    super()._writeFields(encoder)
 
   def merge(self, src):
     super().merge(src)
@@ -1305,12 +1295,12 @@ class SetType(CollectionType, coda.runtime.typemixins.SetTypeMixin):
     if deep and self._elementType and self._elementType.isMutable():
       self._elementType.freeze(deep)
 
-  def _writeFields(self, encoder, top=True):
-    encoder.writeBeginSubtype('SetType', 21)
+  def _writeFields(self, encoder):
+    encoder.writeSubtypeHeader('SetType', 21)
     if self.hasElementType():
       encoder.writeFieldHeader('elementType', 1)
       encoder.writeSharedStruct(self._elementType)
-    super()._writeFields(encoder, False)
+    super()._writeFields(encoder)
 
   def merge(self, src):
     super().merge(src)
@@ -1385,15 +1375,15 @@ class MapType(CollectionType, coda.runtime.typemixins.MapTypeMixin):
     if deep and self._valueType and self._valueType.isMutable():
       self._valueType.freeze(deep)
 
-  def _writeFields(self, encoder, top=True):
-    encoder.writeBeginSubtype('MapType', 22)
+  def _writeFields(self, encoder):
+    encoder.writeSubtypeHeader('MapType', 22)
     if self.hasKeyType():
       encoder.writeFieldHeader('keyType', 1)
       encoder.writeSharedStruct(self._keyType)
     if self.hasValueType():
       encoder.writeFieldHeader('valueType', 2)
       encoder.writeSharedStruct(self._valueType)
-    super()._writeFields(encoder, False)
+    super()._writeFields(encoder)
 
   def merge(self, src):
     super().merge(src)
@@ -1498,8 +1488,8 @@ class ModifiedType(Type, coda.runtime.typemixins.ModifiedTypeMixin):
     if deep and self._elementType and self._elementType.isMutable():
       self._elementType.freeze(deep)
 
-  def _writeFields(self, encoder, top=True):
-    encoder.writeBeginSubtype('ModifiedType', 23)
+  def _writeFields(self, encoder):
+    encoder.writeSubtypeHeader('ModifiedType', 23)
     if self.hasElementType():
       encoder.writeFieldHeader('elementType', 1)
       encoder.writeSharedStruct(self._elementType)
@@ -1509,7 +1499,7 @@ class ModifiedType(Type, coda.runtime.typemixins.ModifiedTypeMixin):
     if self.hasShared():
       encoder.writeFieldHeader('shared', 3)
       encoder.writeBoolean(self._shared)
-    super()._writeFields(encoder, False)
+    super()._writeFields(encoder)
 
   def merge(self, src):
     super().merge(src)
@@ -1634,8 +1624,8 @@ class DeclType(Type, coda.runtime.typemixins.DeclTypeMixin):
     if deep and self._enclosingType and self._enclosingType.isMutable():
       self._enclosingType.freeze(deep)
 
-  def _writeFields(self, encoder, top=True):
-    encoder.writeBeginSubtype('DeclType', 41)
+  def _writeFields(self, encoder):
+    encoder.writeSubtypeHeader('DeclType', 41)
     if self.hasFile():
       encoder.writeFieldHeader('file', 2)
       encoder.writeSharedStruct(self._file)
@@ -1648,7 +1638,7 @@ class DeclType(Type, coda.runtime.typemixins.DeclTypeMixin):
     if self.hasSourceLine():
       encoder.writeFieldHeader('sourceLine', 5)
       encoder.writeInteger(self._sourceLine)
-    super()._writeFields(encoder, False)
+    super()._writeFields(encoder)
 
   def merge(self, src):
     super().merge(src)
@@ -1812,7 +1802,7 @@ class StructType(DeclType):
       if deep and self._options and self._options.isMutable():
         self._options.freeze(deep)
 
-    def _writeFields(self, encoder, top=True):
+    def _writeFields(self, encoder):
       if self.hasName():
         encoder.writeFieldHeader('name', 1)
         encoder.writeString(self._name)
@@ -1958,7 +1948,7 @@ class StructType(DeclType):
       if deep and self._type and self._type.isMutable():
         self._type.freeze(deep)
 
-    def _writeFields(self, encoder, top=True):
+    def _writeFields(self, encoder):
       if self.hasName():
         encoder.writeFieldHeader('name', 1)
         encoder.writeString(self._name)
@@ -2070,7 +2060,7 @@ class StructType(DeclType):
       if deep and self._options and self._options.isMutable():
         self._options.freeze(deep)
 
-    def _writeFields(self, encoder, top=True):
+    def _writeFields(self, encoder):
       if self.hasName():
         encoder.writeFieldHeader('name', 1)
         encoder.writeString(self._name)
@@ -2278,8 +2268,8 @@ class StructType(DeclType):
     if type(self._extensions) is not tuple:
       self._extensions = tuple(self._extensions)
 
-  def _writeFields(self, encoder, top=True):
-    encoder.writeBeginSubtype('StructType', 30)
+  def _writeFields(self, encoder):
+    encoder.writeSubtypeHeader('StructType', 30)
     if self.hasOptions():
       encoder.writeFieldHeader('options', 1)
       encoder.writeSharedStruct(self._options)
@@ -2319,7 +2309,7 @@ class StructType(DeclType):
     if self.hasMaxExtension():
       encoder.writeFieldHeader('maxExtension', 10)
       encoder.writeInteger(self._maxExtension)
-    super()._writeFields(encoder, False)
+    super()._writeFields(encoder)
 
   def merge(self, src):
     super().merge(src)
@@ -2559,7 +2549,7 @@ class EnumType(DeclType):
         self._name,
         self._value))
 
-    def _writeFields(self, encoder, top=True):
+    def _writeFields(self, encoder):
       if self.hasName():
         encoder.writeFieldHeader('name', 1)
         encoder.writeString(self._name)
@@ -2643,8 +2633,8 @@ class EnumType(DeclType):
     if type(self._values) is not tuple:
       self._values = tuple(self._values)
 
-  def _writeFields(self, encoder, top=True):
-    encoder.writeBeginSubtype('EnumType', 31)
+  def _writeFields(self, encoder):
+    encoder.writeSubtypeHeader('EnumType', 31)
     if self.hasOptions():
       encoder.writeFieldHeader('options', 1)
       encoder.writeSharedStruct(self._options)
@@ -2654,7 +2644,7 @@ class EnumType(DeclType):
       for val in self._values:
         encoder.writeStruct(val)
       encoder.writeEndList()
-    super()._writeFields(encoder, False)
+    super()._writeFields(encoder)
 
   def merge(self, src):
     super().merge(src)
@@ -2770,20 +2760,20 @@ class ExtensionField(coda.runtime.Object):
     super()._freezeImpl(deep)
     if deep and self._file and self._file.isMutable():
       self._file.freeze(deep)
-    if deep and self._enclosingType.isMutable():
+    if deep and self._enclosingType and self._enclosingType.isMutable():
       self._enclosingType.freeze(deep)
     if deep and self._extends and self._extends.isMutable():
       self._extends.freeze(deep)
     if deep and self._type and self._type.isMutable():
       self._type.freeze(deep)
 
-  def _writeFields(self, encoder, top=True):
+  def _writeFields(self, encoder):
     if self.hasFile():
       encoder.writeFieldHeader('file', 1)
       encoder.writeSharedStruct(self._file)
     if self.hasEnclosingType():
       encoder.writeFieldHeader('enclosingType', 2)
-      encoder.writeStruct(self._enclosingType)
+      encoder.writeSharedStruct(self._enclosingType)
     if self.hasSourceLine():
       encoder.writeFieldHeader('sourceLine', 3)
       encoder.writeInteger(self._sourceLine)
@@ -3022,7 +3012,7 @@ class FileDescriptor(coda.runtime.Object):
       if type(self._package) is not coda.runtime.FrozenDict:
         self._package = coda.runtime.FrozenDict(self._package)
 
-    def _writeFields(self, encoder, top=True):
+    def _writeFields(self, encoder):
       if self.hasPath():
         encoder.writeFieldHeader('path', 1)
         encoder.writeString(self._path)
@@ -3140,7 +3130,7 @@ class FileDescriptor(coda.runtime.Object):
     if type(self._imports) is not tuple:
       self._imports = tuple(self._imports)
 
-  def _writeFields(self, encoder, top=True):
+  def _writeFields(self, encoder):
     if self.hasName():
       encoder.writeFieldHeader('name', 1)
       encoder.writeString(self._name)
@@ -3391,7 +3381,7 @@ FILE = coda.runtime.createFile('descriptors.coda', 'data', 'coda.descriptors',
     d.FileOptions().setPackage({'cpp': 'coda::descriptors', 'java': 'coda.descriptors', 'python': 'coda.runtime.descdata'}).setOuterClass({'java': 'Descriptors'}).setFilepath({'cpp': 'coda/runtime/descriptors_generated'}).setImports({'cpp': ['coda/runtime/descriptors_mixin.h']}),
     d.StructOptions().setAllowSubtypes(True),
     d.StructOptions().setMixin({'cpp': 'coda::descriptors::DeclTypeMixin', 'python.python3': 'coda.runtime.typemixins.DeclTypeMixin'}),
-    d.StructOptions().setMixin({'cpp': 'coda::descriptors::TypeMixin', 'python.python3': 'coda.runtime.typemixins.TypeMixin'}),
+    d.StructOptions().setMixin({'cpp': 'coda::descriptors::TypeMixin', 'python.python3': 'coda.runtime.typemixins.TypeMixin'}).setShared(True),
     d.StructOptions().setMixin({'python.python3': 'coda.runtime.typemixins.BooleanTypeMixin'}),
     d.StructOptions().setMixin({'python.python3': 'coda.runtime.typemixins.BytesTypeMixin'}),
     d.StructOptions().setMixin({'python.python3': 'coda.runtime.typemixins.DoubleTypeMixin'}),

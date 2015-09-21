@@ -20,3 +20,4 @@ Command to create eclipse project:
 Command to regenerate C++ descriptor files:
 
    bin/codagen data/descriptors.coda -o cpp:support/cpp/lib/ --headerout cpp:support/cpp/include/
+   

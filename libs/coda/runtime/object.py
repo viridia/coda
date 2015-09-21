@@ -135,7 +135,12 @@ class Object(metaclass=ObjectMeta):
     result.__present = set(self.__present)
     return result
 
-  def write(self, encoder):
+  def encode(self, encoder):
+    encoder.fileBegin()
+    self._writeFields(encoder)
+    encoder.fileEnd()
+
+  def writeFields(self, encoder):
     self._writeFields(encoder)
 
   def _writeFields(self, encoder):
