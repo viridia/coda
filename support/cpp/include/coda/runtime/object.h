@@ -91,7 +91,7 @@ public:
   virtual std::size_t hashValue() const;
 
   /** Write to stream. */
-  void write(coda::io::Encoder* encoder) const {
+  void encode(coda::io::Encoder* encoder) const {
     beginWrite(encoder);
     endWrite(encoder);
   }

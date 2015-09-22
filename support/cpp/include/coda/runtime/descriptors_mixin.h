@@ -17,18 +17,11 @@ namespace descriptors {
 /** Mixin class for Type. */
 class TypeMixin {
 public:
-  /**
-   * Given a destination address, copy the data from the source address to the destination.
-   * This simply copies the data from the source address to the destination address.
-   */
-  virtual void put(void* dst, void* src) const {}
+  /** Allocate a temporary instance of this type. Used in deserialization. */
+  virtual void* makeTemp() const { return NULL; };
 
-  /**
-   * Given the address of a collection, copy the data from the source and add it to the collection.
-   * For map types, this treats the data at the source address as a key, inserts it into the map,
-   * and returns the address of the associated (now default-constucted) value.
-   */
-  virtual void* add(void* collection, void* src) const { return NULL; }
+  /** Free a previously allocated instance of this type. Used in deserialization. */
+  virtual void freeTemp(void*) const {};
 
 protected:
   virtual ~TypeMixin() {}

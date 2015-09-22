@@ -12,17 +12,27 @@
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
+#include <utility>
 #include <assert.h>
 
 namespace coda {
 namespace types {
+
+/** Returns true if the given type kind can be represented as POD data which requires no
+    construction or destruction step. */
+inline bool isPodType(int32_t kind) {
+  return (kind >= descriptors::TYPE_KIND_BOOL && kind <= descriptors::TYPE_KIND_DOUBLE) ||
+      kind == descriptors::TYPE_KIND_STRUCT || kind == descriptors::TYPE_KIND_ENUM;
+}
 
 class Boolean : public coda::descriptors::BooleanType {
 public:
   typedef bool cpp_type;
 
   Boolean();
-  void put(void* dst, void* src) const;
+
+  void* makeTemp() const { return new cpp_type; }
+  void freeTemp(void* ptr) const { delete (cpp_type*) ptr; }
 
   static Boolean DESCRIPTOR;
 };
@@ -32,7 +42,9 @@ public:
   typedef int16_t cpp_type;
 
   Integer16();
-  void put(void* dst, void* src) const;
+
+  void* makeTemp() const { return new cpp_type; }
+  void freeTemp(void* ptr) const { delete (cpp_type*) ptr; }
 
   static Integer16 DESCRIPTOR;
 };
@@ -42,7 +54,9 @@ public:
   typedef int32_t cpp_type;
 
   Integer32();
-  void put(void* dst, void* src) const;
+
+  void* makeTemp() const { return new cpp_type; }
+  void freeTemp(void* ptr) const { delete (cpp_type*) ptr; }
 
   static Integer32 DESCRIPTOR;
 };
@@ -52,7 +66,9 @@ public:
   typedef int64_t cpp_type;
 
   Integer64();
-  void put(void* dst, void* src) const;
+
+  void* makeTemp() const { return new cpp_type; }
+  void freeTemp(void* ptr) const { delete (cpp_type*) ptr; }
 
   static Integer64 DESCRIPTOR;
 };
@@ -62,7 +78,9 @@ public:
   typedef float cpp_type;
 
   Float();
-  void put(void* dst, void* src) const;
+
+  void* makeTemp() const { return new cpp_type; }
+  void freeTemp(void* ptr) const { delete (cpp_type*) ptr; }
 
   static Float DESCRIPTOR;
 };
@@ -72,7 +90,9 @@ public:
   typedef double cpp_type;
 
   Double();
-  void put(void* dst, void* src) const;
+
+  void* makeTemp() const { return new cpp_type; }
+  void freeTemp(void* ptr) const { delete (cpp_type*) ptr; }
 
   static Double DESCRIPTOR;
 };
@@ -82,7 +102,9 @@ public:
   typedef std::string cpp_type;
 
   String();
-  void put(void* dst, void* src) const;
+
+  void* makeTemp() const { return new cpp_type; }
+  void freeTemp(void* ptr) const { delete (cpp_type*) ptr; }
 
   static String DESCRIPTOR;
 };
@@ -92,13 +114,20 @@ public:
   typedef std::string cpp_type;
 
   Bytes();
-  void put(void* dst, void* src) const;
+
+  void* makeTemp() const { return new cpp_type; }
+  void freeTemp(void* ptr) const { delete (cpp_type*) ptr; }
 
   static Bytes DESCRIPTOR;
 };
 
+class GenericList : public coda::descriptors::ListType {
+public:
+  virtual void* append(void* collection, void* element) const = 0;
+};
+
 template<class ElementType>
-class List : public coda::descriptors::ListType {
+class List : public GenericList {
 public:
   typedef typename ElementType::cpp_type element_type;
   typedef std::vector<element_type> cpp_type;
@@ -108,17 +137,12 @@ public:
     freeze();
   }
 
-  void put(void* dst, void* src) const {
-    ((cpp_type*) dst)->swap(*(cpp_type*) src);
-  }
+  void* makeTemp() const { return new cpp_type; }
+  void freeTemp(void* ptr) const { delete (cpp_type*) ptr; }
 
-  void* add(void* collection, void* src) const {
+  void* append(void* collection, void* src) const {
     cpp_type* list = (cpp_type*) collection;
-    if (src == NULL) {
-      list->push_back(element_type());
-    } else {
-      list->push_back(*(element_type*)src);
-    }
+    list->push_back(std::move(*(element_type*)src));
     return &list->back();
   }
 
@@ -128,8 +152,13 @@ public:
 template<class ElementType>
 List<ElementType> List<ElementType>::DESCRIPTOR;
 
+class GenericSet : public coda::descriptors::SetType {
+public:
+  virtual void* insert(void* collection, void* element) const = 0;
+};
+
 template<class ElementType>
-class Set : public coda::descriptors::SetType {
+class Set : public GenericSet {
 public:
   typedef typename ElementType::cpp_type element_type;
   typedef std::unordered_set<element_type> cpp_type;
@@ -139,12 +168,11 @@ public:
     freeze();
   }
 
-  void put(void* dst, void* src) const {
-    ((cpp_type*) dst)->swap(*(cpp_type*) src);
-  }
+  void* makeTemp() const { return new cpp_type; }
+  void freeTemp(void* ptr) const { delete (cpp_type*) ptr; }
 
-  void* add(void* collection, void* src) const {
-    ((cpp_type*)collection)->insert(*(element_type*)src);
+  void* insert(void* collection, void* src) const {
+    ((cpp_type*)collection)->insert(std::move(*(element_type*)src));
     return NULL;
   }
 
@@ -154,8 +182,13 @@ public:
 template<class ElementType>
 Set<ElementType> Set<ElementType>::DESCRIPTOR;
 
+class GenericMap : public coda::descriptors::MapType {
+public:
+  virtual void add(void* collection, void* key, void *value) const = 0;
+};
+
 template<class KeyType, class ValueType>
-class Map : public coda::descriptors::MapType {
+class Map : public GenericMap {
 public:
   typedef typename KeyType::cpp_type key_type;
   typedef typename ValueType::cpp_type value_type;
@@ -168,8 +201,12 @@ public:
     assert(getValueType() != NULL);
     freeze();
   }
-  void* add(void* collection, void* src) const {
-    return &(*(cpp_type*)collection)[*(key_type*)src];
+
+  void* makeTemp() const { return new cpp_type; }
+  void freeTemp(void* ptr) const { delete (cpp_type*) ptr; }
+
+  void add(void* collection, void* key, void *value) const {
+    (*(cpp_type*)collection)[*(key_type*)key] = std::move(*(value_type*)value);
   }
 
   static Map DESCRIPTOR;
@@ -191,13 +228,8 @@ public:
     freeze();
   }
 
-  void put(void* dst, void* src) const {
-    getElementType()->put(dst, src);
-  }
-
-  void* add(void* collection, void* src) const {
-    return getElementType()->add(collection, src);
-  }
+  void* makeTemp() const { return new cpp_type; }
+  void freeTemp(void* ptr) const { delete (cpp_type*) ptr; }
 
   static Modified DESCRIPTOR;
 };

@@ -115,6 +115,9 @@ public:
     return (*create)();
   }
 
+  void* makeTemp() const { return new (runtime::Object*); }
+  void freeTemp(void* ptr) const { delete (runtime::Object**) ptr; }
+
 private:
   friend class coda::descriptors::StaticFileDescriptor;
 
@@ -156,6 +159,9 @@ public:
     setOptions(&options);
     getMutableValues().assign(values.begin(), values.end());
   }
+
+  void* makeTemp() const { return new int32_t; }
+  void freeTemp(void* ptr) const { delete (int32_t*) ptr; }
 
 private:
   friend class coda::descriptors::StructDescriptor;

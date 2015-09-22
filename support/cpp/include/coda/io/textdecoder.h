@@ -15,6 +15,11 @@ namespace coda {
 namespace runtime {
 class Object;
 }
+namespace types {
+class GenericList;
+class GenericSet;
+class GenericMap;
+}
 namespace io {
 
 /**
@@ -78,11 +83,33 @@ private:
     TM_NULLABLE = (1<<2),
   };
 
-  void readValue(const descriptors::Type* expectedType, int flags, void* data);
   runtime::Object* readStructFields(const descriptors::StructDescriptor* expectedType, int flags);
   runtime::Object* readStructValue(const descriptors::StructDescriptor* expectedType, int flags);
-  void readListValue(const descriptors::Type* expectedType, int flags, void* data);
-  void readMapValue(const descriptors::MapType* expectedType, int flags, void* data);
+  void readValue(const descriptors::Type* expectedType, int flags, void* data);
+  void readListValue(const types::GenericList* expectedType, int flags, void* data);
+  void readSetValue(const types::GenericSet* expectedType, int flags, void* data);
+  void readMapValue(const types::GenericMap* expectedType, int flags, void* data);
+
+  template<class KeyType, class ValueType>
+  void readMapElements(
+      const types::GenericMap* mapType,
+      const descriptors::Type* keyType,
+      int keyTypeFlags,
+      const descriptors::Type* valueType,
+      int valueTypeFlags,
+      void* data);
+
+  template<class T>
+  void readListElements(
+      const descriptors::Type* elementType,
+      int elementFlags,
+      std::vector<T>& data);
+
+  template<class T>
+  void readSetElements(
+      const descriptors::Type* elementType,
+      int elementFlags,
+      std::unordered_set<T>& data);
 
   /** Match a token. */
   bool match(Token tok) {

@@ -197,7 +197,7 @@ Encoder& TextEncoder::writeStruct(const coda::runtime::Object* value) {
     if (index >= 0) {
       strm << " #" << index;
     }
-    value->write(this);
+    value->encode(this);
     writeEndStruct();
     inProgress.erase(sid);
   }

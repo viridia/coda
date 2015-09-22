@@ -3,11 +3,13 @@
 // ============================================================================
 
 #include "coda/io/textdecoder.h"
+#include "coda/types.h"
 #include "coda/runtime/typeregistry.h"
 
 #include <strstream>
 #include <assert.h>
 #include <cstdlib>
+#include <utility>
 
 #include <iostream>
 
@@ -53,42 +55,39 @@ void TextDecoder::readValue(const Type* expectedType, int flags, void* data) {
   int32_t expectedTypeId = expectedType->typeId();
   if (match(TOKEN_LBRACE)) {
     if (token == TOKEN_ID || token == TOKEN_TYPEREF) {
-      runtime::Object* v =
+      *(runtime::Object**) data =
           readStructValue(static_cast<const StructDescriptor*>(expectedType), flags);
-      expectedType->put(data, &v);
     } else {
-      return readMapValue(static_cast<const MapType*>(expectedType), flags, data);
+      return readMapValue(static_cast<const types::GenericMap*>(expectedType), flags, data);
     }
   } else if (match(TOKEN_LBRACKET)) {
     // It's a list literal
-    if (expectedType->typeId() != TYPE_KIND_LIST and expectedType->typeId() != TYPE_KIND_SET) {
+    if (expectedType->typeId() == TYPE_KIND_LIST) {
+      readListValue(static_cast<const types::GenericList*>(expectedType), flags, data);
+    } else if (expectedType->typeId() == TYPE_KIND_SET) {
+      readSetValue(static_cast<const types::GenericSet*>(expectedType), flags, data);
+    } else {
       typeError(tokenLineno, tokenColumn, expectedType, "list");
     }
-    readListValue(expectedType, flags, data);
   } else if (token == TOKEN_INTVAL) {
     switch (expectedTypeId) {
       case TYPE_KIND_INTEGER: {
         const IntegerType* intType = static_cast<const IntegerType*>(expectedType);
         if (intType->getBits() == 16) {
-          int16_t v = strtol(tokenValue.c_str(), NULL, 10);
-          expectedType->put(data, &v);
+          *(int16_t*) data = strtol(tokenValue.c_str(), NULL, 10);
         } else if (intType->getBits() == 32) {
-          int32_t v = strtol(tokenValue.c_str(), NULL, 10);
-          expectedType->put(data, &v);
+          *(int32_t*) data = strtol(tokenValue.c_str(), NULL, 10);
         } else if (intType->getBits() == 64) {
-          int64_t v = strtoll(tokenValue.c_str(), NULL, 10);
-          expectedType->put(data, &v);
+          *(int64_t*) data = strtoll(tokenValue.c_str(), NULL, 10);
         }
         break;
       }
       case TYPE_KIND_FLOAT: {
-        float v = strtod(tokenValue.c_str(), NULL);
-        expectedType->put(data, &v);
+        *(float*) data = (float) strtod(tokenValue.c_str(), NULL);
         break;
       }
       case TYPE_KIND_DOUBLE: {
-        double v = strtod(tokenValue.c_str(), NULL);
-        expectedType->put(data, &v);
+        *(double*) data = strtod(tokenValue.c_str(), NULL);
         break;
       }
       default:
@@ -99,13 +98,11 @@ void TextDecoder::readValue(const Type* expectedType, int flags, void* data) {
   } else if (token == TOKEN_FLOATVAL) {
     switch (expectedTypeId) {
       case TYPE_KIND_FLOAT: {
-        float v = strtod(tokenValue.c_str(), NULL);
-        expectedType->put(data, &v);
+        *(float*) data = (float) strtod(tokenValue.c_str(), NULL);
         break;
       }
       case TYPE_KIND_DOUBLE: {
-        double v = strtod(tokenValue.c_str(), NULL);
-        expectedType->put(data, &v);
+        *(double*) data = strtod(tokenValue.c_str(), NULL);
         break;
       }
       default:
@@ -118,20 +115,19 @@ void TextDecoder::readValue(const Type* expectedType, int flags, void* data) {
       typeError(tokenLineno, tokenColumn, expectedType, "boolean");
     }
     bool v = (token == TOKEN_TRUE);
-    expectedType->put(data, &v);
+    *(bool*) data = v;
     next();
   } else if (token == TOKEN_STRING) {
     if (expectedType->typeId() != TYPE_KIND_STRING) {
       typeError(tokenLineno, tokenColumn, expectedType, "string");
     }
-    expectedType->put(data, &tokenValue);
+    *(std::string*) data = std::move(tokenValue);
     next();
   } else if (token == TOKEN_NULL) {
     if (!(flags & TM_NULLABLE)) {
       parseError(tokenLineno, tokenColumn, "Null object ref not allowed here.");
     } else {
-      runtime::Object* v = NULL;
-      expectedType->put(data, &v);
+      *(runtime::Object**) data = NULL;
       next();
     }
   } else if (token == TOKEN_OBJREF) {
@@ -144,8 +140,9 @@ void TextDecoder::readValue(const Type* expectedType, int flags, void* data) {
       parseError(tokenLineno, tokenColumn, "Invalid shared object ID " + tokenValue);
     } else if (!value->isInstanceOf(static_cast<const StructDescriptor*>(expectedType))) {
       typeError(tokenLineno, tokenColumn, expectedType, value->descriptor());
+    } else {
+      *(runtime::Object**) data = value;
     }
-    expectedType->put(data, &value);
     next();
   } else {
     parseError(tokenLineno, tokenColumn, "Unexpected token");
@@ -168,9 +165,9 @@ runtime::Object* TextDecoder::readStructValue(const StructDescriptor* expectedTy
   return st;
 }
 
-void TextDecoder::readListValue(const Type* expectedType, int flags, void* data) {
-  assert(expectedType->typeId() == TYPE_KIND_LIST || expectedType->typeId() == TYPE_KIND_SET);
-  const Type* elementType = static_cast<const ListType*>(expectedType)->getElementType();
+void TextDecoder::readListValue(const types::GenericList* listType, int flags, void* data) {
+  assert(listType->typeId() == TYPE_KIND_LIST);
+  const Type* elementType = listType->getElementType();
   int elementFlags = 0;
   if (elementType->typeId() == TYPE_KIND_MODIFIED) {
     const ModifiedType* modifiedType = static_cast<const ModifiedType*>(elementType);
@@ -179,50 +176,72 @@ void TextDecoder::readListValue(const Type* expectedType, int flags, void* data)
     }
     elementType = modifiedType->getElementType();
   }
-  if (expectedType->typeId() == TYPE_KIND_LIST) {
-    for (;;) {
-      if (token == TOKEN_END) {
-        parseError(tokenLineno, tokenColumn, "Premature end of stream while reading list");
-      } else if (token == TOKEN_RBRACKET) {
-        break;
-      }
 
-      readValue(elementType, elementFlags, expectedType->add(data, NULL));
+  switch (elementType->typeId()) {
+    case TYPE_KIND_BOOL:
+    case TYPE_KIND_INTEGER:
+    case TYPE_KIND_FLOAT:
+    case TYPE_KIND_DOUBLE:
+    case TYPE_KIND_STRUCT:
+    case TYPE_KIND_ENUM: {
+      // For primitive types, we merely need a place that's large enough to store any type.
+      ValueHolder v;
+      for (;;) {
+        if (token == TOKEN_END) {
+          parseError(tokenLineno, tokenColumn, "Premature end of stream while reading list");
+        } else if (token == TOKEN_RBRACKET) {
+          break;
+        }
+
+        readValue(elementType, elementFlags, &v);
+        listType->append(data, &v);
+      }
+      break;
     }
-  } else {
-    for (;;) {
-      if (token == TOKEN_END) {
-        parseError(tokenLineno, tokenColumn, "Premature end of stream while reading list");
-      } else if (token == TOKEN_RBRACKET) {
+
+    case TYPE_KIND_STRING:
+    case TYPE_KIND_BYTES: {
+      std::string v;
+      for (;;) {
+        if (token == TOKEN_END) {
+          parseError(tokenLineno, tokenColumn, "Premature end of stream while reading list");
+        } else if (token == TOKEN_RBRACKET) {
+          break;
+        }
+
+        readValue(elementType, elementFlags, &v);
+        listType->append(data, &v);
+        break;
+      }
+      break;
+    }
+
+    case TYPE_KIND_LIST:
+    case TYPE_KIND_SET:
+    case TYPE_KIND_MAP: {
+      // List of lists or Lists of sets.
+      void* element = NULL;
+
+      for (;;) {
+        if (token == TOKEN_END) {
+          parseError(tokenLineno, tokenColumn, "Premature end of stream while reading list");
+        } else if (token == TOKEN_RBRACKET) {
+          break;
+        }
+
+        if (element == NULL) {
+          element = elementType->makeTemp();
+        }
+
+        readValue(elementType, elementFlags, element);
+        listType->append(data, element);
         break;
       }
 
-      // Switching inside the inner loop isn't particularly efficient, but this is a text
-      // decoder, let's not over-optimize.
-      switch (elementType->typeId()) {
-        case TYPE_KIND_BOOL:
-        case TYPE_KIND_INTEGER:
-        case TYPE_KIND_STRUCT:
-        case TYPE_KIND_ENUM: {
-          ValueHolder v;
-          readValue(elementType, elementFlags, &v);
-          expectedType->add(data, &v);
-          break;
-        }
-
-        case TYPE_KIND_STRING:
-        case TYPE_KIND_BYTES: {
-          // Read strings in place
-          std::vector<std::string>& v = *(std::vector<std::string>*)data;
-          v.push_back(std::string());
-          readValue(elementType, elementFlags, (void *)&v.back());
-          expectedType->add(data, &v);
-          break;
-        }
-
-        default:
-          assert(false && "Invalid set member type");
+      if (element != NULL) {
+        elementType->freeTemp(element);
       }
+      break;
     }
   }
 
@@ -231,11 +250,129 @@ void TextDecoder::readListValue(const Type* expectedType, int flags, void* data)
   }
 }
 
-void TextDecoder::readMapValue(const MapType* expectedType, int flags, void* data) {
-  if (expectedType->typeId() != TYPE_KIND_MAP) {
-    typeError(tokenLineno, tokenColumn, expectedType, "map");
+void TextDecoder::readSetValue(const types::GenericSet* setType, int flags, void* data) {
+  assert(setType->typeId() == TYPE_KIND_LIST || setType->typeId() == TYPE_KIND_SET);
+  const Type* elementType = setType->getElementType();
+  int elementFlags = 0;
+  if (elementType->typeId() == TYPE_KIND_MODIFIED) {
+    const ModifiedType* modifiedType = static_cast<const ModifiedType*>(elementType);
+    if (modifiedType->isShared()) {
+      elementFlags = TM_SHARED;
+    }
+    elementType = modifiedType->getElementType();
   }
-  const Type* keyType = expectedType->getKeyType();
+
+  switch (elementType->typeId()) {
+    case TYPE_KIND_BOOL:
+    case TYPE_KIND_INTEGER:
+    case TYPE_KIND_FLOAT:
+    case TYPE_KIND_DOUBLE:
+    case TYPE_KIND_STRUCT:
+    case TYPE_KIND_ENUM: {
+      // For primitive types, we merely need a place that's large enough to store any type.
+      ValueHolder v;
+      for (;;) {
+        if (token == TOKEN_END) {
+          parseError(tokenLineno, tokenColumn, "Premature end of stream while reading list");
+        } else if (token == TOKEN_RBRACKET) {
+          break;
+        }
+
+        readValue(elementType, elementFlags, &v);
+        setType->insert(data, &v);
+      }
+      break;
+    }
+
+    case TYPE_KIND_STRING:
+    case TYPE_KIND_BYTES: {
+      std::string v;
+      for (;;) {
+        if (token == TOKEN_END) {
+          parseError(tokenLineno, tokenColumn, "Premature end of stream while reading list");
+        } else if (token == TOKEN_RBRACKET) {
+          break;
+        }
+
+        readValue(elementType, elementFlags, &v);
+        setType->insert(data, &v);
+        break;
+      }
+      break;
+    }
+
+    case TYPE_KIND_LIST:
+    case TYPE_KIND_SET:
+    case TYPE_KIND_MAP: {
+      // List of lists or Lists of sets.
+      void* element = NULL;
+
+      for (;;) {
+        if (token == TOKEN_END) {
+          parseError(tokenLineno, tokenColumn, "Premature end of stream while reading list");
+        } else if (token == TOKEN_RBRACKET) {
+          break;
+        }
+
+        if (element == NULL) {
+          element = elementType->makeTemp();
+        }
+
+        readValue(elementType, elementFlags, element);
+        setType->insert(data, element);
+        break;
+      }
+
+      if (element != NULL) {
+        elementType->freeTemp(element);
+      }
+      break;
+    }
+  }
+
+  if (!match(TOKEN_RBRACKET)) {
+    parseError(tokenLineno, tokenColumn, "']' expected after list value");
+  }
+}
+
+template<class KeyType, class ValueType>
+void TextDecoder::readMapElements(
+    const types::GenericMap* mapType,
+    const descriptors::Type* keyType,
+    int keyTypeFlags,
+    const descriptors::Type* valueType,
+    int valueTypeFlags,
+    void* data) {
+  KeyType key;
+  ValueType value;
+  for (;;) {
+    if (token == TOKEN_END) {
+      parseError(tokenLineno, tokenColumn, "Premature end of stream while reading map value.");
+    } else if (token == TOKEN_RBRACE) {
+      break;
+    }
+    readValue(keyType, keyTypeFlags, &key);
+    if (!match(TOKEN_COLON)) {
+      parseError(tokenLineno, tokenColumn, "Colon expected after map key");
+    }
+    if (token == TOKEN_END) {
+      parseError(tokenLineno, tokenColumn, "Premature end of stream while reading map");
+    }
+    readValue(valueType, valueTypeFlags, &value);
+    mapType->add(data, &key, &value);
+  }
+  if (!match(TOKEN_RBRACE)) {
+    parseError(tokenLineno, tokenColumn, "'}' expected after map");
+  }
+}
+
+void TextDecoder::readMapValue(const types::GenericMap* mapType, int flags, void* data) {
+  if (mapType->typeId() != TYPE_KIND_MAP) {
+    typeError(tokenLineno, tokenColumn, mapType, "map");
+  }
+
+  // Decompose the key type.
+  const Type* keyType = mapType->getKeyType();
   int keyFlags = 0;
   if (keyType->typeId() == TYPE_KIND_MODIFIED) {
     const ModifiedType* modifiedType = static_cast<const ModifiedType*>(keyType);
@@ -244,7 +381,9 @@ void TextDecoder::readMapValue(const MapType* expectedType, int flags, void* dat
     }
     keyType = modifiedType->getElementType();
   }
-  const Type* valueType = expectedType->getValueType();
+
+  // Decompose the value type.
+  const Type* valueType = mapType->getValueType();
   int valueFlags = 0;
   if (valueType->typeId() == TYPE_KIND_MODIFIED) {
     const ModifiedType* modifiedType = static_cast<const ModifiedType*>(valueType);
@@ -253,44 +392,74 @@ void TextDecoder::readMapValue(const MapType* expectedType, int flags, void* dat
     }
     valueType = modifiedType->getElementType();
   }
+
+  if (types::isPodType(keyType->typeId())) {
+    if (types::isPodType(valueType->typeId())) {
+      // Simple case where both key and value are primitives.
+      readMapElements<ValueHolder, ValueHolder>(
+          mapType, keyType, keyFlags, valueType, valueFlags, data);
+      return;
+    } else if (valueType->typeId() == TYPE_KIND_STRING || valueType->typeId() == TYPE_KIND_BYTES) {
+      // Key is a primitive and value is a string / bytes object.
+      readMapElements<ValueHolder, std::string>(
+          mapType, keyType, keyFlags, valueType, valueFlags, data);
+      return;
+    }
+  } else if (keyType->typeId() == TYPE_KIND_STRING || keyType->typeId() == TYPE_KIND_BYTES) {
+    if (types::isPodType(valueType->typeId())) {
+      // Key is a string and value is a primitive type.
+      readMapElements<std::string, ValueHolder>(
+          mapType, keyType, keyFlags, valueType, valueFlags, data);
+      return;
+    } else if (valueType->typeId() == TYPE_KIND_STRING || valueType->typeId() == TYPE_KIND_BYTES) {
+      // Key is a primitive and value is a string / bytes object.
+      readMapElements<std::string, std::string>(
+          mapType, keyType, keyFlags, valueType, valueFlags, data);
+      return;
+    }
+  }
+
+  // The generic case. Here we need to allocate temporary storage for both the key and the value.
+  // We don't do this for empty maps however.
+  void *key = NULL;
+  void *value = NULL;
   for (;;) {
     if (token == TOKEN_END) {
       parseError(tokenLineno, tokenColumn, "Premature end of stream while reading map value.");
     } else if (token == TOKEN_RBRACE) {
       break;
     }
-    void* valueData = NULL;
-    switch (keyType->typeId()) {
-      case TYPE_KIND_BOOL:
-      case TYPE_KIND_INTEGER:
-      case TYPE_KIND_STRUCT:
-      case TYPE_KIND_ENUM: {
-        ValueHolder v;
-        readValue(keyType, keyFlags, &v);
-        valueData = expectedType->add(data, &v);
-        break;
-      }
 
-      case TYPE_KIND_STRING:
-      case TYPE_KIND_BYTES: {
-        // Read strings in place
-        std::string v;
-        readValue(keyType, keyFlags, &v);
-        valueData = expectedType->add(data, &v);
-        break;
-      }
-
-      default:
-        assert(false && "Invalid map key type");
+    // Allocate space for key and value.
+    if (key == NULL) {
+      key = keyType->makeTemp();
+      value = valueType->makeTemp();
     }
+
+    // Read the key.
+    readValue(keyType, keyFlags, key);
+
+    // Colon between key and value.
     if (!match(TOKEN_COLON)) {
       parseError(tokenLineno, tokenColumn, "Colon expected after map key");
     }
     if (token == TOKEN_END) {
       parseError(tokenLineno, tokenColumn, "Premature end of stream while reading map");
     }
-    readValue(valueType, valueFlags, valueData);
+
+    // Read the value.
+    readValue(valueType, valueFlags, value);
+
+    // Store in map.
+    mapType->add(data, key, value);
   }
+
+  // Free temp storage for key and value.
+  if (key != NULL) {
+    keyType->freeTemp(key);
+    valueType->freeTemp(value);
+  }
+
   if (!match(TOKEN_RBRACE)) {
     parseError(tokenLineno, tokenColumn, "'}' expected after map");
   }

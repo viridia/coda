@@ -103,7 +103,7 @@ class Decoder {
 public:
 
   template<class T>
-  T* read() {
+  T* decode() {
     return static_cast<T*>(readObject(&T::DESCRIPTOR));
   }
 

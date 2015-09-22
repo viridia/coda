@@ -12,19 +12,19 @@ namespace coda {
 namespace descriptors {
 
 coda::descriptors::FieldOptions _options0 = coda::descriptors::freeze(coda::descriptors::FieldOptions().setNullable(true));
-coda::descriptors::FileOptions _options1 = coda::descriptors::freeze(coda::descriptors::FileOptions().putPackage("cpp", "coda::descriptors").putPackage("python", "coda.runtime.descdata").putPackage("java", "coda.descriptors").putOuterClass("java", "Descriptors").putFilepath("cpp", "coda/runtime/descriptors_generated").putImports("cpp", coda::descriptors::StaticListBuilder<std::string>().add("coda/runtime/descriptors_mixin.h").build()));
-coda::descriptors::StructOptions _options2 = coda::descriptors::freeze(coda::descriptors::StructOptions().putMixin("cpp", "coda::descriptors::DeclTypeMixin").putMixin("python.python3", "coda.runtime.typemixins.DeclTypeMixin"));
-coda::descriptors::StructOptions _options3 = coda::descriptors::freeze(coda::descriptors::StructOptions().putMixin("cpp", "coda::descriptors::TypeMixin").putMixin("python.python3", "coda.runtime.typemixins.TypeMixin").setShared(true));
-coda::descriptors::StructOptions _options4 = coda::descriptors::freeze(coda::descriptors::StructOptions().putMixin("python.python3", "coda.runtime.typemixins.BooleanTypeMixin"));
-coda::descriptors::StructOptions _options5 = coda::descriptors::freeze(coda::descriptors::StructOptions().putMixin("python.python3", "coda.runtime.typemixins.BytesTypeMixin"));
-coda::descriptors::StructOptions _options6 = coda::descriptors::freeze(coda::descriptors::StructOptions().putMixin("python.python3", "coda.runtime.typemixins.DoubleTypeMixin"));
-coda::descriptors::StructOptions _options7 = coda::descriptors::freeze(coda::descriptors::StructOptions().putMixin("python.python3", "coda.runtime.typemixins.FloatTypeMixin"));
-coda::descriptors::StructOptions _options8 = coda::descriptors::freeze(coda::descriptors::StructOptions().putMixin("python.python3", "coda.runtime.typemixins.IntegerTypeMixin"));
-coda::descriptors::StructOptions _options9 = coda::descriptors::freeze(coda::descriptors::StructOptions().putMixin("python.python3", "coda.runtime.typemixins.ListTypeMixin"));
-coda::descriptors::StructOptions _options10 = coda::descriptors::freeze(coda::descriptors::StructOptions().putMixin("python.python3", "coda.runtime.typemixins.MapTypeMixin"));
-coda::descriptors::StructOptions _options11 = coda::descriptors::freeze(coda::descriptors::StructOptions().putMixin("python.python3", "coda.runtime.typemixins.ModifiedTypeMixin"));
-coda::descriptors::StructOptions _options12 = coda::descriptors::freeze(coda::descriptors::StructOptions().putMixin("python.python3", "coda.runtime.typemixins.SetTypeMixin"));
-coda::descriptors::StructOptions _options13 = coda::descriptors::freeze(coda::descriptors::StructOptions().putMixin("python.python3", "coda.runtime.typemixins.StringTypeMixin"));
+coda::descriptors::FileOptions _options1 = coda::descriptors::freeze(coda::descriptors::FileOptions().putPackage("java", "coda.descriptors").putPackage("cpp", "coda::descriptors").putPackage("python", "coda.runtime.descdata").putOuterClass("java", "Descriptors").putFilepath("cpp", "coda/runtime/descriptors_generated").putImports("cpp", coda::descriptors::StaticListBuilder<std::string>().add("coda/runtime/descriptors_mixin.h").build()));
+coda::descriptors::StructOptions _options2 = coda::descriptors::freeze(coda::descriptors::StructOptions().putMixin("python.python3", "coda.runtime.typemixins.BooleanTypeMixin"));
+coda::descriptors::StructOptions _options3 = coda::descriptors::freeze(coda::descriptors::StructOptions().putMixin("python.python3", "coda.runtime.typemixins.BytesTypeMixin"));
+coda::descriptors::StructOptions _options4 = coda::descriptors::freeze(coda::descriptors::StructOptions().putMixin("python.python3", "coda.runtime.typemixins.DeclTypeMixin").putMixin("cpp", "coda::descriptors::DeclTypeMixin"));
+coda::descriptors::StructOptions _options5 = coda::descriptors::freeze(coda::descriptors::StructOptions().putMixin("python.python3", "coda.runtime.typemixins.DoubleTypeMixin"));
+coda::descriptors::StructOptions _options6 = coda::descriptors::freeze(coda::descriptors::StructOptions().putMixin("python.python3", "coda.runtime.typemixins.FloatTypeMixin"));
+coda::descriptors::StructOptions _options7 = coda::descriptors::freeze(coda::descriptors::StructOptions().putMixin("python.python3", "coda.runtime.typemixins.IntegerTypeMixin"));
+coda::descriptors::StructOptions _options8 = coda::descriptors::freeze(coda::descriptors::StructOptions().putMixin("python.python3", "coda.runtime.typemixins.ListTypeMixin"));
+coda::descriptors::StructOptions _options9 = coda::descriptors::freeze(coda::descriptors::StructOptions().putMixin("python.python3", "coda.runtime.typemixins.MapTypeMixin"));
+coda::descriptors::StructOptions _options10 = coda::descriptors::freeze(coda::descriptors::StructOptions().putMixin("python.python3", "coda.runtime.typemixins.ModifiedTypeMixin"));
+coda::descriptors::StructOptions _options11 = coda::descriptors::freeze(coda::descriptors::StructOptions().putMixin("python.python3", "coda.runtime.typemixins.SetTypeMixin"));
+coda::descriptors::StructOptions _options12 = coda::descriptors::freeze(coda::descriptors::StructOptions().putMixin("python.python3", "coda.runtime.typemixins.StringTypeMixin"));
+coda::descriptors::StructOptions _options13 = coda::descriptors::freeze(coda::descriptors::StructOptions().putMixin("python.python3", "coda.runtime.typemixins.TypeMixin").putMixin("cpp", "coda::descriptors::TypeMixin").setShared(true));
 coda::descriptors::StructOptions _options14 = coda::descriptors::freeze(coda::descriptors::StructOptions().setAllowSubtypes(true));
 
 // ============================================================================
@@ -831,7 +831,7 @@ coda::descriptors::StructDescriptor Type::DESCRIPTOR(
   FILE,
   NULL,
   NULL,
-  _options3,
+  _options13,
   coda::descriptors::StaticArrayRef<coda::descriptors::StructDescriptor*>(),
   coda::descriptors::StaticArrayRef<coda::descriptors::EnumDescriptor*>(),
   coda::descriptors::StaticArrayRef<coda::descriptors::FieldDescriptor*>(),
@@ -853,7 +853,7 @@ coda::descriptors::StructDescriptor BooleanType::DESCRIPTOR(
   FILE,
   NULL,
   &Type::DESCRIPTOR,
-  _options4,
+  _options2,
   coda::descriptors::StaticArrayRef<coda::descriptors::StructDescriptor*>(),
   coda::descriptors::StaticArrayRef<coda::descriptors::EnumDescriptor*>(),
   coda::descriptors::StaticArrayRef<coda::descriptors::FieldDescriptor*>(),
@@ -893,7 +893,7 @@ coda::descriptors::StructDescriptor IntegerType::DESCRIPTOR(
   FILE,
   NULL,
   &Type::DESCRIPTOR,
-  _options8,
+  _options7,
   coda::descriptors::StaticArrayRef<coda::descriptors::StructDescriptor*>(),
   coda::descriptors::StaticArrayRef<coda::descriptors::EnumDescriptor*>(),
   IntegerType::Fields,
@@ -941,7 +941,7 @@ coda::descriptors::StructDescriptor FloatType::DESCRIPTOR(
   FILE,
   NULL,
   &Type::DESCRIPTOR,
-  _options7,
+  _options6,
   coda::descriptors::StaticArrayRef<coda::descriptors::StructDescriptor*>(),
   coda::descriptors::StaticArrayRef<coda::descriptors::EnumDescriptor*>(),
   coda::descriptors::StaticArrayRef<coda::descriptors::FieldDescriptor*>(),
@@ -971,7 +971,7 @@ coda::descriptors::StructDescriptor DoubleType::DESCRIPTOR(
   FILE,
   NULL,
   &Type::DESCRIPTOR,
-  _options6,
+  _options5,
   coda::descriptors::StaticArrayRef<coda::descriptors::StructDescriptor*>(),
   coda::descriptors::StaticArrayRef<coda::descriptors::EnumDescriptor*>(),
   coda::descriptors::StaticArrayRef<coda::descriptors::FieldDescriptor*>(),
@@ -1001,7 +1001,7 @@ coda::descriptors::StructDescriptor StringType::DESCRIPTOR(
   FILE,
   NULL,
   &Type::DESCRIPTOR,
-  _options13,
+  _options12,
   coda::descriptors::StaticArrayRef<coda::descriptors::StructDescriptor*>(),
   coda::descriptors::StaticArrayRef<coda::descriptors::EnumDescriptor*>(),
   coda::descriptors::StaticArrayRef<coda::descriptors::FieldDescriptor*>(),
@@ -1031,7 +1031,7 @@ coda::descriptors::StructDescriptor BytesType::DESCRIPTOR(
   FILE,
   NULL,
   &Type::DESCRIPTOR,
-  _options5,
+  _options3,
   coda::descriptors::StaticArrayRef<coda::descriptors::StructDescriptor*>(),
   coda::descriptors::StaticArrayRef<coda::descriptors::EnumDescriptor*>(),
   coda::descriptors::StaticArrayRef<coda::descriptors::FieldDescriptor*>(),
@@ -1101,7 +1101,7 @@ coda::descriptors::StructDescriptor ListType::DESCRIPTOR(
   FILE,
   NULL,
   &CollectionType::DESCRIPTOR,
-  _options9,
+  _options8,
   coda::descriptors::StaticArrayRef<coda::descriptors::StructDescriptor*>(),
   coda::descriptors::StaticArrayRef<coda::descriptors::EnumDescriptor*>(),
   ListType::Fields,
@@ -1167,7 +1167,7 @@ coda::descriptors::StructDescriptor SetType::DESCRIPTOR(
   FILE,
   NULL,
   &CollectionType::DESCRIPTOR,
-  _options12,
+  _options11,
   coda::descriptors::StaticArrayRef<coda::descriptors::StructDescriptor*>(),
   coda::descriptors::StaticArrayRef<coda::descriptors::EnumDescriptor*>(),
   SetType::Fields,
@@ -1239,7 +1239,7 @@ coda::descriptors::StructDescriptor MapType::DESCRIPTOR(
   FILE,
   NULL,
   &CollectionType::DESCRIPTOR,
-  _options10,
+  _options9,
   coda::descriptors::StaticArrayRef<coda::descriptors::StructDescriptor*>(),
   coda::descriptors::StaticArrayRef<coda::descriptors::EnumDescriptor*>(),
   MapType::Fields,
@@ -1327,7 +1327,7 @@ coda::descriptors::StructDescriptor ModifiedType::DESCRIPTOR(
   FILE,
   NULL,
   &Type::DESCRIPTOR,
-  _options11,
+  _options10,
   coda::descriptors::StaticArrayRef<coda::descriptors::StructDescriptor*>(),
   coda::descriptors::StaticArrayRef<coda::descriptors::EnumDescriptor*>(),
   ModifiedType::Fields,
@@ -1425,7 +1425,7 @@ coda::descriptors::StructDescriptor DeclType::DESCRIPTOR(
   FILE,
   NULL,
   &Type::DESCRIPTOR,
-  _options2,
+  _options4,
   coda::descriptors::StaticArrayRef<coda::descriptors::StructDescriptor*>(),
   coda::descriptors::StaticArrayRef<coda::descriptors::EnumDescriptor*>(),
   DeclType::Fields,

@@ -25,7 +25,7 @@ TEST(TextCodecTest, TestEncodeDecode) {
   descriptors::StructType::DESCRIPTOR.write(&encoder2);
   std::string sourcePath("test");
   coda::io::TextDecoder decoder(strm, &runtime::TypeRegistry::getInstance(), sourcePath);
-  descriptors::StructType* st = decoder.read<descriptors::StructType>();
+  descriptors::StructType* st = decoder.decode<descriptors::StructType>();
   EXPECT_TRUE(isa<descriptors::StructType>(st));
 //  self.assertEqual(st.getFullName(), descriptors.StructType.DESCRIPTOR.getFullName())
 }*/
@@ -85,8 +85,8 @@ TYPED_TEST_CASE(CodecTest, CodecTypes);
 TYPED_TEST(CodecTest, TestEncodeDecodeBool) {
   BoolValue* source = new BoolValue();
   source->setValue(true);
-  source->write(&this->codec.encoder);
-  BoolValue* actual = this->codec.decoder.template read<BoolValue>();
+  source->encode(&this->codec.encoder);
+  BoolValue* actual = this->codec.decoder.template decode<BoolValue>();
   ASSERT_THAT(actual, ::testing::NotNull());
   ASSERT_TRUE(IsA<BoolValue>(actual));
   EXPECT_EQ(&BoolValue::DESCRIPTOR, actual->descriptor());
@@ -96,8 +96,8 @@ TYPED_TEST(CodecTest, TestEncodeDecodeBool) {
 TYPED_TEST(CodecTest, TestEncodeDecodeInteger) {
   IntegerValue* source = new IntegerValue();
   source->setValue(77);
-  source->write(&this->codec.encoder);
-  IntegerValue* actual = this->codec.decoder.template read<IntegerValue>();
+  source->encode(&this->codec.encoder);
+  IntegerValue* actual = this->codec.decoder.template decode<IntegerValue>();
   ASSERT_THAT(actual, ::testing::NotNull());
   ASSERT_TRUE(IsA<IntegerValue>(actual));
   EXPECT_EQ(&IntegerValue::DESCRIPTOR, actual->descriptor());
@@ -107,8 +107,8 @@ TYPED_TEST(CodecTest, TestEncodeDecodeInteger) {
 TYPED_TEST(CodecTest, TestEncodeDecodeString) {
   StringValue* source = new StringValue();
   source->setValue("foo");
-  source->write(&this->codec.encoder);
-  StringValue* actual = this->codec.decoder.template read<StringValue>();
+  source->encode(&this->codec.encoder);
+  StringValue* actual = this->codec.decoder.template decode<StringValue>();
   ASSERT_THAT(actual, ::testing::NotNull());
   ASSERT_TRUE(IsA<StringValue>(actual));
   EXPECT_EQ(&StringValue::DESCRIPTOR, actual->descriptor());
@@ -118,8 +118,8 @@ TYPED_TEST(CodecTest, TestEncodeDecodeString) {
 TYPED_TEST(CodecTest, TestEncodeDecodeEmptyListValue) {
   ListValue* source = new ListValue();
 //  source->setValue("foo");
-  source->write(&this->codec.encoder);
-  ListValue* actual = this->codec.decoder.template read<ListValue>();
+  source->encode(&this->codec.encoder);
+  ListValue* actual = this->codec.decoder.template decode<ListValue>();
   ASSERT_THAT(actual, ::testing::NotNull());
   ASSERT_TRUE(IsA<ListValue>(actual));
   EXPECT_EQ(&ListValue::DESCRIPTOR, actual->descriptor());
@@ -132,8 +132,8 @@ TYPED_TEST(CodecTest, TestEncodeDecodeListValue) {
   source->getMutableValue().push_back(&(new IntegerValue())->setValue(11));
   source->getMutableValue().push_back(&(new IntegerValue())->setValue(12));
   source->getMutableValue().push_back(&(new IntegerValue())->setValue(13));
-  source->write(&this->codec.encoder);
-  ListValue* actual = this->codec.decoder.template read<ListValue>();
+  source->encode(&this->codec.encoder);
+  ListValue* actual = this->codec.decoder.template decode<ListValue>();
   ASSERT_THAT(actual, ::testing::NotNull());
   ASSERT_TRUE(IsA<ListValue>(actual));
   EXPECT_EQ(&ListValue::DESCRIPTOR, actual->descriptor());
