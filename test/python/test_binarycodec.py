@@ -29,7 +29,6 @@ class BinaryCodecTest(unittest.TestCase):
     self.buffer.seek(0)
 #     print("Binary buffer length:", len(self.buffer.getvalue()))
     decoder = BinaryCodec.createDecoder(self.buffer)
-    decoder.setDebug(True)
     st = decoder.decode(descriptors.StructType)
     self.assertIsInstance(st, descriptors.StructType)
     self.assertEqual(st.getFullName(), descriptors.StructType.DESCRIPTOR.getFullName())
