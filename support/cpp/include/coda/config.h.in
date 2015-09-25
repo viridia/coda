@@ -8,6 +8,7 @@
 // C headers
 #cmakedefine CODA_HAVE_MATH_H 1
 #cmakedefine CODA_HAVE_STDINT_H 1
+#cmakedefine CODA_HAVE_INTRIN_H 1
 
 // C++ headers
 #cmakedefine CODA_HAVE_BITSET 1
@@ -15,5 +16,11 @@
 #cmakedefine CODA_HAVE_MEMORY 1
 #cmakedefine CODA_HAVE_UNORDERED_SET 1
 #cmakedefine CODA_HAVE_UNORDERED_MAP 1
+
+#cmakedefine CODA_BIG_ENDIAN 1
+
+#cmakedefine CODA_HAVE_GCC_BYTESWAP_16 1
+#cmakedefine CODA_HAVE_GCC_BYTESWAP_32 1
+#cmakedefine CODA_HAVE_GCC_BYTESWAP_64 1
 
 #endif

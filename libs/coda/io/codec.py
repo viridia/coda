@@ -118,11 +118,6 @@ class Encoder(metaclass=ABCMeta):
     raise NotImplementedError()
     return self
 
-  @abstractmethod
-  def writeSharedStruct(self, value):
-    raise NotImplementedError()
-    return self
-
 class Decoder(metaclass=ABCMeta):
   @abstractmethod
   def decode(self, cls):

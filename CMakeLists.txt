@@ -13,7 +13,9 @@ set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake_modules/")
 include(CheckIncludeFile)
 include(CheckIncludeFileCXX)
 include(CheckFunctionExists)
+include(CheckCXXSourceCompiles)
 include(CheckTypeSize)
+include(TestBigEndian)
 
 # Report an error if a required header file is not found.
 macro(check_required_include_file_cxx INCLUDE VARIABLE)
@@ -44,6 +46,7 @@ check_include_file(stdint.h CODA_HAVE_STDINT_H)
 #check_include_file(sys/types.h HAVE_SYS_TYPES_H)
 #check_include_file(sys/resource.h HAVE_SYS_RESOURCE_H)
 #check_include_file(libkern/OSAtomic.h HAVE_LIBKERN_OSATOMIC_H)
+check_include_file(intrin.h HAVE_INTRIN_H)
 check_required_include_file_cxx(bitset CODA_HAVE_BITSET)
 check_required_include_file_cxx(functional CODA_HAVE_FUNCTIONAL)
 check_required_include_file_cxx(functional CODA_HAVE_MEMORY)
@@ -55,6 +58,38 @@ check_required_include_file_cxx(unordered_set CODA_HAVE_UNORDERED_SET)
 #check_include_file_cxx(dlfcn.h HAVE_DLFCN_H)
 #check_include_file_cxx(unwind.h HAVE_UNWIND_H)
 #check_include_file_cxx(libunwind.h HAVE_LIBUNWIND_H)
+
+# Endian conversions.
+test_big_endian(CODA_BIG_ENDIAN)
+if (CODA_HAVE_INTRIN_H)
+set(CMAKE_REQUIRED_INCLUDES intrin.h)
+check_function_exists(_byteswap_ushort CODA_HAVE_BYTESWAP_SHORT)
+check_function_exists(_byteswap_ulong CODA_HAVE_BYTESWAP_ULONG)
+check_function_exists(_byteswap_uuint64 CODA_HAVE_BYTESWAP_UINT64)
+endif (CODA_HAVE_INTRIN_H)
+
+# GCC's __builtin_bswap* should be checked individually 
+# because some of them can be missing depends on the GCC version.
+check_cxx_source_compiles("
+  int main() {
+    __builtin_bswap16(0);
+    return 0; 
+  }
+" CODA_HAVE_GCC_BYTESWAP_16)
+
+check_cxx_source_compiles("
+  int main() {
+    __builtin_bswap32(0);
+    return 0; 
+  }
+" CODA_HAVE_GCC_BYTESWAP_32)
+
+check_cxx_source_compiles("
+  int main() {
+    __builtin_bswap64(0);
+    return 0; 
+  }
+" CODA_HAVE_GCC_BYTESWAP_64)
 
 #if (CMAKE_USE_PTHREADS_INIT)
 #    set (HAVE_PTHREADS ON)

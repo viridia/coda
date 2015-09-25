@@ -12,7 +12,22 @@
 namespace coda {
 namespace io {
 
-Encoder& TextEncoder::writeFieldHeader(const char* name, int32_t fieldId) {
+std::ostream& operator<<(std::ostream& os, const runtime::StringRef& str) {
+  os.write(str.begin(), str.size());
+  return os;
+}
+
+Encoder& TextEncoder::writeSubtypeHeader(const runtime::StringRef& subtypeName, int32_t subtypeId) {
+  states.push_back(state);
+  beginValue();
+  strm << '$' << subtypeId << " (" << subtypeName << "): {";
+  indentLevel += 2;
+  first = true;
+  state = STRUCT;
+  return *this;
+}
+
+Encoder& TextEncoder::writeFieldHeader(const runtime::StringRef& fieldName, int32_t fieldId) {
   assert(!fieldHeader);
   assert(state == CLEAR || state == STRUCT);
   if (!first) {
@@ -22,13 +37,9 @@ Encoder& TextEncoder::writeFieldHeader(const char* name, int32_t fieldId) {
     strm << '\n';
     indent();
   }
-  strm << name << ": ";
+  strm << fieldName << ": ";
   fieldHeader = true;
   state = STRUCT;
-  return *this;
-}
-
-Encoder& TextEncoder::writeFieldHeader(const std::string& name, int32_t fieldId) {
   return *this;
 }
 
@@ -82,7 +93,7 @@ Encoder& TextEncoder::writeDouble(double value) {
   return *this;
 }
 
-Encoder& TextEncoder::writeString(const std::string& value) {
+Encoder& TextEncoder::writeString(const runtime::StringRef& value) {
   beginValue();
   strm << "'";
   strm << value; // TODO: Escapes
@@ -90,7 +101,7 @@ Encoder& TextEncoder::writeString(const std::string& value) {
   return *this;
 }
 
-Encoder& TextEncoder::writeBytes(const std::string& value) {
+Encoder& TextEncoder::writeBytes(const runtime::StringRef& value) {
   beginValue();
   strm << "<[";
   strm << "]>";
@@ -180,15 +191,24 @@ Encoder& TextEncoder::writeEndMap() {
   return *this;
 }
 
-Encoder& TextEncoder::writeStruct(const coda::runtime::Object* value) {
+Encoder& TextEncoder::writeStruct(const coda::runtime::Object* value, bool shared) {
   size_t stackLen = states.size();
   beginValue();
   if (value == NULL) {
     strm << "null";
   } else {
+    if (shared) {
+      int32_t index = addShared(value);
+      if (index >= 0) {
+        beginValue();
+        strm << '%' << index;
+        return *this;
+      }
+    }
     void* sid = (void*) value;
     if (inProgress.find(sid) != inProgress.end()) {
-      throw EncodingError("Already serializing object of type " + value->descriptor()->getFullName());
+      throw EncodingError("Already serializing object of type " +
+          value->descriptor()->getFullName());
     }
     inProgress.insert(sid);
     writeBeginStruct();
@@ -202,31 +222,6 @@ Encoder& TextEncoder::writeStruct(const coda::runtime::Object* value) {
     inProgress.erase(sid);
   }
   assert(stackLen == states.size());
-  return *this;
-}
-
-Encoder& TextEncoder::writeSharedStruct(const coda::runtime::Object* value) {
-  if (value == NULL) {
-    writeStruct(value);
-  } else {
-    int32_t index = addShared(value);
-    if (index >= 0) {
-      beginValue();
-      strm << '%' << index;
-    } else {
-      writeStruct(value);
-    }
-  }
-  return *this;
-}
-
-Encoder& TextEncoder::writeBeginSubtype(const std::string& name, int32_t subtypeId) {
-  states.push_back(state);
-  beginValue();
-  strm << '$' << subtypeId << " (" << name << "): {";
-  indentLevel += 2;
-  first = true;
-  state = STRUCT;
   return *this;
 }
 
@@ -283,6 +278,5 @@ void TextEncoder::beginValue() {
   }
   first = false;
 }
-
 
 }} // namespace

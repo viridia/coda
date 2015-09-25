@@ -1226,7 +1226,7 @@ class ListType(CollectionType, coda.runtime.typemixins.ListTypeMixin):
     encoder.writeSubtypeHeader('ListType', 20)
     if self.hasElementType():
       encoder.writeFieldHeader('elementType', 1)
-      encoder.writeSharedStruct(self._elementType)
+      encoder.writeStruct(self._elementType, True)
     super()._writeFields(encoder)
 
   def merge(self, src):
@@ -1299,7 +1299,7 @@ class SetType(CollectionType, coda.runtime.typemixins.SetTypeMixin):
     encoder.writeSubtypeHeader('SetType', 21)
     if self.hasElementType():
       encoder.writeFieldHeader('elementType', 1)
-      encoder.writeSharedStruct(self._elementType)
+      encoder.writeStruct(self._elementType, True)
     super()._writeFields(encoder)
 
   def merge(self, src):
@@ -1379,10 +1379,10 @@ class MapType(CollectionType, coda.runtime.typemixins.MapTypeMixin):
     encoder.writeSubtypeHeader('MapType', 22)
     if self.hasKeyType():
       encoder.writeFieldHeader('keyType', 1)
-      encoder.writeSharedStruct(self._keyType)
+      encoder.writeStruct(self._keyType, True)
     if self.hasValueType():
       encoder.writeFieldHeader('valueType', 2)
-      encoder.writeSharedStruct(self._valueType)
+      encoder.writeStruct(self._valueType, True)
     super()._writeFields(encoder)
 
   def merge(self, src):
@@ -1492,7 +1492,7 @@ class ModifiedType(Type, coda.runtime.typemixins.ModifiedTypeMixin):
     encoder.writeSubtypeHeader('ModifiedType', 23)
     if self.hasElementType():
       encoder.writeFieldHeader('elementType', 1)
-      encoder.writeSharedStruct(self._elementType)
+      encoder.writeStruct(self._elementType, True)
     if self.hasConst():
       encoder.writeFieldHeader('const', 2)
       encoder.writeBoolean(self._const)
@@ -1628,10 +1628,10 @@ class DeclType(Type, coda.runtime.typemixins.DeclTypeMixin):
     encoder.writeSubtypeHeader('DeclType', 41)
     if self.hasFile():
       encoder.writeFieldHeader('file', 2)
-      encoder.writeSharedStruct(self._file)
+      encoder.writeStruct(self._file, True)
     if self.hasEnclosingType():
       encoder.writeFieldHeader('enclosingType', 3)
-      encoder.writeSharedStruct(self._enclosingType)
+      encoder.writeStruct(self._enclosingType, True)
     if self.hasName():
       encoder.writeFieldHeader('name', 4)
       encoder.writeString(self._name)
@@ -1808,13 +1808,13 @@ class StructType(DeclType):
         encoder.writeString(self._name)
       if self.hasType():
         encoder.writeFieldHeader('type', 2)
-        encoder.writeSharedStruct(self._type)
+        encoder.writeStruct(self._type, True)
       if self.hasId():
         encoder.writeFieldHeader('id', 3)
         encoder.writeInteger(self._id)
       if self.hasOptions():
         encoder.writeFieldHeader('options', 4)
-        encoder.writeSharedStruct(self._options)
+        encoder.writeStruct(self._options, True)
 
     def merge(self, src):
       if src.hasName():
@@ -1954,7 +1954,7 @@ class StructType(DeclType):
         encoder.writeString(self._name)
       if self.hasType():
         encoder.writeFieldHeader('type', 2)
-        encoder.writeSharedStruct(self._type)
+        encoder.writeStruct(self._type, True)
 
     def merge(self, src):
       if src.hasName():
@@ -2072,13 +2072,13 @@ class StructType(DeclType):
         encoder.writeEndList()
       if self.hasReturnType():
         encoder.writeFieldHeader('returnType', 3)
-        encoder.writeSharedStruct(self._returnType)
+        encoder.writeStruct(self._returnType, True)
       if self.hasId():
         encoder.writeFieldHeader('id', 4)
         encoder.writeInteger(self._id)
       if self.hasOptions():
         encoder.writeFieldHeader('options', 5)
-        encoder.writeSharedStruct(self._options)
+        encoder.writeStruct(self._options, True)
 
     def merge(self, src):
       if src.hasName():
@@ -2272,10 +2272,10 @@ class StructType(DeclType):
     encoder.writeSubtypeHeader('StructType', 30)
     if self.hasOptions():
       encoder.writeFieldHeader('options', 1)
-      encoder.writeSharedStruct(self._options)
+      encoder.writeStruct(self._options, True)
     if self.hasBaseType():
       encoder.writeFieldHeader('baseType', 3)
-      encoder.writeSharedStruct(self._baseType)
+      encoder.writeStruct(self._baseType, True)
     if self.hasTypeId():
       encoder.writeFieldHeader('typeId', 4)
       encoder.writeInteger(self._typeId)
@@ -2289,13 +2289,13 @@ class StructType(DeclType):
       encoder.writeFieldHeader('structs', 6)
       encoder.writeBeginList(30, len(self._structs))
       for val in self._structs:
-        encoder.writeSharedStruct(val)
+        encoder.writeStruct(val, True)
       encoder.writeEndList()
     if len(self._enums):
       encoder.writeFieldHeader('enums', 7)
       encoder.writeBeginList(30, len(self._enums))
       for val in self._enums:
-        encoder.writeSharedStruct(val)
+        encoder.writeStruct(val, True)
       encoder.writeEndList()
     if len(self._extensions):
       encoder.writeFieldHeader('extensions', 8)
@@ -2637,7 +2637,7 @@ class EnumType(DeclType):
     encoder.writeSubtypeHeader('EnumType', 31)
     if self.hasOptions():
       encoder.writeFieldHeader('options', 1)
-      encoder.writeSharedStruct(self._options)
+      encoder.writeStruct(self._options, True)
     if len(self._values):
       encoder.writeFieldHeader('values', 2)
       encoder.writeBeginList(30, len(self._values))
@@ -2770,16 +2770,16 @@ class ExtensionField(coda.runtime.Object):
   def _writeFields(self, encoder):
     if self.hasFile():
       encoder.writeFieldHeader('file', 1)
-      encoder.writeSharedStruct(self._file)
+      encoder.writeStruct(self._file, True)
     if self.hasEnclosingType():
       encoder.writeFieldHeader('enclosingType', 2)
-      encoder.writeSharedStruct(self._enclosingType)
+      encoder.writeStruct(self._enclosingType, True)
     if self.hasSourceLine():
       encoder.writeFieldHeader('sourceLine', 3)
       encoder.writeInteger(self._sourceLine)
     if self.hasExtends():
       encoder.writeFieldHeader('extends', 4)
-      encoder.writeSharedStruct(self._extends)
+      encoder.writeStruct(self._extends, True)
     if self.hasName():
       encoder.writeFieldHeader('name', 5)
       encoder.writeString(self._name)
@@ -2788,7 +2788,7 @@ class ExtensionField(coda.runtime.Object):
       encoder.writeInteger(self._id)
     if self.hasType():
       encoder.writeFieldHeader('type', 7)
-      encoder.writeSharedStruct(self._type)
+      encoder.writeStruct(self._type, True)
 
   def merge(self, src):
     if src.hasFile():
@@ -3147,19 +3147,19 @@ class FileDescriptor(coda.runtime.Object):
       encoder.writeFieldHeader('structs', 5)
       encoder.writeBeginList(30, len(self._structs))
       for val in self._structs:
-        encoder.writeSharedStruct(val)
+        encoder.writeStruct(val, True)
       encoder.writeEndList()
     if len(self._enums):
       encoder.writeFieldHeader('enums', 6)
       encoder.writeBeginList(30, len(self._enums))
       for val in self._enums:
-        encoder.writeSharedStruct(val)
+        encoder.writeStruct(val, True)
       encoder.writeEndList()
     if len(self._extensions):
       encoder.writeFieldHeader('extensions', 7)
       encoder.writeBeginList(30, len(self._extensions))
       for val in self._extensions:
-        encoder.writeSharedStruct(val)
+        encoder.writeStruct(val, True)
       encoder.writeEndList()
     if len(self._imports):
       encoder.writeFieldHeader('imports', 8)

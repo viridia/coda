@@ -23,10 +23,12 @@ class DataType:
   PLIST = 11    # List of fixed-width items (followed by format and length)
   MAP = 12      # Map of items (followed by length)
   STRUCT = 13   # Beginning of a struct
-  SUBTYPE = 14  # Beginning of subtype data, field ID is actually subtype ID
+  SSTRUCT = 14  # Beginning of a shared struct
+  SUBTYPE = 15  # Beginning of subtype data, field ID is actually subtype ID
 
   # Extended types - low bits must be 0
   SHARED_REF = 0x10   # Reference to a shared object (followed by object id). Used in maps/lists.
+  SHARED_DEF = 0x20   # Definition of a shared object (followed by struct). Used in maps/lists.
 
   MAXVAL = SUBTYPE
 
@@ -53,6 +55,7 @@ DTYPE_NAMES = {
   DataType.PLIST: 'plist',
   DataType.MAP: 'map',
   DataType.STRUCT: 'struct',
+  DataType.SSTRUCT: 'shared_struct',
   DataType.SUBTYPE: 'subtype',
 }
 
@@ -123,11 +126,25 @@ class BinaryEncoder(coda.io.AbstractEncoder):
     return self
 
   def writeInteger(self, value):
+    if self.__fieldId is not None:
+      if value == 0:
+        self.__beginValue(DataType.ZERO)
+        return
+      elif value == 1:
+        self.__beginValue(DataType.ONE)
+        return
     self.__beginValue(DataType.VARINT)
     self.__writeVarInt(self.zigZagEncode(value))
     return self
 
   def writeFixed16(self, value):
+    if self.__fieldId is not None:
+      if value == 0:
+        self.__beginValue(DataType.ZERO)
+        return
+      elif value == 1:
+        self.__beginValue(DataType.ONE)
+        return
     self.__beginValue(DataType.FIXED16)
     self.__stream.write(DataFormat.FIXED16.pack(value))
     return self
@@ -188,24 +205,21 @@ class BinaryEncoder(coda.io.AbstractEncoder):
 
   writeEndMap = writeEndList
 
-  def writeSharedStruct(self, value):
-    if value is None:
-      self.writeStruct(value)
-    else:
-      index = self.addShared(value)
-      if index is not None:
-        # OK so the problem here is when we're writing a list or a map, we have no
-        # field ID. Now, normally we would expect a field ID of the struct.
-        if self.__fieldId is None:
-          self.__writeUByte(DataType.SHARED_REF)
-        self.writeInteger(index)
-      else:
-        self.writeStruct(value)
-
-  def writeStruct(self, value):
+  def writeStruct(self, value, shared=False):
     if value is None:
       self.__beginValue(DataType.ZERO)
     else:
+      if shared:
+        index = self.addShared(value)
+        if index is not None:
+          # If we're inside a container, there are no field headers, so add a special prefix
+          # byte to the beginning of the struct to indicate that this is a reference to a shared
+          # struct previously seen.
+          if self.__fieldId is None:
+            self.__writeUByte(DataType.SHARED_REF)
+          self.writeInteger(index)
+          return self
+
       assert isinstance(value, coda.runtime.Object), type(value)
       sid = id(value)
       if sid in self.__inProgress:
@@ -213,7 +227,9 @@ class BinaryEncoder(coda.io.AbstractEncoder):
             value.descriptor().getFullName())
       self.__inProgress.add(sid)
       savedState = self.__state
-      self.__beginValue(DataType.STRUCT)
+      if self.__fieldId is None and shared:
+        self.__writeUByte(DataType.SHARED_DEF)
+      self.__beginValue(DataType.SSTRUCT if shared else DataType.STRUCT)
       savedFieldId = self.__lastFieldId
       self.__lastFieldId = 0
       self.__state = self.State.STRUCT
@@ -324,7 +340,12 @@ class BinaryDecoder(coda.io.AbstractDecoder):
       if expectedKind != types.TypeKind.STRUCT:
         self.fatal(self.__lastReadPos,
             'Type error: Expecting {0}, got a list', expectedType.getName())
-      return self.__readStructValue(expectedType)
+      return self.__readStructValue(expectedType, False)
+    elif actualType == DataType.SSTRUCT:
+      if expectedKind != types.TypeKind.STRUCT:
+        self.fatal(self.__lastReadPos,
+            'Type error: Expecting {0}, got a list', expectedType.getName())
+      return self.__readStructValue(expectedType, True)
     elif actualType == DataType.LIST:
       return self.__readListValue(expectedType, actualType)
     elif actualType == DataType.PLIST:
@@ -361,6 +382,8 @@ class BinaryDecoder(coda.io.AbstractDecoder):
       elif expectedKind == types.TypeKind.STRUCT:
         if actualType == DataType.ZERO:
           return None
+        elif actualType == DataType.ONE:
+          return self.__getShared(1)
         elif actualType == DataType.VARINT:
           return self.__getShared(value)
         # Fall through
@@ -396,14 +419,10 @@ class BinaryDecoder(coda.io.AbstractDecoder):
     else:
       assert False, 'Invalid data type'
 
-  def __readStructValue(self, expectedType):
-    shared = False
+  def __readStructValue(self, expectedType, shared):
     originalType = expectedType
     if expectedType.typeId() == types.TypeKind.MODIFIED:
-      shared = expectedType.isShared()
       expectedType = expectedType.getElementType()
-    else:
-      shared = self.__isSharedType(expectedType)
 
     if expectedType.typeId() != types.TypeKind.STRUCT:
       self.fatal(self.__lastReadPos,
@@ -511,10 +530,13 @@ class BinaryDecoder(coda.io.AbstractDecoder):
 
       if dataType == DataType.END:
         break
+      elif dataType == DataType.SHARED_DEF:
+        shared = True
       elif dataType == DataType.SHARED_REF:
+        assert not shared
         oid = self.zigZagDecode(self.__readVarInt())
         if self.__debug:
-          self.__debugf('shared object: {0}', oid)
+          self.__debugf('shared ref: {0}', oid)
         return self.__getShared(oid)
       elif dataType == DataType.SUBTYPE:
 #         base = self.__getBase(self.__descriptor)
@@ -594,10 +616,10 @@ class BinaryDecoder(coda.io.AbstractDecoder):
     byte = data[0]
     delta = byte >> 4
     dataType = byte & 0x0f
-    if dataType > DataType.MAXVAL:
-      self.fatal(self.__lastReadPos, 'Invalid data type: 0x{0:x}', byte)
-#     if self.__debug:
-#       self.__debugf('-- dataType: 0x{0:x}', byte)
+#     if dataType > DataType.MAXVAL:
+#       self.fatal(self.__lastReadPos, 'Invalid data type: 0x{0:x}', byte)
+# #     if self.__debug:
+# #       self.__debugf('-- dataType: 0x{0:x}', byte)
     if dataType == DataType.SUBTYPE:
       if delta > 0:
         self.__subtypeId = delta
@@ -606,9 +628,11 @@ class BinaryDecoder(coda.io.AbstractDecoder):
       if self.__debug:
         self.__debugf('-- subtype header: dataType:{0}, subtypeId:{1}',
             DTYPE_NAMES[dataType], self.__subtypeId)
-    elif dataType == DataType.END:
-      dataType = byte # For extended types
-    elif dataType != DataType.END:
+    elif dataType == 0:
+      # A delta of 0 means that the data type is an extended data type (>15).
+      # This includes SHARED_REF and SHARED_DEF.
+      dataType = byte
+    else:
       if delta > 0:
         self.__fieldId += delta
       else:
@@ -671,15 +695,6 @@ class BinaryDecoder(coda.io.AbstractDecoder):
       self.fatal(self.__lastReadPos,
           'Invalid shared object ID {0}, expecting type {1} (while reading struct {2}).',
           index, self.__descriptor.getName(), self.__descriptor.getName())
-
-  def __isSharedType(self, ty):
-    while True:
-      if ty.getOptions().hasShared():
-        return ty.getOptions().isShared()
-      if ty.hasBaseType():
-        ty = ty.getBaseType()
-      else:
-        return False
 
   def typeError(self, pos, actualType, valueName, toType):
     if isinstance(actualType, types.Type):

@@ -175,12 +175,18 @@ class TextEncoder(coda.io.AbstractEncoder):
     self.__first = False
     return self
 
-  def writeStruct(self, value):
+  def writeStruct(self, value, shared=False):
     stackLen = len(self.__states)
     self.__beginValue()
     if value is None:
       self.__stream.write("null")
     else:
+      if shared:
+        index = self.addShared(value)
+        if index is not None:
+          self.__beginValue()
+          self.__stream.write('%' + str(index))
+          return self
       assert isinstance(value, coda.runtime.Object)
       sid = id(value)
       if sid in self.__inProgress:
@@ -196,17 +202,6 @@ class TextEncoder(coda.io.AbstractEncoder):
       self.__inProgress.remove(sid)
     assert stackLen == len(self.__states)
     return self
-
-  def writeSharedStruct(self, value):
-    if value is None:
-      self.writeStruct(value)
-    else:
-      index = self.addShared(value)
-      if index is not None:
-        self.__beginValue()
-        self.__stream.write('%' + str(index))
-      else:
-        self.writeStruct(value)
 
   def __writeBeginStruct(self):
     if len(self.__states) > self.__maxDepth:

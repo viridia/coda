@@ -567,7 +567,7 @@ class Python3Generator(genbase.CodeGenerator):
       self.writeLn("encoder.writeEndMap()")
     elif fkind == types.TypeKind.STRUCT:
       if self.isSharedType(fty):
-        self.writeLnFmt("encoder.writeSharedStruct({0})", var)
+        self.writeLnFmt("encoder.writeStruct({0}, True)", var)
       else:
         self.writeLnFmt("encoder.writeStruct({0})", var)
     elif fkind == types.TypeKind.ENUM:
@@ -575,7 +575,7 @@ class Python3Generator(genbase.CodeGenerator):
     elif fkind == types.TypeKind.MODIFIED:
       if fty.isShared():
         assert isinstance(fty.getElementType(), types.StructType)
-        self.writeLnFmt("encoder.writeSharedStruct({0})", var)
+        self.writeLnFmt("encoder.writeStruct({0}, True)", var)
       else:
         self.genValueWrite(var, fty.getElementType(), options)
     else:

@@ -1,12 +1,16 @@
 // ============================================================================
-// Coda Text Encoder
+// Coda Binary Encoder
 // ============================================================================
 
-#ifndef CODA_IO_TEXTENCODER_H
-#define CODA_IO_TEXTENCODER_H 1
+#ifndef CODA_IO_BINARYENCODER_H
+#define CODA_IO_BINARYENCODER_H 1
 
 #ifndef CODA_IO_ABSTRACTENCODER_H
   #include "coda/io/abstractencoder.h"
+#endif
+
+#ifndef CODA_IO_BINARYFORMAT_H
+  #include "coda/io/binaryformat.h"
 #endif
 
 #include <ostream>
@@ -15,19 +19,11 @@ namespace coda {
 namespace io {
 
 /**
- * Encoder that serializes into text format.
+ * Encoder that serializes into binary format.
  */
-class TextEncoder : public AbstractEncoder {
+class BinaryEncoder : public AbstractEncoder {
 public:
-  TextEncoder(std::ostream& str)
-    : strm(str)
-    , indentLevel(0)
-    , first(true)
-    , state(CLEAR)
-    , fieldHeader(false)
-    , maxDepth(255)
-  {
-  }
+  BinaryEncoder(std::ostream& str);
 
   Encoder& writeSubtypeHeader(const runtime::StringRef& subtypeName, int32_t subtypeId);
   Encoder& writeFieldHeader(const runtime::StringRef& fieldName, int32_t fieldId);
@@ -52,7 +48,7 @@ public:
       coda::descriptors::TypeKind valueKind,
       size_t length);
   Encoder& writeEndMap();
-  Encoder& writeStruct(const coda::runtime::Object* value, bool shared=true);
+  Encoder& writeStruct(const coda::runtime::Object* value, bool shared=false);
   Encoder& writeEndSubtype();
 
 private:
@@ -61,22 +57,25 @@ private:
     STRUCT,
     CONTAINER,
     MAP_KEY,
-    MAP_VALUE
+    MAP_VALUE,
+    SUBTYPE
   };
 
   std::ostream& strm;
-  int32_t indentLevel;
-  bool first;
   State state;
-  bool fieldHeader;
   std::unordered_set<void*> inProgress;
   std::vector<State> states;
-  size_t maxDepth;
+  int32_t subtypeId;
+  int32_t fieldId;
+  int32_t lastFieldId;
 
-  void writeBeginStruct();
-  void writeEndStruct();
-  void indent();
-  void beginValue();
+  void beginValue(DataType dt);
+  void beginSubtype();
+  void writeUByte(uint8_t);
+  void writeVarInt(uint32_t);
+  void writeVarInt(uint64_t);
+  static uint32_t zigZagEncode(int32_t value);
+  static uint64_t zigZagEncode(int64_t value);
 };
 
 }} // namespace

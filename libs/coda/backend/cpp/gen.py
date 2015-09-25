@@ -1019,7 +1019,7 @@ class CppGenerator(AbstractCppGenerator):
       self.indent()
       if base:
         self.writeLnFmt('{0}::beginWrite(encoder);', baseName)
-      self.writeLnFmt('encoder->writeBeginSubtype("{0}", {1});',
+      self.writeLnFmt('encoder->writeSubtypeHeader("{0}", {1});',
           struct.getName(), self.formatTypeKind(struct.getTypeId()))
       self.unindent()
       self.writeLn('}')
@@ -1147,11 +1147,11 @@ class CppGenerator(AbstractCppGenerator):
       self.endForLoop()
       self.writeLn("encoder->writeEndMap();")
     elif fkind == types.TypeKind.STRUCT:
-      self.writeLnFmt("encoder->writeSharedStruct({0});", var)
+      self.writeLnFmt("encoder->writeStruct({0}, true);", var)
     elif fkind == types.TypeKind.MODIFIED:
       if fty.isShared():
         assert isinstance(fty.getElementType(), types.StructType)
-        self.writeLnFmt("encoder->writeSharedStruct({0});", var)
+        self.writeLnFmt("encoder->writeStruct({0}, true);", var)
       else:
         self.genValueWrite(var, fty.getElementType(), options)
     else:

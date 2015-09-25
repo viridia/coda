@@ -59,6 +59,7 @@ public:
   }
 
   void dumpStream() {
+    strm.flush();
     std::cout.flush();
     std::cerr.flush();
     std::cerr << "Stream contents: <<<";
@@ -137,7 +138,7 @@ TYPED_TEST(CodecTest, TestEncodeDecodeListValue) {
   ASSERT_THAT(actual, ::testing::NotNull());
   ASSERT_TRUE(IsA<ListValue>(actual));
   EXPECT_EQ(&ListValue::DESCRIPTOR, actual->descriptor());
-  EXPECT_EQ(3, actual->getValue().size());
+  ASSERT_EQ(3, actual->getValue().size());
   ASSERT_TRUE(IsA<IntegerValue>(actual->getValue()[0]));
   EXPECT_EQ(11, ((IntegerValue*)actual->getValue()[0])->getValue());
   EXPECT_EQ(12, ((IntegerValue*)actual->getValue()[1])->getValue());

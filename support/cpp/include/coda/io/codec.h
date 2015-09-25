@@ -9,6 +9,10 @@
   #include "coda/descriptors.h"
 #endif
 
+#ifndef CODA_STRINGREF_H
+  #include "coda/runtime/stringref.h"
+#endif
+
 namespace coda {
 namespace io {
 
@@ -27,10 +31,12 @@ class Encoder {
 public:
   virtual Encoder& addExtern(const coda::runtime::Object* obj, int32_t index = -1) = 0;
 
+  /** Start a subtype record. */
+  virtual Encoder& writeSubtypeHeader(const runtime::StringRef& subtypeName, int32_t subtypeId) = 0;
+
   /** Write out a field header. This should be called immediately before writing the data
       for the field. */
-  virtual Encoder& writeFieldHeader(const char* name, int32_t fieldId) = 0;
-  virtual Encoder& writeFieldHeader(const std::string& name, int32_t fieldId) = 0;
+  virtual Encoder& writeFieldHeader(const runtime::StringRef& fieldName, int32_t fieldId) = 0;
 
   /** Write a boolean value to the stream. */
   virtual Encoder& writeBoolean(bool value) = 0;
@@ -51,10 +57,10 @@ public:
   virtual Encoder& writeDouble(double value) = 0;
 
   /** Write a string value to the stream. */
-  virtual Encoder& writeString(const std::string& value) = 0;
+  virtual Encoder& writeString(const runtime::StringRef& value) = 0;
 
   /** Write a bytes value to the stream. */
-  virtual Encoder& writeBytes(const std::string& value) = 0;
+  virtual Encoder& writeBytes(const runtime::StringRef& value) = 0;
 
   /** Start a list value. */
   virtual Encoder& writeBeginList(
@@ -80,13 +86,7 @@ public:
   virtual Encoder& writeEndMap() = 0;
 
   /** Write a struct value to the stream. */
-  virtual Encoder& writeStruct(const coda::runtime::Object* value) = 0;
-
-  /** Write a shared struct value to the stream. */
-  virtual Encoder& writeSharedStruct(const coda::runtime::Object* value) = 0;
-
-  /** Start a subtype record. */
-  virtual Encoder& writeBeginSubtype(const std::string& name, int32_t subtypeId) = 0;
+  virtual Encoder& writeStruct(const coda::runtime::Object* value, bool shared=true) = 0;
 
   /** Finish a subtype record. */
   virtual Encoder& writeEndSubtype() = 0;

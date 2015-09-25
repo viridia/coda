@@ -9,7 +9,6 @@ class TextCodecTest(unittest.TestCase):
   def dumpBuffer(self, buffer):
     for lineno, line in enumerate(buffer.getvalue().split('\n')):
       print('{0}: {1}'.format(lineno+1, line))
-    print("Text buffer:", buffer.getvalue())
   
   def testEncodeDecodeBoolean(self):
     source = BoolValue()
@@ -18,7 +17,7 @@ class TextCodecTest(unittest.TestCase):
     encoder = TextCodec.createEncoder(buffer)
     source.encode(encoder)
     buffer.seek(0)
-    self.dumpBuffer(buffer)
+#     self.dumpBuffer(buffer)
     decoder = TextCodec.createDecoder(buffer)
     result = decoder.decode(BoolValue)
     self.assertIsInstance(result, BoolValue)
