@@ -134,6 +134,7 @@ def main(argv=None):
         if importPath not in files:
           ast = parseFile(parser, importPath)
           if ast:
+            files[importPath] = ast
             imports.append(ast)
             readImports(ast)
 

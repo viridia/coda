@@ -1,10 +1,8 @@
 '''Classes to bootstrap a generated Coda module.'''
 
-import os.path
-
 class Bootstrap:
   deferred = []
-  incomplete = []
+  #incomplete = []
   structDescriptorClass = None
   enumDescriptorClass = None
   descdata = None
@@ -39,6 +37,8 @@ def createFile(name, path, package, structs=(), enums=(), extensions=(),
   # Function to initialize descriptors after modules have been imported
   def initDescriptors():
     def initDeferredModule(importModule, initFn):
+      if importModule.get('__initializing__'):
+        return
       moduleName = importModule['__name__']
       if 'FILE' not in importModule:
         return
@@ -51,6 +51,7 @@ def createFile(name, path, package, structs=(), enums=(), extensions=(),
       for importPath, localName in lateImports:
         mod = __import__(importPath, globals(), locals(), 'FILE')
         importModule[localName] = mod
+      importModule['__initializing__'] = True
       initFn()
     def handleModuleDeps():
       for importMap in imports.values():

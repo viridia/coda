@@ -232,7 +232,7 @@ class Python3TransformGenerator(genvisitor.Python3VisitorGenerator):
       self.indent()
       self.writeLn('newMap = {}')
       self.writeLn('fieldChanged = False')
-      self.writeLnFmt('for k, v in {value}.get{field}():', **fmtParams)
+      self.writeLnFmt('for k, v in {value}.get{field}().items():', **fmtParams)
       self.indent()
       if visitKeys:
         self.writeLnFmt('kNew = self.traverse{struct}(k)', **fmtParams)
