@@ -10,7 +10,7 @@
 namespace sample {
 
 coda::descriptors::FieldOptions _options0 = coda::descriptors::freeze(coda::descriptors::FieldOptions().setFixed(true));
-coda::descriptors::FileOptions _options1 = coda::descriptors::freeze(coda::descriptors::FileOptions().putPackage("cpp", "sample").putPackage("java", "sample").putPackage("python", "sample").putOuterClass("java", "Sample"));
+coda::descriptors::FileOptions _options1 = coda::descriptors::freeze(coda::descriptors::FileOptions().putPackage("python", "sample").putPackage("java", "sample").putPackage("cpp", "sample").putOuterClass("java", "Sample"));
 
 // ============================================================================
 // E
@@ -293,6 +293,39 @@ void S1::freezeImpl() {
   }
 }
 
+void S1::clear() {
+  _scalarBoolean = false;
+  _scalarI16 = 0;
+  _scalarI32 = 0;
+  _scalarI64 = 0;
+  _scalarFixedI16 = 0;
+  _scalarFixedI32 = 0;
+  _scalarFixedI64 = 0;
+  _scalarFloat = 0;
+  _scalarDouble = 0;
+  _scalarEnum = E_E0;
+  _listBoolean.clear();
+  _listInt.clear();
+  _listFloat.clear();
+  _listString.clear();
+  _listEnum.clear();
+  _setInt.clear();
+  _setString.clear();
+  _setEnum.clear();
+  _mapIntString.clear();
+  _mapStringInt.clear();
+  _mapEnumStruct.clear();
+  _unused = 0;
+}
+
+void S1::deleteRecursiveImpl(Object** queue) {
+  for (std::unordered_map<E, S1*, coda::runtime::EnumHash<E> >::const_iterator it = _mapEnumStruct.begin(), itEnd = _mapEnumStruct.end(); it != itEnd; ++it) {
+    if (it->second != &S1::DEFAULT_INSTANCE) {
+      it->second->queueForDelete(queue);
+    }
+  }
+}
+
 void S1::endWrite(coda::io::Encoder* encoder) const {
   if (hasScalarBoolean()) {
     encoder->writeFieldHeader("scalarBoolean", 1);
@@ -482,8 +515,8 @@ coda::descriptors::StructDescriptor S2::DESCRIPTOR(
 S2 S2::DEFAULT_INSTANCE;
 
 S2::S2()
-  : _left(NULL)
-  , _right(NULL)
+  : _left(&S1::DEFAULT_INSTANCE)
+  , _right(&S1::DEFAULT_INSTANCE)
 {
 }
 
@@ -507,6 +540,22 @@ void S2::freezeImpl() {
   }
   if (_right->isMutable()) {
     _right->freeze();
+  }
+}
+
+void S2::clear() {
+  S1::clear();
+  _left = &S1::DEFAULT_INSTANCE;
+  _right = &S1::DEFAULT_INSTANCE;
+}
+
+void S2::deleteRecursiveImpl(Object** queue) {
+  S1::deleteRecursiveImpl(queue);
+  if (_left != &S1::DEFAULT_INSTANCE) {
+    _left->queueForDelete(queue);
+  }
+  if (_right != &S1::DEFAULT_INSTANCE) {
+    _right->queueForDelete(queue);
   }
 }
 
@@ -606,6 +655,32 @@ void S3::freezeImpl() {
   for (std::unordered_map<std::string, S1*>::const_iterator it = _sMap.begin(), itEnd = _sMap.end(); it != itEnd; ++it) {
     if (it->second->isMutable()) {
       it->second->freeze();
+    }
+  }
+}
+
+void S3::clear() {
+  S1::clear();
+  _sList.clear();
+  _sSet.clear();
+  _sMap.clear();
+}
+
+void S3::deleteRecursiveImpl(Object** queue) {
+  S1::deleteRecursiveImpl(queue);
+  for (std::vector<S1*>::const_iterator it = _sList.begin(), itEnd = _sList.end(); it != itEnd; ++it) {
+    if ((*it) != &S1::DEFAULT_INSTANCE) {
+      (*it)->queueForDelete(queue);
+    }
+  }
+  for (std::unordered_set<S1*>::const_iterator it = _sSet.begin(), itEnd = _sSet.end(); it != itEnd; ++it) {
+    if ((*it) != &S1::DEFAULT_INSTANCE) {
+      (*it)->queueForDelete(queue);
+    }
+  }
+  for (std::unordered_map<std::string, S1*>::const_iterator it = _sMap.begin(), itEnd = _sMap.end(); it != itEnd; ++it) {
+    if (it->second != &S1::DEFAULT_INSTANCE) {
+      it->second->queueForDelete(queue);
     }
   }
 }

@@ -208,37 +208,40 @@ class DefaultValueProducer(genbase.AbstractTypeTransform):
   def visitType(self, ty, *args):
     raise AssertionError('Type not handled: ' + str(ty))
 
-  def visitBooleanType(self, ty):
+  def visitBooleanType(self, ty, options):
     return 'false'
 
-  def visitIntegerType(self, ty):
+  def visitIntegerType(self, ty, options):
     return '0'
 
-  def visitFloatType(self, ty):
+  def visitFloatType(self, ty, options):
     return '0'
 
-  def visitDoubleType(self, ty):
+  def visitDoubleType(self, ty, options):
     return '0'
 
-  def visitStringType(self, ty):
+  def visitStringType(self, ty, options):
     return None
 
-  def visitBytesType(self, ty):
+  def visitBytesType(self, ty, options):
     return None
 
-  def visitListType(self, ty):
+  def visitListType(self, ty, options):
     return None
 
-  def visitSetType(self, ty):
+  def visitSetType(self, ty, options):
     return None
 
-  def visitMapType(self, ty):
+  def visitMapType(self, ty, options):
     return None
 
-  def visitStructType(self, ty):
-    return 'NULL'
+  def visitStructType(self, ty, options):
+    if options.isNullable():
+      return 'NULL'
+    else:
+      return '&{0}::DEFAULT_INSTANCE'.format(getQualName(ty))
 
-  def visitEnumType(self, ty):
+  def visitEnumType(self, ty, options):
     # TODO: get first member
     if len(ty.getValues()) > 0:
       value = ty.getValues()[0]
@@ -246,8 +249,8 @@ class DefaultValueProducer(genbase.AbstractTypeTransform):
       return '{0}_{1}'.format(prefix, value.getName())
     return '({0}) 0'.format(self.nameFormatter(ty))
 
-  def visitModifiedType(self, ty):
-    return self(ty.getElementType())
+  def visitModifiedType(self, ty, options):
+    return self(ty.getElementType(), options)
 
 class ValueFormatter(genbase.AbstractTypeTransform):
   '''Transform a typed expression into its C++ representation.'''
@@ -556,7 +559,7 @@ class CppHeaderGenerator(AbstractCppGenerator):
       self.indent()
       delim = ':'
       for field in struct.getFields():
-        value = self.defaultValueOf(field.getType())
+        value = self.defaultValueOf(field.getType(), field.getOptions())
         if value:
           self.writeLnFmt('{0} _{1}({2})', delim, field.getName(), value)
           delim = ','
@@ -612,9 +615,11 @@ class CppHeaderGenerator(AbstractCppGenerator):
     if struct.getFields():
       self.writeLn('size_t hashValue() const;')
 
-    # Freezing
+    # Freezing and clearing
     if struct.getFields():
+      self.writeLn('void clear();')
       self.writeLn('void freezeImpl();')
+      self.writeLn('void deleteRecursiveImpl(Object** freeList);')
 
     # Serialization
     if struct.getBaseType():
@@ -738,7 +743,7 @@ class CppHeaderGenerator(AbstractCppGenerator):
         self.capitalize(field.getName()))
     self.indent()
     self.writeLn('checkMutable();')
-    value = self.defaultValueOf(field.getType())
+    value = self.defaultValueOf(field.getType(), field.getOptions())
     if self.isFieldPresentable(field):
       self.writeLnFmt('fieldsPresent.reset(HAS_{0});',
           toUpperUnderscore(field.getName()))
@@ -972,7 +977,7 @@ class CppGenerator(AbstractCppGenerator):
       self.indent()
       delim = ':'
       for field in struct.getFields():
-        value = self.defaultValueOf(field.getType())
+        value = self.defaultValueOf(field.getType(), field.getOptions())
         if value:
           self.writeLnFmt('{0} _{1}({2})', delim, field.getName(), value)
           delim = ','
@@ -1040,7 +1045,7 @@ class CppGenerator(AbstractCppGenerator):
       self.writeLn('}')
       self.writeLn()
 
-    # Freezing
+    # Freezing and clearing
     if struct.getFields():
       self.writeLnFmt('void {0}::freezeImpl() {{', structQualName)
       self.indent()
@@ -1050,6 +1055,30 @@ class CppGenerator(AbstractCppGenerator):
         fname = field.getName()
         ftype = field.getType()
         self.genValueFreeze('_' + fname, ftype, field.getOptions())
+      self.unindent()
+      self.writeLn('}')
+      self.writeLn()
+
+      self.writeLnFmt('void {0}::clear() {{', structQualName)
+      self.indent()
+      if base:
+        self.writeLnFmt('{0}::clear();', baseName)
+      for field in struct.getFields():
+        fname = field.getName()
+        ftype = field.getType()
+        self.genValueClear('_' + fname, field)
+      self.unindent()
+      self.writeLn('}')
+      self.writeLn()
+
+      self.writeLnFmt('void {0}::deleteRecursiveImpl(Object** queue) {{', structQualName)
+      self.indent()
+      if base:
+        self.writeLnFmt('{0}::deleteRecursiveImpl(queue);', baseName)
+      for field in struct.getFields():  
+        fname = field.getName()
+        ftype = field.getType()
+        self.genValueDelete('_' + fname, ftype, field.getOptions())
       self.unindent()
       self.writeLn('}')
       self.writeLn()
@@ -1138,6 +1167,54 @@ class CppGenerator(AbstractCppGenerator):
           self.writeLnFmt('if ({0}->isMutable()) {{', var)
         self.indent()
         self.writeLnFmt('{0}->freeze();', var)
+        self.unindent()
+        self.writeLn("}")
+
+  def genValueClear(self, var, field):
+      fname = field.getName()
+      ftype = field.getType()
+      while ftype.typeId() == types.TypeKind.MODIFIED:
+        ftype = ftype.getElementType()
+      fkind = ftype.typeId()
+      
+      if fkind == types.TypeKind.LIST or fkind == types.TypeKind.SET or fkind == types.TypeKind.MAP:
+        self.writeLnFmt('{0}.clear();', var)
+      else:
+        value = self.defaultValueOf(field.getType(), field.getOptions())
+        if value:
+          self.writeLnFmt('{0} = {1};', var, value)
+
+  def genValueDelete(self, var, ftype, options, level=0):
+      fkind = ftype.typeId()
+      iteratorName = 'it' if level == 0 else 'i' + str(level)
+      if fkind == types.TypeKind.LIST:
+        if self.isFreezableType(ftype.getElementType()):
+          typeName = self.formatType(ftype, False, False)
+          self.beginForLoop(typeName, var, iteratorName)
+          self.genValueDelete('(*' + iteratorName + ')', ftype.getElementType(), options, level + 1)
+          self.endForLoop()
+      elif fkind == types.TypeKind.SET:
+        if self.isFreezableType(ftype.getElementType()):
+          typeName = self.formatType(ftype, False, False)
+          self.beginForLoop(typeName, var, iteratorName)
+          self.genValueDelete('(*' + iteratorName + ')', ftype.getElementType(), options, level + 1)
+          self.endForLoop()
+      elif fkind == types.TypeKind.MAP:
+        if self.isFreezableType(ftype.getKeyType()) or self.isFreezableType(ftype.getValueType()):
+          typeName = self.formatType(ftype, False, False)
+          self.beginForLoop(typeName, var, iteratorName)
+          if self.isFreezableType(ftype.getKeyType()):
+            self.genValueDelete(iteratorName + '->first', ftype.getKeyType(), options, level + 1)
+          if self.isFreezableType(ftype.getValueType()):
+            self.genValueDelete(iteratorName + '->second', ftype.getValueType(), options, level + 1)
+          self.endForLoop()
+      elif fkind == types.TypeKind.MODIFIED:
+        self.genValueDelete(var, ftype.getElementType(), options, level)
+      elif fkind == types.TypeKind.STRUCT:
+        defaultVal = self.defaultValueOf(ftype, options)
+        self.writeLnFmt('if ({0} != {1}) {{', var, defaultVal)
+        self.indent()
+        self.writeLnFmt('{0}->queueForDelete(queue);', var)
         self.unindent()
         self.writeLn("}")
 

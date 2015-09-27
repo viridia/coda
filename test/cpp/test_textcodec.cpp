@@ -243,6 +243,7 @@ TYPED_TEST(CodecTest, TestDecodeSample) {
   // Unused
   ASSERT_FALSE(s1->hasUnused());
 
+  result->deleteRecursive();
 }
 
 }

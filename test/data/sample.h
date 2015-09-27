@@ -94,7 +94,9 @@ public:
 
   bool equals(const coda::runtime::Object* other) const;
   size_t hashValue() const;
+  void clear();
   void freezeImpl();
+  void deleteRecursiveImpl(Object** freeList);
   void endWrite(coda::io::Encoder* encoder) const;
 
   bool hasScalarBoolean() const {
@@ -726,7 +728,9 @@ public:
 
   bool equals(const coda::runtime::Object* other) const;
   size_t hashValue() const;
+  void clear();
   void freezeImpl();
+  void deleteRecursiveImpl(Object** freeList);
   void beginWrite(coda::io::Encoder* encoder) const;
   void endWrite(coda::io::Encoder* encoder) const;
 
@@ -754,7 +758,7 @@ public:
   S2& clearLeft() {
     checkMutable();
     fieldsPresent.reset(HAS_LEFT);
-    _left = NULL;
+    _left = &S1::DEFAULT_INSTANCE;
     return *this;
   }
 
@@ -782,7 +786,7 @@ public:
   S2& clearRight() {
     checkMutable();
     fieldsPresent.reset(HAS_RIGHT);
-    _right = NULL;
+    _right = &S1::DEFAULT_INSTANCE;
     return *this;
   }
 
@@ -834,7 +838,9 @@ public:
 
   bool equals(const coda::runtime::Object* other) const;
   size_t hashValue() const;
+  void clear();
   void freezeImpl();
+  void deleteRecursiveImpl(Object** freeList);
   void beginWrite(coda::io::Encoder* encoder) const;
   void endWrite(coda::io::Encoder* encoder) const;
 

@@ -66,6 +66,9 @@ public:
   /** Return true if this object is an instance of the specified descriptor. */
   bool isInstanceOf(const descriptors::StructType* st) const;
 
+  /** Reset this object back to it's default state. */
+  virtual void clear() {}
+
   /** Make this object and any contained objects immutable. */
   void freeze();
 
@@ -96,8 +99,28 @@ public:
     endWrite(encoder);
   }
 
+  /** Delete this object and any objects it references. */
+  void deleteRecursive() {
+    static Object* DELETE_SENTINEL = reinterpret_cast<Object*>(-1);
+    Object* queue = DELETE_SENTINEL;
+    queueForDelete(&queue);
+    while (queue != DELETE_SENTINEL) {
+      Object* head = queue;
+      queue = queue->_nextToDelete;
+      delete head;
+    }
+  }
+
+  // Add this object to the deletion queue. Treat as private.
+  void queueForDelete(Object** queue) {
+    if (_nextToDelete == NULL) {
+      _nextToDelete = *queue;
+      *queue = this;
+      deleteRecursiveImpl(queue);
+    }
+  }
 protected:
-  Object() : _mutable(true) {}
+  Object() : _mutable(true), _nextToDelete(NULL) {}
 
   /** Throw an exception if this object is not mutable. */
   void checkMutable() const throw(IllegalMutationError);
@@ -107,6 +130,8 @@ protected:
 
   virtual void beginWrite(coda::io::Encoder* encoder) const {}
   virtual void endWrite(coda::io::Encoder* encoder) const {}
+
+  virtual void deleteRecursiveImpl(Object** queue) {}
 
 /*
   def __str__(self):
@@ -147,6 +172,7 @@ private:
   }
 
   bool _mutable;
+  Object *_nextToDelete;
 };
 
 }} // namespace

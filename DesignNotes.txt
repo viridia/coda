@@ -1,12 +1,28 @@
--- Figure a better API for C++ serializer field access.
+-- Create a deletion traverser for C++. (deleteRecursive)
+-- Add shared object tests to sample test.
+-- Finish C++ text encoder and check against sample.
+-- Finish C++ binary encoder and write tests.
+-- Delete extensions feature.
+-- Ensure that root classes do not have a type id.
+-- Finish documenting binary format.
+-- Document text format.
+-- Double-round-trip test: text -> binary -> text
+-- Java backend.
+-- Implememnt C++ merge.
+-- Implement skipping of deleted / unknown fields.
+-- Custom options in .coda files.
+-- UnknownFields - do we care?
+-- Memory pool support.
+   This will require creating custom implementations of collections.
+
+Older notes:
+
 -- Finish binary decoder (Python, C++)
 -- analyzer should check for invalid package names
--- Implement extension fields
--- Base classes need to declare a type id - make code consistent
+-- Deprecate extension fields
 -- NULL defaults
 -- Mutation unit test
 -- Add source line numbers to C++ descriptors
--- use shared_ptr
 -- specify the type of the typeid function (should be implicit from base initializer.)
 -- equals() should shortcut reference comparison for objects
 -- option for python generator to generate pydev type hints
