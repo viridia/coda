@@ -36,6 +36,14 @@ public:
   virtual std::size_t hashValue() const = 0;
 };
 
+/** Specialized hasher for enums. */
+template<typename E>
+struct EnumHash {
+  size_t operator()(E value) const noexcept {
+    return std::hash<int32_t>()((int32_t) value);
+  }
+};
+
 /** Combine two hash vaues. */
 inline void hash_combine(std::size_t& lhs, std::size_t rhs) {
   lhs ^= rhs + 0x9e3779b9 + (lhs<<6) + (lhs>>2);
@@ -81,7 +89,8 @@ inline std::size_t hash(const std::string& value) {
 template<class T>
 inline std::size_t hash(const std::vector<T>& value) {
   std::size_t result = 1;
-  for (typename std::vector<T>::const_iterator it = value.begin(), itEnd = value.end(); it != itEnd; ++it) {
+  for (typename std::vector<T>::const_iterator it = value.begin(), itEnd = value.end();
+      it != itEnd; ++it) {
     hash_combine(result, hash(*it));
   }
   return result;
@@ -90,8 +99,19 @@ inline std::size_t hash(const std::vector<T>& value) {
 template<class T>
 inline std::size_t hash(const std::unordered_set<T>& value) {
   std::size_t result = 2;
-  for (typename std::unordered_set<T>::const_iterator it = value.begin(), itEnd = value.end(); it != itEnd; ++it) {
-    hash_combine(result, hash(*it));
+  for (typename std::unordered_set<T>::const_iterator it = value.begin(), itEnd = value.end();
+      it != itEnd; ++it) {
+    result += hash(*it);
+  }
+  return result;
+}
+
+template<class T>
+inline std::size_t hash(const std::unordered_set<T, EnumHash<T>>& value) {
+  std::size_t result = 2;
+  for (typename std::unordered_set<T, EnumHash<T>>::const_iterator it =
+      value.begin(), itEnd = value.end(); it != itEnd; ++it) {
+    result += EnumHash<T>()(*it);
   }
   return result;
 }
@@ -99,9 +119,24 @@ inline std::size_t hash(const std::unordered_set<T>& value) {
 template<class K, class V>
 inline std::size_t hash(const std::unordered_map<K, V>& value) {
   std::size_t result = 2;
-  for (typename std::unordered_map<K, V>::const_iterator it = value.begin(), itEnd = value.end(); it != itEnd; ++it) {
-    hash_combine(result, hash(it->first));
-    hash_combine(result, hash(it->second));
+  for (typename std::unordered_map<K, V>::const_iterator it = value.begin(), itEnd = value.end();
+      it != itEnd; ++it) {
+    std::size_t entryHash = hash(it->first);
+    hash_combine(entryHash, hash(it->second));
+    result += entryHash;
+  }
+  return result;
+}
+
+template<class K, class V>
+inline std::size_t hash(const std::unordered_map<K, V, EnumHash<K>>& value) {
+  std::size_t result = 2;
+  for (typename std::unordered_map<K, V, EnumHash<K>>::const_iterator it =
+      value.begin(), itEnd = value.end();
+      it != itEnd; ++it) {
+    std::size_t entryHash = EnumHash<K>()(it->first);
+    hash_combine(entryHash, hash(it->second));
+    result += entryHash;
   }
   return result;
 }

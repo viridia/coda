@@ -123,7 +123,7 @@ public:
 
 class GenericList : public coda::descriptors::ListType {
 public:
-  virtual void* append(void* collection, void* element) const = 0;
+  virtual void append(void* collection, void* element) const = 0;
 };
 
 template<class ElementType>
@@ -140,10 +140,9 @@ public:
   void* makeTemp() const { return new cpp_type; }
   void freeTemp(void* ptr) const { delete (cpp_type*) ptr; }
 
-  void* append(void* collection, void* src) const {
+  void append(void* collection, void* src) const {
     cpp_type* list = (cpp_type*) collection;
     list->push_back(std::move(*(element_type*)src));
-    return &list->back();
   }
 
   static List DESCRIPTOR;
@@ -154,7 +153,7 @@ List<ElementType> List<ElementType>::DESCRIPTOR;
 
 class GenericSet : public coda::descriptors::SetType {
 public:
-  virtual void* insert(void* collection, void* element) const = 0;
+  virtual void insert(void* collection, void* element) const = 0;
 };
 
 template<class ElementType>
@@ -171,9 +170,8 @@ public:
   void* makeTemp() const { return new cpp_type; }
   void freeTemp(void* ptr) const { delete (cpp_type*) ptr; }
 
-  void* insert(void* collection, void* src) const {
+  void insert(void* collection, void* src) const {
     ((cpp_type*)collection)->insert(std::move(*(element_type*)src));
-    return NULL;
   }
 
   static Set DESCRIPTOR;
@@ -237,6 +235,23 @@ public:
 template<class ElementType, bool Const, bool Shared>
 Modified<ElementType, Const, Shared> Modified<ElementType, Const, Shared>::DESCRIPTOR;
 
+template<descriptors::EnumDescriptor& DESC>
+class Enum : public coda::descriptors::Type {
+public:
+  typedef int32_t cpp_type;
+
+  Enum() {
+    freeze();
+  }
+
+  void* makeTemp() const { return new cpp_type; }
+  void freeTemp(void* ptr) const { delete (cpp_type*) ptr; }
+
+  static descriptors::EnumDescriptor& DESCRIPTOR;
+};
+
+template<descriptors::EnumDescriptor& DESC>
+descriptors::EnumDescriptor& Enum<DESC>::DESCRIPTOR = DESC;
 
 }} // namespace
 

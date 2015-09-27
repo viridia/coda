@@ -100,23 +100,27 @@ class CppTypeFormatter(genbase.AbstractTypeTransform):
         const, ref)
 
   def visitSetType(self, ty, const, ref):
-    return self.refType(
-        'std::unordered_set<{0}>'.format(
-            self(ty.getElementType(), False, False)),
-        const, ref)
+    if ty.getElementType().typeId() == types.TypeKind.ENUM:
+      return self.refType(
+          'std::unordered_set<{0}, coda::runtime::EnumHash<{0}> >'.format(
+              self(ty.getElementType(), False, False)),
+          const, ref)
+    else:
+      return self.refType(
+          'std::unordered_set<{0}>'.format(
+              self(ty.getElementType(), False, False)),
+          const, ref)
 
   def visitMapType(self, ty, const, ref):
-    if ty.getValueType().typeId() in HAVE_TYPE_ARGS:
-      return self.refType(
-          'std::unordered_map<{0}, {1} >'.format(
+    params = '{0}, {1}'.format(
               self(ty.getKeyType(), False, False),
-              self(ty.getValueType(), False, False)),
-              const, ref)
-    return self.refType(
-        'std::unordered_map<{0}, {1}>'.format(
-            self(ty.getKeyType(), False, False),
-            self(ty.getValueType(), False, False)),
-            const, ref)
+              self(ty.getValueType(), False, False))
+    if ty.getKeyType().typeId() == types.TypeKind.ENUM:
+      params += ', coda::runtime::EnumHash<{0}>'.format(
+              self(ty.getKeyType(), False, False))
+    if params.endswith('>'):
+      params += ' '
+    return self.refType('std::unordered_map<{0}>'.format(params), const, ref)
 
   def visitStructType(self, ty, const, ref):
     return self.pointerType(self.nameFormatter(ty), const)
@@ -186,7 +190,7 @@ class TypeDescriptorFormatter(genbase.AbstractTypeTransform):
     return self.nameFormatter(ty)
 
   def visitEnumType(self, ty):
-    return self.nameFormatter(ty)
+    return 'coda::types::Enum<{0}_DESCRIPTOR>'.format(self.nameFormatter(ty))
 
   def visitModifiedType(self, ty):
     return 'coda::types::Modified<{0}, {1}, {2}>'.format(
@@ -196,6 +200,10 @@ class TypeDescriptorFormatter(genbase.AbstractTypeTransform):
 
 class DefaultValueProducer(genbase.AbstractTypeTransform):
   '''Transform a type into it's default value.'''
+
+  def __init__(self, nameFormatter):
+    super().__init__()
+    self.nameFormatter = nameFormatter
 
   def visitType(self, ty, *args):
     raise AssertionError('Type not handled: ' + str(ty))
@@ -232,7 +240,11 @@ class DefaultValueProducer(genbase.AbstractTypeTransform):
 
   def visitEnumType(self, ty):
     # TODO: get first member
-    return '0'
+    if len(ty.getValues()) > 0:
+      value = ty.getValues()[0]
+      prefix = toUpperUnderscore(ty.getName())
+      return '{0}_{1}'.format(prefix, value.getName())
+    return '({0}) 0'.format(self.nameFormatter(ty))
 
   def visitModifiedType(self, ty):
     return self(ty.getElementType())
@@ -297,7 +309,7 @@ class AbstractCppGenerator(genbase.CodeGenerator):
     super().__init__(optionScope, options)
     self.formatTypeName = TypeNameFormatter(self)
     self.formatType = CppTypeFormatter(self.formatTypeName)
-    self.defaultValueOf = DefaultValueProducer()
+    self.defaultValueOf = DefaultValueProducer(self.formatTypeName)
     self.describeType = TypeDescriptorFormatter(self.formatTypeName)
     self.formatValue = ValueFormatter(self.formatType)
     self.typeKinds = {}
@@ -517,6 +529,15 @@ class CppHeaderGenerator(AbstractCppGenerator):
         self.writeLnFmt('{0} _{1};',
             self.formatType(field.getType(), False, False), field.getName())
       self.writeLn()
+      if len(presentable) > 0:
+        self.writeLn('bool isFieldPresent(size_t index) const {')
+        self.writeLn('  return fieldsPresent[index];')
+        self.writeLn('}')
+        self.writeLn()
+        self.writeLn('void setFieldPresent(size_t index, bool present) {')
+        self.writeLn('  fieldsPresent[index] = present;')
+        self.writeLn('}')
+        self.writeLn()
       for field in struct.getFields():
         self.writeLnFmt('static coda::descriptors::FieldDescriptor Field_{0};', field.getName())
       self.writeLn('static coda::descriptors::FieldDescriptor* Fields[];')
@@ -610,6 +631,8 @@ class CppHeaderGenerator(AbstractCppGenerator):
       self.writeLnFmt('{0}_{1} = {2},', prefix, value.getName(), value.getValue())
     self.unindent()
     self.writeLn('};')
+    if not enum.hasEnclosingType():
+      self.writeLnFmt('extern coda::descriptors::EnumDescriptor {0}_DESCRIPTOR;', enum.getName())
 
   def endEnum(self, fd, enum):
     '''@type fd: coda.descriptors.FileDescriptor'''
@@ -831,20 +854,29 @@ class CppGenerator(AbstractCppGenerator):
     structQualName = getQualName(struct)
 
     # Table of field definitions
+    presentable = ()
     if struct.getFields():
+      presentable = self.getPresentableFields(struct)
       for field in struct.getFields():
         self.writeLnFmt(
             'coda::descriptors::FieldDescriptor {0}::Field_{1}(',
             structQualName, field.getName())
         self.indent(2)
         self.writeLnFmt('"{0}", {1},', field.getName(), field.getId())
-        self.writeLnFmt('{0}::DESCRIPTOR,', self.describeType(field.getType()))
+        if field.getType().typeId() == types.TypeKind.ENUM:
+          self.writeLnFmt('{0}_DESCRIPTOR,', field.getType().getName())
+        else:
+          self.writeLnFmt('{0}::DESCRIPTOR,', self.describeType(field.getType()))
         optionId = self.optionIdOf(field.getOptions())
         if optionId >= 0:
           self.writeLnFmt('_options{0},', optionId)
         else:
           self.writeLn('coda::descriptors::FieldOptions::DEFAULT_INSTANCE,')
-        self.writeLnFmt('CODA_OFFSET_OF({0}, _{1}));', structQualName, field.getName())
+        self.writeLnFmt('CODA_OFFSET_OF({0}, _{1}),', structQualName, field.getName())
+        if self.isFieldPresentable(field):
+          self.writeLnFmt('{0}::HAS_{1});', structQualName, toUpperUnderscore(field.getName()))
+        else:
+          self.writeLnFmt('(size_t)-1);')
         self.unindent(2)
       self.writeLn()
 
@@ -913,7 +945,14 @@ class CppGenerator(AbstractCppGenerator):
     self.writeLn(structArray + ',')
     self.writeLn(enumArray + ',')
     self.writeLn(fieldArray + ',')
-    self.writeLnFmt('&coda::descriptors::StaticObjectBuilder<{0}>::create', structQualName)
+    self.writeLnFmt('&coda::descriptors::StaticObjectBuilder<{0}>::create,', structQualName)
+    if len(presentable) > 0:
+      self.writeLnFmt('(coda::descriptors::PresenceGetter) &{0}::isFieldPresent,',
+          getQualName(struct))
+      self.writeLnFmt('(coda::descriptors::PresenceSetter) &{0}::setFieldPresent',
+          getQualName(struct))
+    else:
+      self.writeLn('NULL, NULL')
     self.unindent()
     self.writeLn(');')
     self.writeLn()
@@ -989,7 +1028,12 @@ class CppGenerator(AbstractCppGenerator):
       self.indent()
       self.writeLnFmt('size_t hash = {0}::hashValue();', baseName)
       for field in struct.getFields():
-        hashExpr = 'coda::runtime::hash(_{0})'.format(field.getName())
+        if field.getType().typeId() == types.TypeKind.ENUM:
+          hashExpr = 'coda::runtime::EnumHash<{0}>()(_{1})'.format(
+              self.formatType(field.getType(), False, False),
+              field.getName())
+        else:
+          hashExpr = 'coda::runtime::hash(_{0})'.format(field.getName())
         self.writeLnFmt('coda::runtime::hash_combine(hash, {0});', hashExpr)
       self.writeLn('return hash;')
       self.unindent()
@@ -1146,6 +1190,8 @@ class CppGenerator(AbstractCppGenerator):
       self.writeLn("encoder->writeEndMap();")
     elif fkind == types.TypeKind.STRUCT:
       self.writeLnFmt("encoder->writeStruct({0}, true);", var)
+    elif fkind == types.TypeKind.ENUM:
+      self.writeLnFmt("encoder->writeInteger((int32_t) {0});", var)
     elif fkind == types.TypeKind.MODIFIED:
       if fty.isShared():
         assert isinstance(fty.getElementType(), types.StructType)
@@ -1153,7 +1199,7 @@ class CppGenerator(AbstractCppGenerator):
       else:
         self.genValueWrite(var, fty.getElementType(), options)
     else:
-      assert False and 'Illegal type kind'
+      assert False, 'Illegal type kind: ' + str(fkind)
 
   def formatOptions(self, opts):
     def setOptionValues(opts, struct):

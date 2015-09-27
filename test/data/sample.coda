@@ -1,0 +1,59 @@
+# Definitions for CODA descriptors
+
+package sample;
+
+options {
+  package:cpp = 'sample';
+  package:python = 'sample';
+  package:java = 'sample';
+  outerClass:java = 'Sample';
+}
+
+enum E {
+  E0 = 0,
+  E1 = 1,
+  E2 = 2,
+}
+
+struct S1 {
+  scalarBoolean : bool = 1;
+  scalarI16 : i16 = 2;
+  scalarI32 : i32 = 3;
+  scalarI64 : i32 = 4;
+  scalarFixedI16 : i16 = 5 [fixed];
+  scalarFixedI32 : i32 = 6 [fixed];
+  scalarFixedI64 : i32 = 7 [fixed];
+  scalarFloat : float = 8;
+  scalarDouble : double = 9;
+  scalarString : string = 10;
+  scalarBytes : bytes = 11;
+  scalarEnum : E = 12;
+  
+  listBoolean : list[bool] = 20;
+  listInt : list[i32] = 21;
+  listFloat : list[float] = 22;
+  listString : list[string] = 23;
+  listEnum : list[E] = 24;
+
+  setInt : set[i32] = 41;
+  setString : set[string] = 43;
+  setEnum : set[E] = 44;
+
+  mapIntString : map[i32, string] = 51;
+  mapStringInt : map[string, i32] = 52;
+  mapEnumStruct : map[E, S1] = 53;
+
+  # Example of an unused field.
+  unused : i32 = 100;
+}
+
+struct S2(S1) = 1 {
+  left: S1 = 1;
+  right: S1 = 2;
+}
+
+struct S3(S1) = 2 {
+  sList : list[S1] = 1;
+  sSet : set[S1] = 2;
+  sMap : map[string, S1] = 3;
+}

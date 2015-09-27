@@ -204,7 +204,15 @@ StaticFileDescriptor::StaticFileDescriptor(
   setPackage(package);
   setOptions(&options);
   getMutableStructs().assign(structs.begin(), structs.end());
+  for (std::vector<StructType*>::const_iterator it =
+      getMutableStructs().begin(), itEnd = getMutableStructs().end(); it != itEnd; ++it) {
+    ((StructDescriptor*)(*it))->setFile(this);
+  }
   getMutableEnums().assign(enums.begin(), enums.end());
+  for (std::vector<EnumType*>::const_iterator it =
+      getMutableEnums().begin(), itEnd = getMutableEnums().end(); it != itEnd; ++it) {
+    ((EnumDescriptor*)(*it))->setFile(this);
+  }
   freezeLocal();
   runtime::TypeRegistry::getInstance().addFile(this);
 }

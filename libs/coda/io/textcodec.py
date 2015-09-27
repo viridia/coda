@@ -11,6 +11,19 @@ class TextEncoder(coda.io.AbstractEncoder):
     MAP_KEY = 3
     MAP_VALUE = 4
     SUBTYPE = 5
+    
+  class StringEncoder:
+    ESCAPES = {
+        ord('\n'): '\\n',
+        ord('\t'): '\\t',
+        ord('\r'): '\\r'
+    }
+    def __getitem__(self, ch):
+      if ch < 32:
+        return self.ESCAPES.get(ch, '\\%d' % ch)
+      elif ch == ord('\''):
+        return '\\\''
+      return ch
 
   def __init__(self, stream):
     super().__init__()
@@ -24,13 +37,14 @@ class TextEncoder(coda.io.AbstractEncoder):
     self.__maxDepth = 255
     self.__subtypeName = None
     self.__subtypeId = None
+    self.__strEncoder = self.StringEncoder()
 
   def fileBegin(self):
     pass
 
   def fileEnd(self):
     if self.__state == self.State.SUBTYPE:
-      self.__stream.write("}")
+      self.__stream.write("\n}\n")
       self.__indentLevel -= 2
     self.__state = self.State.CLEAR
 
@@ -102,13 +116,17 @@ class TextEncoder(coda.io.AbstractEncoder):
   def writeString(self, value):
     self.__beginValue()
     self.__stream.write("'")
-    self.__stream.write(value) # TODO: Escapes
+    self.__stream.write(value.translate(self.__strEncoder)) # TODO: Escapes
     self.__stream.write("'")
     return self
 
   def writeBytes(self, value):
     self.__beginValue()
     self.__stream.write("<[")
+    sep=''
+    for ch in value:
+      self.__stream.write("%s%d" % (sep, ch))
+      sep = ','
     self.__stream.write("]>")
     return self
 
@@ -220,9 +238,9 @@ class TextEncoder(coda.io.AbstractEncoder):
       self.__stream.write('\n')
       self.__indent()
     if self.__state == self.State.SUBTYPE:
-      self.__stream.write("}")
+      self.__stream.write("}\n")
       self.__indentLevel -= 2
-#       self.__indent()
+      self.__indent()
     self.__stream.write("}")
     self.__state = self.__states.pop()
     self.__first = False
@@ -410,6 +428,14 @@ class TextDecoder(coda.io.AbstractDecoder):
       r'\\t'
       self.stringVal.append('\t')
 
+    def t_sstring_dstring_esc(self, t):
+      r'\\\d+'
+      self.stringVal.append(chr(int(t.value[1:])))
+
+    def t_sstring_dstring_squote(self, t):
+      r'\\\''
+      self.stringVal.append('\'')
+
     # Error handling
 
     def t_error(self, t):
@@ -454,6 +480,9 @@ class TextDecoder(coda.io.AbstractDecoder):
     if self.match('LBRACE'):
       if self.__token.type == 'ID' or self.__token.type == 'TYPEREF':
         return self.__readStructValue(expectedType, options)
+      elif self.__token.type == 'RBRACE' and expectedType.typeId() == types.TypeKind.STRUCT:
+        # {} can be either an empty map or empty object.
+        return self.__readStructValue(expectedType, options)
       else:
         return self.__readMapValue(expectedType, options)
     elif self.match('LBRACKET'):
@@ -463,10 +492,17 @@ class TextDecoder(coda.io.AbstractDecoder):
         self.fatal(self.__token.lineno,
             'Type error: Expecting {0}, got a list', str(expectedType))
       return self.__readListValue(expectedType, options)
+    elif self.match('LBINARY'):
+      # It's a bytes object
+      if expectedType.typeId() != types.TypeKind.BYTES:
+        self.fatal(self.__token.lineno,
+            'Type error: Expecting {0}, got a BYTES object', str(expectedType))
+      return self.__readBytesValue()
     elif tt == 'INTVAL':
       if (expectedType.typeId() != types.TypeKind.INTEGER and
           expectedType.typeId() != types.TypeKind.FLOAT and
-          expectedType.typeId() != types.TypeKind.DOUBLE):
+          expectedType.typeId() != types.TypeKind.DOUBLE and
+          expectedType.typeId() != types.TypeKind.ENUM):
         self.fatal(self.__token.lineno,
             'Type error: Expecting {0}, got a number', str(expectedType))
       result = self.__token.value
@@ -478,7 +514,9 @@ class TextDecoder(coda.io.AbstractDecoder):
           expectedType.typeId() != types.TypeKind.DOUBLE):
         self.fatal(self.__token.lineno,
             'Type error: Expecting {0}, got a number', str(expectedType))
-      assert False, 'Implement floats'
+      result = self.__token.value
+      self.next()
+      return result
     elif tt == 'TRUE' or tt == 'FALSE':
       if expectedType.typeId() != types.TypeKind.BOOL:
         self.fatal(self.__token.lineno,
@@ -505,6 +543,22 @@ class TextDecoder(coda.io.AbstractDecoder):
       return value
     else:
       self.fatal(self.__token.lineno, 'Unexpected token {0}', tt)
+
+  def __readBytesValue(self):
+    result = []
+    if not self.match('RBINARY'):
+      while True:
+        if self.__token.type == 'INTVAL':
+          result.append(self.__token.value)
+          self.next()
+        else:
+          self.fatal(self.__token.lineno, 'Integer value expected')
+        
+        if self.match('RBINARY'):
+          break
+        elif not self.match('COMMA'):
+          self.fatal(self.__token.lineno, "',' or ']>' expected.")
+    return bytes(result)
 
   def __readStructValue(self, expectedType, options):
     shared = False
@@ -581,6 +635,8 @@ class TextDecoder(coda.io.AbstractDecoder):
       result.append(element)
     if not self.match('RBRACKET'):
       self.fatal(self.__token.lineno, "']' expected after list")
+    if (expectedType.typeId() == types.TypeKind.SET):
+      result = set(result)
     return result
 
   def __readStructFields(self):

@@ -86,6 +86,7 @@ private:
   runtime::Object* readStructFields(const descriptors::StructDescriptor* expectedType, int flags);
   runtime::Object* readStructValue(const descriptors::StructDescriptor* expectedType, int flags);
   void readValue(const descriptors::Type* expectedType, int flags, void* data);
+  void readBytesValue(std::string& data);
   void readListValue(const types::GenericList* expectedType, int flags, void* data);
   void readSetValue(const types::GenericSet* expectedType, int flags, void* data);
   void readMapValue(const types::GenericMap* expectedType, int flags, void* data);
@@ -148,7 +149,7 @@ private:
   int32_t column;
   const std::string& sourcePath;
 
-  char ch;
+  int ch;
   Token token;
   std::string tokenValue;
   bool tokenSign;

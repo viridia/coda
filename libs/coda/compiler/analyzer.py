@@ -305,6 +305,9 @@ class Analyzer:
           struct.setTypeId(enumVal.getValue())
       else:
         struct.setTypeId(ast.typeId)
+      if struct.typeId() == 0:
+        self.errorReporter.errorAt(ast.typeId.location, 'Type id of 0 is not valid')
+        return
     if ast.baseType:
       assert struct.hasTypeId()
       assert struct.getTypeId() is not None
@@ -317,16 +320,22 @@ class Analyzer:
             ast.baseType.location,
             'Base type \'{0}\' is not a struct'.format(ast.baseType.name))
         return baseType
-      if not baseType.hasTypeId():
-        self.errorReporter.errorAt(
-            ast.baseType.location,
-            'Base type \'{0}\' must declare a type id to be inheritable'.format(ast.baseType.name))
-        return types.ERROR
+#       if not baseType.hasTypeId():
+#         self.errorReporter.errorAt(
+#             ast.baseType.location,
+#             'Base type \'{0}\' must declare a type id to be inheritable'.format(ast.baseType.name))
+#         return types.ERROR
       struct.setBaseType(baseType)
       extensibleBase = self.getExtensibleBase(baseType)
-      while baseType.hasBaseType():
-        baseType = baseType.getBaseType()
-      typeForId = self.typeRegistry.getSubtype(baseType, struct.getTypeId())
+      rootType = baseType
+      while rootType.hasBaseType():
+        rootType = rootType.getBaseType()
+      if rootType.hasTypeId():
+        self.errorReporter.errorAt(
+            ast.baseType.location,
+            'Root type \'{0}\' must not have a type id.'.format(rootType.getName()))
+        return types.ERROR
+      typeForId = self.typeRegistry.getSubtype(rootType, struct.getTypeId())
       if typeForId:
         self.errorReporter.errorAt(
             ast.location,

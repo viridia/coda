@@ -1,0 +1,79 @@
+$1 (S2): {
+  left: {
+    scalarBoolean: true
+    scalarI16: 11
+    scalarI32: 12
+    scalarI64: 13
+    scalarFixedI16: 14
+    scalarFixedI32: 15
+    scalarFixedI64: 16
+    scalarFloat: 55.0
+    scalarDouble: 56.0
+    scalarString: 'alpha\n\t'
+    scalarBytes: <[98,101,116,97]>
+    scalarEnum: 1
+    listBoolean: [
+      true
+      false
+      true
+    ]
+    listInt: [
+      100
+      101
+      102
+    ]
+    listFloat: [
+      110.0
+      110.1
+      110.2
+    ]
+    listString: [
+      'beta'
+      'delta\0'
+      'yin-yan: ☯'
+    ]
+    listEnum: [
+      1
+      2
+      1
+    ]
+    setInt: [
+      200
+      201
+      202
+    ]
+    setString: [
+      '"double-quoted"'
+      'gamma'
+      '\'single-quoted\''
+    ]
+    setEnum: [
+      1
+      2
+    ]
+    mapIntString: {
+      300: 'three_oh_oh'
+      301: 'three_oh_one'
+    }
+    mapStringInt: {
+      'three_oh_oh': 300
+      'three_oh_one': 301
+    }
+    mapEnumStruct: {
+      1: {}
+      2: {
+        $1 (S2): {}
+      }
+    }
+  }
+  right: {
+    $2 (S3): {
+      sList: [
+        {}
+        {
+          $1 (S2): {}
+        }
+      ]
+    }
+  }
+}

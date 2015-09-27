@@ -9,9 +9,13 @@
 #include "coda/io/textdecoder.h"
 #include "coda/runtime/typeregistry.h"
 #include "coda/types.h"
+#include "sample.h"
+
+extern char* test_data_dir;
 
 #include <sstream>
 #include <iostream>
+#include <fstream>
 
 namespace coda {
 using namespace coda::descriptors;
@@ -143,6 +147,21 @@ TYPED_TEST(CodecTest, TestEncodeDecodeListValue) {
   EXPECT_EQ(11, ((IntegerValue*)actual->getValue()[0])->getValue());
   EXPECT_EQ(12, ((IntegerValue*)actual->getValue()[1])->getValue());
   EXPECT_EQ(13, ((IntegerValue*)actual->getValue()[2])->getValue());
+}
+
+TYPED_TEST(CodecTest, TestDecodeSample) {
+  std::string sourcePath(test_data_dir);
+  sourcePath.append("/sample.txt");
+  std::cout << sourcePath << '\n';
+  std::ifstream strm(sourcePath.c_str());
+  ASSERT_TRUE(strm.good());
+  coda::io::TextDecoder decoder(strm, &runtime::TypeRegistry::getInstance(), sourcePath);
+  sample::S2* result = decoder.template decode<sample::S2>();
+  ASSERT_THAT(result, ::testing::NotNull());
+  ASSERT_TRUE(result->hasLeft());
+
+  const sample::S1* s1 = result->getLeft();
+  ASSERT_THAT(s1, ::testing::NotNull());
 }
 
 }

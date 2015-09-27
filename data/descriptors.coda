@@ -19,7 +19,7 @@ options {
 # ============================================================================
 
 # Base type for values
-struct Value = 0 {}
+struct Value {}
 
 # Boolean values
 struct BoolValue(Value) = 1 {
@@ -45,9 +45,11 @@ struct ListValue(Value) = 4 {
 # Options
 # ============================================================================
 
-struct Options = 0 {
+struct Options {
   options { allowSubtypes = true; }
 }
+
+struct CustomOption {}
 
 struct FileOptions(Options) = 1 {
   # Package declaration for a given target language
@@ -63,7 +65,10 @@ struct FileOptions(Options) = 1 {
   # This is typically used to import mixin class definitions.
   imports : map[string, list[string]] = 5;
 
-  extensions 1000 to max;
+  # List of extended options.
+  custom : list[CustomOption] = 6;
+
+#  extensions 1000 to max;
 }
 
 struct StructOptions(Options) = 2 {
@@ -97,7 +102,10 @@ struct StructOptions(Options) = 2 {
   # This option can only be specified on root classes.
   'shared': bool = 5;
 
-  extensions 1000 to max;
+  # List of extended options.
+  custom : list[CustomOption] = 6;
+
+#  extensions 1000 to max;
 }
 
 struct FieldOptions(Options) = 3 {
@@ -122,18 +130,26 @@ struct FieldOptions(Options) = 3 {
   # Disables the visitor generator from visiting this field.
   novisit : bool = 8;
 
-  extensions 1000 to max;
+  # List of extended options.
+  custom : list[CustomOption] = 9;
+
+#  extensions 1000 to max;
 }
 
 struct MethodOptions(Options) = 4 {
   # Whether or not this method modifies the object (used to generate 'const' in C++).
-  'const' : bool = 4;
+  'const' : bool = 1;
 
-  extensions 1000 to max;
+  # List of extended options.
+  custom : list[CustomOption] = 2;
+
+#  extensions 1000 to max;
 }
 
 struct EnumOptions(Options) = 5 {
-  extensions 1000 to max;
+  # List of extended options.
+  custom : list[CustomOption] = 1;
+#  extensions 1000 to max;
 }
 
 # ============================================================================
@@ -174,7 +190,7 @@ enum TypeKind {
 # Base type for type descriptors
 # ============================================================================
 
-struct Type = TypeKind.TYPE {
+struct Type {
   options {
     mixin:python.python3 = 'coda.runtime.typemixins.TypeMixin';
     mixin:cpp = 'coda::descriptors::TypeMixin';

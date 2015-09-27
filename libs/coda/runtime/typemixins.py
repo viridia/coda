@@ -88,7 +88,7 @@ class BytesTypeMixin:
     return (self.typeId(),)
 
   def isAssignable(self, value):
-    return isinstance(value, str)
+    return isinstance(value, str) or isinstance(value, bytes)
 
 class ListTypeMixin:
   '''Mixin methods for list types.'''

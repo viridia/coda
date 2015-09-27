@@ -161,6 +161,7 @@ endif (MSVC)
 add_subdirectory(support/cpp)
 add_subdirectory(third-party/cpp)
 add_subdirectory(test/cpp)
+add_subdirectory(test/data)
 
 add_test(unittest test/cpp/unittest)
 

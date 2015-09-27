@@ -54,7 +54,8 @@ runtime::Object* TextDecoder::readObject(const StructDescriptor* desc) {
 void TextDecoder::readValue(const Type* expectedType, int flags, void* data) {
   int32_t expectedTypeId = expectedType->typeId();
   if (match(TOKEN_LBRACE)) {
-    if (token == TOKEN_ID || token == TOKEN_TYPEREF) {
+    if (token == TOKEN_ID || token == TOKEN_TYPEREF ||
+        (token == TOKEN_RBRACE && expectedType->typeId() == TYPE_KIND_STRUCT)) {
       *(runtime::Object**) data =
           readStructValue(static_cast<const StructDescriptor*>(expectedType), flags);
     } else {
@@ -68,6 +69,13 @@ void TextDecoder::readValue(const Type* expectedType, int flags, void* data) {
       readSetValue(static_cast<const types::GenericSet*>(expectedType), flags, data);
     } else {
       typeError(tokenLineno, tokenColumn, expectedType, "list");
+    }
+  } else if (match(TOKEN_LBINARY)) {
+    // It's a bytes object
+    if (expectedType->typeId() != TYPE_KIND_BYTES) {
+      typeError(tokenLineno, tokenColumn, expectedType, "bytes");
+    } else {
+      readBytesValue(*(std::string*) data);
     }
   } else if (token == TOKEN_INTVAL) {
     switch (expectedTypeId) {
@@ -88,6 +96,10 @@ void TextDecoder::readValue(const Type* expectedType, int flags, void* data) {
       }
       case TYPE_KIND_DOUBLE: {
         *(double*) data = strtod(tokenValue.c_str(), NULL);
+        break;
+      }
+      case TYPE_KIND_ENUM: {
+        *(int32_t*) data = strtol(tokenValue.c_str(), NULL, 10);
         break;
       }
       default:
@@ -146,6 +158,31 @@ void TextDecoder::readValue(const Type* expectedType, int flags, void* data) {
     next();
   } else {
     parseError(tokenLineno, tokenColumn, "Unexpected token");
+  }
+}
+
+void TextDecoder::readBytesValue(std::string& data) {
+  data.clear();
+  if (!match(TOKEN_RBINARY)) {
+    uint32_t value;
+    for (;;) {
+      if (token == TOKEN_INTVAL) {
+        value = strtol(tokenValue.c_str(), NULL, 10);
+        next();
+        if (value > 255) {
+          parseError(tokenLineno, tokenColumn, "Bytes value out of range.");
+        }
+        data.push_back((uint8_t) value);
+      } else {
+        parseError(tokenLineno, tokenColumn, "Integer value expected.");
+      }
+
+      if (match(TOKEN_RBINARY)) {
+        break;
+      } else if (!match(TOKEN_COMMA)) {
+        parseError(tokenLineno, tokenColumn, "',' or ']>' expected.");
+      }
+    }
   }
 }
 
@@ -211,7 +248,6 @@ void TextDecoder::readListValue(const types::GenericList* listType, int flags, v
 
         readValue(elementType, elementFlags, &v);
         listType->append(data, &v);
-        break;
       }
       break;
     }
@@ -235,7 +271,6 @@ void TextDecoder::readListValue(const types::GenericList* listType, int flags, v
 
         readValue(elementType, elementFlags, element);
         listType->append(data, element);
-        break;
       }
 
       if (element != NULL) {
@@ -296,7 +331,6 @@ void TextDecoder::readSetValue(const types::GenericSet* setType, int flags, void
 
         readValue(elementType, elementFlags, &v);
         setType->insert(data, &v);
-        break;
       }
       break;
     }
@@ -320,7 +354,6 @@ void TextDecoder::readSetValue(const types::GenericSet* setType, int flags, void
 
         readValue(elementType, elementFlags, element);
         setType->insert(data, element);
-        break;
       }
 
       if (element != NULL) {
@@ -500,6 +533,9 @@ runtime::Object* TextDecoder::readStructFields(const StructDescriptor* expectedT
         fieldType = modifiedType->getElementType();
       }
       readValue(fieldType, flags, fieldAddress(field, instance));
+      if (field->getPresenceBit() != (size_t) -1) {
+        expectedType->setFieldPresent(instance, field->getPresenceBit(), true);
+      }
     } else if (token == TOKEN_TYPEREF) {
       uint32_t typeId = std::strtoul(tokenValue.c_str(), NULL, 10);
       next();

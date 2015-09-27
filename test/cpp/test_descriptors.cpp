@@ -140,7 +140,7 @@ TEST(DescriptorTest, File) {
       coda::descriptors::FILE.getOptions()->getPackage().find("python")->second);
   EXPECT_EQ("coda.descriptors",
       coda::descriptors::FILE.getOptions()->getPackage().find("java")->second);
-  EXPECT_EQ(28, coda::descriptors::FILE.getStructs().size());
+  EXPECT_EQ(29, coda::descriptors::FILE.getStructs().size());
   EXPECT_EQ(1, coda::descriptors::FILE.getEnums().size());
 }
 

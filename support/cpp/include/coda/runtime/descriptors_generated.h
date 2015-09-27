@@ -40,6 +40,7 @@ enum TypeKind {
   TYPE_KIND_COLLECTION = 40,
   TYPE_KIND_DECL = 41,
 };
+extern coda::descriptors::EnumDescriptor TypeKind_DESCRIPTOR;
 
 // ============================================================================
 // Value
@@ -129,6 +130,14 @@ private:
   std::bitset<1> fieldsPresent;
   bool _value;
 
+  bool isFieldPresent(size_t index) const {
+    return fieldsPresent[index];
+  }
+
+  void setFieldPresent(size_t index, bool present) {
+    fieldsPresent[index] = present;
+  }
+
   static coda::descriptors::FieldDescriptor Field_value;
   static coda::descriptors::FieldDescriptor* Fields[];
 };
@@ -196,6 +205,14 @@ private:
   std::bitset<1> fieldsPresent;
   int32_t _value;
 
+  bool isFieldPresent(size_t index) const {
+    return fieldsPresent[index];
+  }
+
+  void setFieldPresent(size_t index, bool present) {
+    fieldsPresent[index] = present;
+  }
+
   static coda::descriptors::FieldDescriptor Field_value;
   static coda::descriptors::FieldDescriptor* Fields[];
 };
@@ -261,6 +278,14 @@ public:
 private:
   std::bitset<1> fieldsPresent;
   std::string _value;
+
+  bool isFieldPresent(size_t index) const {
+    return fieldsPresent[index];
+  }
+
+  void setFieldPresent(size_t index, bool present) {
+    fieldsPresent[index] = present;
+  }
 
   static coda::descriptors::FieldDescriptor Field_value;
   static coda::descriptors::FieldDescriptor* Fields[];
@@ -352,6 +377,31 @@ public:
 };
 
 // ============================================================================
+// CustomOption
+// ============================================================================
+
+class CustomOption : public coda::runtime::Object {
+public:
+  CustomOption()
+  {}
+
+  CustomOption(const CustomOption& _src)
+  {}
+
+  coda::descriptors::StructDescriptor* descriptor() const {
+    return &DESCRIPTOR;
+  }
+
+  coda::runtime::Object* clone() const {
+    return new CustomOption(*this);
+  }
+
+  static coda::descriptors::StructDescriptor DESCRIPTOR;
+  static CustomOption DEFAULT_INSTANCE;
+  static const uint32_t TYPE_ID;
+};
+
+// ============================================================================
 // FileOptions
 // ============================================================================
 
@@ -366,6 +416,7 @@ public:
     , _outerClass(_src._outerClass)
     , _filepath(_src._filepath)
     , _imports(_src._imports)
+    , _custom(_src._custom)
   {}
 
   coda::descriptors::StructDescriptor* descriptor() const {
@@ -382,11 +433,11 @@ public:
   void beginWrite(coda::io::Encoder* encoder) const;
   void endWrite(coda::io::Encoder* encoder) const;
 
-  const std::unordered_map<std::string, std::string >& getPackage() const {
+  const std::unordered_map<std::string, std::string>& getPackage() const {
     return _package;
   }
 
-  std::unordered_map<std::string, std::string >& getMutablePackage() {
+  std::unordered_map<std::string, std::string>& getMutablePackage() {
     checkMutable();
     return _package;
   }
@@ -397,7 +448,7 @@ public:
     return *this;
   }
 
-  FileOptions& setPackage(const std::unordered_map<std::string, std::string >& package) {
+  FileOptions& setPackage(const std::unordered_map<std::string, std::string>& package) {
     checkMutable();
     _package = package;
     return *this;
@@ -409,11 +460,11 @@ public:
     return *this;
   }
 
-  const std::unordered_map<std::string, std::string >& getOuterClass() const {
+  const std::unordered_map<std::string, std::string>& getOuterClass() const {
     return _outerClass;
   }
 
-  std::unordered_map<std::string, std::string >& getMutableOuterClass() {
+  std::unordered_map<std::string, std::string>& getMutableOuterClass() {
     checkMutable();
     return _outerClass;
   }
@@ -424,7 +475,7 @@ public:
     return *this;
   }
 
-  FileOptions& setOuterClass(const std::unordered_map<std::string, std::string >& outerClass) {
+  FileOptions& setOuterClass(const std::unordered_map<std::string, std::string>& outerClass) {
     checkMutable();
     _outerClass = outerClass;
     return *this;
@@ -436,11 +487,11 @@ public:
     return *this;
   }
 
-  const std::unordered_map<std::string, std::string >& getFilepath() const {
+  const std::unordered_map<std::string, std::string>& getFilepath() const {
     return _filepath;
   }
 
-  std::unordered_map<std::string, std::string >& getMutableFilepath() {
+  std::unordered_map<std::string, std::string>& getMutableFilepath() {
     checkMutable();
     return _filepath;
   }
@@ -451,7 +502,7 @@ public:
     return *this;
   }
 
-  FileOptions& setFilepath(const std::unordered_map<std::string, std::string >& filepath) {
+  FileOptions& setFilepath(const std::unordered_map<std::string, std::string>& filepath) {
     checkMutable();
     _filepath = filepath;
     return *this;
@@ -490,20 +541,43 @@ public:
     return *this;
   }
 
+  const std::vector<CustomOption*>& getCustom() const {
+    return _custom;
+  }
+
+  std::vector<CustomOption*>& getMutableCustom() {
+    checkMutable();
+    return _custom;
+  }
+
+  FileOptions& setCustom(const std::vector<CustomOption*>& custom) {
+    checkMutable();
+    _custom = custom;
+    return *this;
+  }
+
+  FileOptions& clearCustom() {
+    checkMutable();
+    _custom.clear();
+    return *this;
+  }
+
   static coda::descriptors::StructDescriptor DESCRIPTOR;
   static FileOptions DEFAULT_INSTANCE;
   static const uint32_t TYPE_ID;
 
 private:
-  std::unordered_map<std::string, std::string > _package;
-  std::unordered_map<std::string, std::string > _outerClass;
-  std::unordered_map<std::string, std::string > _filepath;
+  std::unordered_map<std::string, std::string> _package;
+  std::unordered_map<std::string, std::string> _outerClass;
+  std::unordered_map<std::string, std::string> _filepath;
   std::unordered_map<std::string, std::vector<std::string> > _imports;
+  std::vector<CustomOption*> _custom;
 
   static coda::descriptors::FieldDescriptor Field_package;
   static coda::descriptors::FieldDescriptor Field_outerClass;
   static coda::descriptors::FieldDescriptor Field_filepath;
   static coda::descriptors::FieldDescriptor Field_imports;
+  static coda::descriptors::FieldDescriptor Field_custom;
   static coda::descriptors::FieldDescriptor* Fields[];
 };
 
@@ -532,6 +606,7 @@ public:
     , _mixin(_src._mixin)
     , _reference(_src._reference)
     , _shared(_src._shared)
+    , _custom(_src._custom)
   {}
 
   coda::descriptors::StructDescriptor* descriptor() const {
@@ -570,11 +645,11 @@ public:
     return *this;
   }
 
-  const std::unordered_map<std::string, std::string >& getGenClassName() const {
+  const std::unordered_map<std::string, std::string>& getGenClassName() const {
     return _genClassName;
   }
 
-  std::unordered_map<std::string, std::string >& getMutableGenClassName() {
+  std::unordered_map<std::string, std::string>& getMutableGenClassName() {
     checkMutable();
     return _genClassName;
   }
@@ -585,7 +660,7 @@ public:
     return *this;
   }
 
-  StructOptions& setGenClassName(const std::unordered_map<std::string, std::string >& genClassName) {
+  StructOptions& setGenClassName(const std::unordered_map<std::string, std::string>& genClassName) {
     checkMutable();
     _genClassName = genClassName;
     return *this;
@@ -597,11 +672,11 @@ public:
     return *this;
   }
 
-  const std::unordered_map<std::string, std::string >& getMixin() const {
+  const std::unordered_map<std::string, std::string>& getMixin() const {
     return _mixin;
   }
 
-  std::unordered_map<std::string, std::string >& getMutableMixin() {
+  std::unordered_map<std::string, std::string>& getMutableMixin() {
     checkMutable();
     return _mixin;
   }
@@ -612,7 +687,7 @@ public:
     return *this;
   }
 
-  StructOptions& setMixin(const std::unordered_map<std::string, std::string >& mixin) {
+  StructOptions& setMixin(const std::unordered_map<std::string, std::string>& mixin) {
     checkMutable();
     _mixin = mixin;
     return *this;
@@ -668,6 +743,27 @@ public:
     return *this;
   }
 
+  const std::vector<CustomOption*>& getCustom() const {
+    return _custom;
+  }
+
+  std::vector<CustomOption*>& getMutableCustom() {
+    checkMutable();
+    return _custom;
+  }
+
+  StructOptions& setCustom(const std::vector<CustomOption*>& custom) {
+    checkMutable();
+    _custom = custom;
+    return *this;
+  }
+
+  StructOptions& clearCustom() {
+    checkMutable();
+    _custom.clear();
+    return *this;
+  }
+
   static coda::descriptors::StructDescriptor DESCRIPTOR;
   static StructOptions DEFAULT_INSTANCE;
   static const uint32_t TYPE_ID;
@@ -675,16 +771,26 @@ public:
 private:
   std::bitset<3> fieldsPresent;
   bool _allowSubtypes;
-  std::unordered_map<std::string, std::string > _genClassName;
-  std::unordered_map<std::string, std::string > _mixin;
+  std::unordered_map<std::string, std::string> _genClassName;
+  std::unordered_map<std::string, std::string> _mixin;
   bool _reference;
   bool _shared;
+  std::vector<CustomOption*> _custom;
+
+  bool isFieldPresent(size_t index) const {
+    return fieldsPresent[index];
+  }
+
+  void setFieldPresent(size_t index, bool present) {
+    fieldsPresent[index] = present;
+  }
 
   static coda::descriptors::FieldDescriptor Field_allowSubtypes;
   static coda::descriptors::FieldDescriptor Field_genClassName;
   static coda::descriptors::FieldDescriptor Field_mixin;
   static coda::descriptors::FieldDescriptor Field_reference;
   static coda::descriptors::FieldDescriptor Field_shared;
+  static coda::descriptors::FieldDescriptor Field_custom;
   static coda::descriptors::FieldDescriptor* Fields[];
 };
 
@@ -721,6 +827,7 @@ public:
     , _ignore(_src._ignore)
     , _default(_src._default)
     , _novisit(_src._novisit)
+    , _custom(_src._custom)
   {}
 
   coda::descriptors::StructDescriptor* descriptor() const {
@@ -902,6 +1009,27 @@ public:
     return *this;
   }
 
+  const std::vector<CustomOption*>& getCustom() const {
+    return _custom;
+  }
+
+  std::vector<CustomOption*>& getMutableCustom() {
+    checkMutable();
+    return _custom;
+  }
+
+  FieldOptions& setCustom(const std::vector<CustomOption*>& custom) {
+    checkMutable();
+    _custom = custom;
+    return *this;
+  }
+
+  FieldOptions& clearCustom() {
+    checkMutable();
+    _custom.clear();
+    return *this;
+  }
+
   static coda::descriptors::StructDescriptor DESCRIPTOR;
   static FieldOptions DEFAULT_INSTANCE;
   static const uint32_t TYPE_ID;
@@ -915,6 +1043,15 @@ private:
   std::unordered_map<std::string, bool> _ignore;
   Value* _default;
   bool _novisit;
+  std::vector<CustomOption*> _custom;
+
+  bool isFieldPresent(size_t index) const {
+    return fieldsPresent[index];
+  }
+
+  void setFieldPresent(size_t index, bool present) {
+    fieldsPresent[index] = present;
+  }
 
   static coda::descriptors::FieldDescriptor Field_nullable;
   static coda::descriptors::FieldDescriptor Field_deprecated;
@@ -923,6 +1060,7 @@ private:
   static coda::descriptors::FieldDescriptor Field_ignore;
   static coda::descriptors::FieldDescriptor Field_default;
   static coda::descriptors::FieldDescriptor Field_novisit;
+  static coda::descriptors::FieldDescriptor Field_custom;
   static coda::descriptors::FieldDescriptor* Fields[];
 };
 
@@ -943,6 +1081,7 @@ public:
   MethodOptions(const MethodOptions& _src)
     : Options(*this)
     , _const(_src._const)
+    , _custom(_src._custom)
   {}
 
   coda::descriptors::StructDescriptor* descriptor() const {
@@ -981,6 +1120,27 @@ public:
     return *this;
   }
 
+  const std::vector<CustomOption*>& getCustom() const {
+    return _custom;
+  }
+
+  std::vector<CustomOption*>& getMutableCustom() {
+    checkMutable();
+    return _custom;
+  }
+
+  MethodOptions& setCustom(const std::vector<CustomOption*>& custom) {
+    checkMutable();
+    _custom = custom;
+    return *this;
+  }
+
+  MethodOptions& clearCustom() {
+    checkMutable();
+    _custom.clear();
+    return *this;
+  }
+
   static coda::descriptors::StructDescriptor DESCRIPTOR;
   static MethodOptions DEFAULT_INSTANCE;
   static const uint32_t TYPE_ID;
@@ -988,8 +1148,18 @@ public:
 private:
   std::bitset<1> fieldsPresent;
   bool _const;
+  std::vector<CustomOption*> _custom;
+
+  bool isFieldPresent(size_t index) const {
+    return fieldsPresent[index];
+  }
+
+  void setFieldPresent(size_t index, bool present) {
+    fieldsPresent[index] = present;
+  }
 
   static coda::descriptors::FieldDescriptor Field_const;
+  static coda::descriptors::FieldDescriptor Field_custom;
   static coda::descriptors::FieldDescriptor* Fields[];
 };
 
@@ -1004,6 +1174,7 @@ public:
 
   EnumOptions(const EnumOptions& _src)
     : Options(*this)
+    , _custom(_src._custom)
   {}
 
   coda::descriptors::StructDescriptor* descriptor() const {
@@ -1014,11 +1185,42 @@ public:
     return new EnumOptions(*this);
   }
 
+  bool equals(const coda::runtime::Object* other) const;
+  size_t hashValue() const;
+  void freezeImpl();
   void beginWrite(coda::io::Encoder* encoder) const;
   void endWrite(coda::io::Encoder* encoder) const;
+
+  const std::vector<CustomOption*>& getCustom() const {
+    return _custom;
+  }
+
+  std::vector<CustomOption*>& getMutableCustom() {
+    checkMutable();
+    return _custom;
+  }
+
+  EnumOptions& setCustom(const std::vector<CustomOption*>& custom) {
+    checkMutable();
+    _custom = custom;
+    return *this;
+  }
+
+  EnumOptions& clearCustom() {
+    checkMutable();
+    _custom.clear();
+    return *this;
+  }
+
   static coda::descriptors::StructDescriptor DESCRIPTOR;
   static EnumOptions DEFAULT_INSTANCE;
   static const uint32_t TYPE_ID;
+
+private:
+  std::vector<CustomOption*> _custom;
+
+  static coda::descriptors::FieldDescriptor Field_custom;
+  static coda::descriptors::FieldDescriptor* Fields[];
 };
 
 // ============================================================================
@@ -1136,6 +1338,14 @@ public:
 private:
   std::bitset<1> fieldsPresent;
   int32_t _bits;
+
+  bool isFieldPresent(size_t index) const {
+    return fieldsPresent[index];
+  }
+
+  void setFieldPresent(size_t index, bool present) {
+    fieldsPresent[index] = present;
+  }
 
   static coda::descriptors::FieldDescriptor Field_bits;
   static coda::descriptors::FieldDescriptor* Fields[];
@@ -1347,6 +1557,14 @@ private:
   std::bitset<1> fieldsPresent;
   Type* _elementType;
 
+  bool isFieldPresent(size_t index) const {
+    return fieldsPresent[index];
+  }
+
+  void setFieldPresent(size_t index, bool present) {
+    fieldsPresent[index] = present;
+  }
+
   static coda::descriptors::FieldDescriptor Field_elementType;
   static coda::descriptors::FieldDescriptor* Fields[];
 };
@@ -1416,6 +1634,14 @@ public:
 private:
   std::bitset<1> fieldsPresent;
   Type* _elementType;
+
+  bool isFieldPresent(size_t index) const {
+    return fieldsPresent[index];
+  }
+
+  void setFieldPresent(size_t index, bool present) {
+    fieldsPresent[index] = present;
+  }
 
   static coda::descriptors::FieldDescriptor Field_elementType;
   static coda::descriptors::FieldDescriptor* Fields[];
@@ -1517,6 +1743,14 @@ private:
   std::bitset<2> fieldsPresent;
   Type* _keyType;
   Type* _valueType;
+
+  bool isFieldPresent(size_t index) const {
+    return fieldsPresent[index];
+  }
+
+  void setFieldPresent(size_t index, bool present) {
+    fieldsPresent[index] = present;
+  }
 
   static coda::descriptors::FieldDescriptor Field_keyType;
   static coda::descriptors::FieldDescriptor Field_valueType;
@@ -1638,6 +1872,14 @@ private:
   Type* _elementType;
   bool _const;
   bool _shared;
+
+  bool isFieldPresent(size_t index) const {
+    return fieldsPresent[index];
+  }
+
+  void setFieldPresent(size_t index, bool present) {
+    fieldsPresent[index] = present;
+  }
 
   static coda::descriptors::FieldDescriptor Field_elementType;
   static coda::descriptors::FieldDescriptor Field_const;
@@ -1796,6 +2038,14 @@ private:
   StructType* _enclosingType;
   std::string _name;
   int32_t _sourceLine;
+
+  bool isFieldPresent(size_t index) const {
+    return fieldsPresent[index];
+  }
+
+  void setFieldPresent(size_t index, bool present) {
+    fieldsPresent[index] = present;
+  }
 
   static coda::descriptors::FieldDescriptor Field_file;
   static coda::descriptors::FieldDescriptor Field_enclosingType;
@@ -1963,6 +2213,14 @@ public:
     int32_t _id;
     FieldOptions* _options;
 
+    bool isFieldPresent(size_t index) const {
+      return fieldsPresent[index];
+    }
+
+    void setFieldPresent(size_t index, bool present) {
+      fieldsPresent[index] = present;
+    }
+
     static coda::descriptors::FieldDescriptor Field_name;
     static coda::descriptors::FieldDescriptor Field_type;
     static coda::descriptors::FieldDescriptor Field_id;
@@ -2058,6 +2316,14 @@ public:
     std::bitset<2> fieldsPresent;
     std::string _name;
     Type* _type;
+
+    bool isFieldPresent(size_t index) const {
+      return fieldsPresent[index];
+    }
+
+    void setFieldPresent(size_t index, bool present) {
+      fieldsPresent[index] = present;
+    }
 
     static coda::descriptors::FieldDescriptor Field_name;
     static coda::descriptors::FieldDescriptor Field_type;
@@ -2231,6 +2497,14 @@ public:
     Type* _returnType;
     int32_t _id;
     MethodOptions* _options;
+
+    bool isFieldPresent(size_t index) const {
+      return fieldsPresent[index];
+    }
+
+    void setFieldPresent(size_t index, bool present) {
+      fieldsPresent[index] = present;
+    }
 
     static coda::descriptors::FieldDescriptor Field_name;
     static coda::descriptors::FieldDescriptor Field_params;
@@ -2490,6 +2764,14 @@ private:
   int32_t _minExtension;
   int32_t _maxExtension;
 
+  bool isFieldPresent(size_t index) const {
+    return fieldsPresent[index];
+  }
+
+  void setFieldPresent(size_t index, bool present) {
+    fieldsPresent[index] = present;
+  }
+
   static coda::descriptors::FieldDescriptor Field_options;
   static coda::descriptors::FieldDescriptor Field_baseType;
   static coda::descriptors::FieldDescriptor Field_typeId;
@@ -2598,6 +2880,14 @@ public:
     std::string _name;
     int32_t _value;
 
+    bool isFieldPresent(size_t index) const {
+      return fieldsPresent[index];
+    }
+
+    void setFieldPresent(size_t index, bool present) {
+      fieldsPresent[index] = present;
+    }
+
     static coda::descriptors::FieldDescriptor Field_name;
     static coda::descriptors::FieldDescriptor Field_value;
     static coda::descriptors::FieldDescriptor* Fields[];
@@ -2681,6 +2971,14 @@ private:
   std::bitset<1> fieldsPresent;
   EnumOptions* _options;
   std::vector<EnumType::Value*> _values;
+
+  bool isFieldPresent(size_t index) const {
+    return fieldsPresent[index];
+  }
+
+  void setFieldPresent(size_t index, bool present) {
+    fieldsPresent[index] = present;
+  }
 
   static coda::descriptors::FieldDescriptor Field_options;
   static coda::descriptors::FieldDescriptor Field_values;
@@ -2919,6 +3217,14 @@ private:
   int32_t _id;
   Type* _type;
 
+  bool isFieldPresent(size_t index) const {
+    return fieldsPresent[index];
+  }
+
+  void setFieldPresent(size_t index, bool present) {
+    fieldsPresent[index] = present;
+  }
+
   static coda::descriptors::FieldDescriptor Field_file;
   static coda::descriptors::FieldDescriptor Field_enclosingType;
   static coda::descriptors::FieldDescriptor Field_sourceLine;
@@ -2995,11 +3301,11 @@ public:
       return *this;
     }
 
-    const std::unordered_map<std::string, std::string >& getPackage() const {
+    const std::unordered_map<std::string, std::string>& getPackage() const {
       return _package;
     }
 
-    std::unordered_map<std::string, std::string >& getMutablePackage() {
+    std::unordered_map<std::string, std::string>& getMutablePackage() {
       checkMutable();
       return _package;
     }
@@ -3010,7 +3316,7 @@ public:
       return *this;
     }
 
-    Import& setPackage(const std::unordered_map<std::string, std::string >& package) {
+    Import& setPackage(const std::unordered_map<std::string, std::string>& package) {
       checkMutable();
       _package = package;
       return *this;
@@ -3029,7 +3335,15 @@ public:
   private:
     std::bitset<1> fieldsPresent;
     std::string _path;
-    std::unordered_map<std::string, std::string > _package;
+    std::unordered_map<std::string, std::string> _package;
+
+    bool isFieldPresent(size_t index) const {
+      return fieldsPresent[index];
+    }
+
+    void setFieldPresent(size_t index, bool present) {
+      fieldsPresent[index] = present;
+    }
 
     static coda::descriptors::FieldDescriptor Field_path;
     static coda::descriptors::FieldDescriptor Field_package;
@@ -3253,6 +3567,14 @@ private:
   std::vector<EnumType*> _enums;
   std::vector<ExtensionField*> _extensions;
   std::vector<FileDescriptor::Import*> _imports;
+
+  bool isFieldPresent(size_t index) const {
+    return fieldsPresent[index];
+  }
+
+  void setFieldPresent(size_t index, bool present) {
+    fieldsPresent[index] = present;
+  }
 
   static coda::descriptors::FieldDescriptor Field_name;
   static coda::descriptors::FieldDescriptor Field_directory;

@@ -75,6 +75,7 @@ class BinaryEncoder(coda.io.AbstractEncoder):
       types.TypeKind.SET: DataType.LIST,
       types.TypeKind.MAP: DataType.MAP,
       types.TypeKind.STRUCT: DataType.STRUCT,
+      types.TypeKind.ENUM: DataType.VARINT,
   }
 
   class State:

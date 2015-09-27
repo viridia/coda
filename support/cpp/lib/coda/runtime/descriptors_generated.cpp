@@ -12,7 +12,7 @@ namespace coda {
 namespace descriptors {
 
 coda::descriptors::FieldOptions _options0 = coda::descriptors::freeze(coda::descriptors::FieldOptions().setNullable(true));
-coda::descriptors::FileOptions _options1 = coda::descriptors::freeze(coda::descriptors::FileOptions().putPackage("java", "coda.descriptors").putPackage("python", "coda.runtime.descdata").putPackage("cpp", "coda::descriptors").putOuterClass("java", "Descriptors").putFilepath("cpp", "coda/runtime/descriptors_generated").putImports("cpp", coda::descriptors::StaticListBuilder<std::string>().add("coda/runtime/descriptors_mixin.h").build()));
+coda::descriptors::FileOptions _options1 = coda::descriptors::freeze(coda::descriptors::FileOptions().putPackage("python", "coda.runtime.descdata").putPackage("cpp", "coda::descriptors").putPackage("java", "coda.descriptors").putOuterClass("java", "Descriptors").putFilepath("cpp", "coda/runtime/descriptors_generated").putImports("cpp", coda::descriptors::StaticListBuilder<std::string>().add("coda/runtime/descriptors_mixin.h").build()));
 coda::descriptors::StructOptions _options2 = coda::descriptors::freeze(coda::descriptors::StructOptions().putMixin("python.python3", "coda.runtime.typemixins.BooleanTypeMixin"));
 coda::descriptors::StructOptions _options3 = coda::descriptors::freeze(coda::descriptors::StructOptions().putMixin("python.python3", "coda.runtime.typemixins.BytesTypeMixin"));
 coda::descriptors::StructOptions _options4 = coda::descriptors::freeze(coda::descriptors::StructOptions().putMixin("python.python3", "coda.runtime.typemixins.DeclTypeMixin").putMixin("cpp", "coda::descriptors::DeclTypeMixin"));
@@ -90,7 +90,8 @@ coda::descriptors::StructDescriptor Value::DESCRIPTOR(
   coda::descriptors::StaticArrayRef<coda::descriptors::StructDescriptor*>(),
   coda::descriptors::StaticArrayRef<coda::descriptors::EnumDescriptor*>(),
   coda::descriptors::StaticArrayRef<coda::descriptors::FieldDescriptor*>(),
-  &coda::descriptors::StaticObjectBuilder<Value>::create
+  &coda::descriptors::StaticObjectBuilder<Value>::create,
+  NULL, NULL
 );
 
 Value Value::DEFAULT_INSTANCE;
@@ -103,7 +104,8 @@ coda::descriptors::FieldDescriptor BoolValue::Field_value(
     "value", 1,
     coda::types::Boolean::DESCRIPTOR,
     coda::descriptors::FieldOptions::DEFAULT_INSTANCE,
-    CODA_OFFSET_OF(BoolValue, _value));
+    CODA_OFFSET_OF(BoolValue, _value),
+    BoolValue::HAS_VALUE);
 
 coda::descriptors::FieldDescriptor* BoolValue::Fields[] = {
   &BoolValue::Field_value,
@@ -122,7 +124,9 @@ coda::descriptors::StructDescriptor BoolValue::DESCRIPTOR(
   coda::descriptors::StaticArrayRef<coda::descriptors::StructDescriptor*>(),
   coda::descriptors::StaticArrayRef<coda::descriptors::EnumDescriptor*>(),
   BoolValue::Fields,
-  &coda::descriptors::StaticObjectBuilder<BoolValue>::create
+  &coda::descriptors::StaticObjectBuilder<BoolValue>::create,
+  (coda::descriptors::PresenceGetter) &BoolValue::isFieldPresent,
+  (coda::descriptors::PresenceSetter) &BoolValue::setFieldPresent
 );
 
 BoolValue BoolValue::DEFAULT_INSTANCE;
@@ -161,7 +165,8 @@ coda::descriptors::FieldDescriptor IntegerValue::Field_value(
     "value", 1,
     coda::types::Integer32::DESCRIPTOR,
     coda::descriptors::FieldOptions::DEFAULT_INSTANCE,
-    CODA_OFFSET_OF(IntegerValue, _value));
+    CODA_OFFSET_OF(IntegerValue, _value),
+    IntegerValue::HAS_VALUE);
 
 coda::descriptors::FieldDescriptor* IntegerValue::Fields[] = {
   &IntegerValue::Field_value,
@@ -180,7 +185,9 @@ coda::descriptors::StructDescriptor IntegerValue::DESCRIPTOR(
   coda::descriptors::StaticArrayRef<coda::descriptors::StructDescriptor*>(),
   coda::descriptors::StaticArrayRef<coda::descriptors::EnumDescriptor*>(),
   IntegerValue::Fields,
-  &coda::descriptors::StaticObjectBuilder<IntegerValue>::create
+  &coda::descriptors::StaticObjectBuilder<IntegerValue>::create,
+  (coda::descriptors::PresenceGetter) &IntegerValue::isFieldPresent,
+  (coda::descriptors::PresenceSetter) &IntegerValue::setFieldPresent
 );
 
 IntegerValue IntegerValue::DEFAULT_INSTANCE;
@@ -219,7 +226,8 @@ coda::descriptors::FieldDescriptor StringValue::Field_value(
     "value", 1,
     coda::types::String::DESCRIPTOR,
     coda::descriptors::FieldOptions::DEFAULT_INSTANCE,
-    CODA_OFFSET_OF(StringValue, _value));
+    CODA_OFFSET_OF(StringValue, _value),
+    StringValue::HAS_VALUE);
 
 coda::descriptors::FieldDescriptor* StringValue::Fields[] = {
   &StringValue::Field_value,
@@ -238,7 +246,9 @@ coda::descriptors::StructDescriptor StringValue::DESCRIPTOR(
   coda::descriptors::StaticArrayRef<coda::descriptors::StructDescriptor*>(),
   coda::descriptors::StaticArrayRef<coda::descriptors::EnumDescriptor*>(),
   StringValue::Fields,
-  &coda::descriptors::StaticObjectBuilder<StringValue>::create
+  &coda::descriptors::StaticObjectBuilder<StringValue>::create,
+  (coda::descriptors::PresenceGetter) &StringValue::isFieldPresent,
+  (coda::descriptors::PresenceSetter) &StringValue::setFieldPresent
 );
 
 StringValue StringValue::DEFAULT_INSTANCE;
@@ -277,7 +287,8 @@ coda::descriptors::FieldDescriptor ListValue::Field_value(
     "value", 1,
     coda::types::List<Value>::DESCRIPTOR,
     coda::descriptors::FieldOptions::DEFAULT_INSTANCE,
-    CODA_OFFSET_OF(ListValue, _value));
+    CODA_OFFSET_OF(ListValue, _value),
+    (size_t)-1);
 
 coda::descriptors::FieldDescriptor* ListValue::Fields[] = {
   &ListValue::Field_value,
@@ -296,7 +307,8 @@ coda::descriptors::StructDescriptor ListValue::DESCRIPTOR(
   coda::descriptors::StaticArrayRef<coda::descriptors::StructDescriptor*>(),
   coda::descriptors::StaticArrayRef<coda::descriptors::EnumDescriptor*>(),
   ListValue::Fields,
-  &coda::descriptors::StaticObjectBuilder<ListValue>::create
+  &coda::descriptors::StaticObjectBuilder<ListValue>::create,
+  NULL, NULL
 );
 
 ListValue ListValue::DEFAULT_INSTANCE;
@@ -353,10 +365,34 @@ coda::descriptors::StructDescriptor Options::DESCRIPTOR(
   coda::descriptors::StaticArrayRef<coda::descriptors::StructDescriptor*>(),
   coda::descriptors::StaticArrayRef<coda::descriptors::EnumDescriptor*>(),
   coda::descriptors::StaticArrayRef<coda::descriptors::FieldDescriptor*>(),
-  &coda::descriptors::StaticObjectBuilder<Options>::create
+  &coda::descriptors::StaticObjectBuilder<Options>::create,
+  NULL, NULL
 );
 
 Options Options::DEFAULT_INSTANCE;
+
+// ============================================================================
+// CustomOption
+// ============================================================================
+
+const uint32_t CustomOption::TYPE_ID = 0;
+
+coda::descriptors::StructDescriptor CustomOption::DESCRIPTOR(
+  "CustomOption",
+  0,
+  &CustomOption::DEFAULT_INSTANCE,
+  FILE,
+  NULL,
+  NULL,
+  coda::descriptors::StructOptions::DEFAULT_INSTANCE,
+  coda::descriptors::StaticArrayRef<coda::descriptors::StructDescriptor*>(),
+  coda::descriptors::StaticArrayRef<coda::descriptors::EnumDescriptor*>(),
+  coda::descriptors::StaticArrayRef<coda::descriptors::FieldDescriptor*>(),
+  &coda::descriptors::StaticObjectBuilder<CustomOption>::create,
+  NULL, NULL
+);
+
+CustomOption CustomOption::DEFAULT_INSTANCE;
 
 // ============================================================================
 // FileOptions
@@ -366,28 +402,39 @@ coda::descriptors::FieldDescriptor FileOptions::Field_package(
     "package", 1,
     coda::types::Map<coda::types::String, coda::types::String >::DESCRIPTOR,
     coda::descriptors::FieldOptions::DEFAULT_INSTANCE,
-    CODA_OFFSET_OF(FileOptions, _package));
+    CODA_OFFSET_OF(FileOptions, _package),
+    (size_t)-1);
 coda::descriptors::FieldDescriptor FileOptions::Field_outerClass(
     "outerClass", 3,
     coda::types::Map<coda::types::String, coda::types::String >::DESCRIPTOR,
     coda::descriptors::FieldOptions::DEFAULT_INSTANCE,
-    CODA_OFFSET_OF(FileOptions, _outerClass));
+    CODA_OFFSET_OF(FileOptions, _outerClass),
+    (size_t)-1);
 coda::descriptors::FieldDescriptor FileOptions::Field_filepath(
     "filepath", 4,
     coda::types::Map<coda::types::String, coda::types::String >::DESCRIPTOR,
     coda::descriptors::FieldOptions::DEFAULT_INSTANCE,
-    CODA_OFFSET_OF(FileOptions, _filepath));
+    CODA_OFFSET_OF(FileOptions, _filepath),
+    (size_t)-1);
 coda::descriptors::FieldDescriptor FileOptions::Field_imports(
     "imports", 5,
     coda::types::Map<coda::types::String, coda::types::List<coda::types::String > >::DESCRIPTOR,
     coda::descriptors::FieldOptions::DEFAULT_INSTANCE,
-    CODA_OFFSET_OF(FileOptions, _imports));
+    CODA_OFFSET_OF(FileOptions, _imports),
+    (size_t)-1);
+coda::descriptors::FieldDescriptor FileOptions::Field_custom(
+    "custom", 6,
+    coda::types::List<CustomOption>::DESCRIPTOR,
+    coda::descriptors::FieldOptions::DEFAULT_INSTANCE,
+    CODA_OFFSET_OF(FileOptions, _custom),
+    (size_t)-1);
 
 coda::descriptors::FieldDescriptor* FileOptions::Fields[] = {
   &FileOptions::Field_package,
   &FileOptions::Field_outerClass,
   &FileOptions::Field_filepath,
   &FileOptions::Field_imports,
+  &FileOptions::Field_custom,
 };
 
 const uint32_t FileOptions::TYPE_ID = 1;
@@ -403,7 +450,8 @@ coda::descriptors::StructDescriptor FileOptions::DESCRIPTOR(
   coda::descriptors::StaticArrayRef<coda::descriptors::StructDescriptor*>(),
   coda::descriptors::StaticArrayRef<coda::descriptors::EnumDescriptor*>(),
   FileOptions::Fields,
-  &coda::descriptors::StaticObjectBuilder<FileOptions>::create
+  &coda::descriptors::StaticObjectBuilder<FileOptions>::create,
+  NULL, NULL
 );
 
 FileOptions FileOptions::DEFAULT_INSTANCE;
@@ -413,7 +461,8 @@ bool FileOptions::equals(const coda::runtime::Object* other) const {
         _package == ((FileOptions*) other)->_package &&
         _outerClass == ((FileOptions*) other)->_outerClass &&
         _filepath == ((FileOptions*) other)->_filepath &&
-        _imports == ((FileOptions*) other)->_imports;
+        _imports == ((FileOptions*) other)->_imports &&
+        _custom == ((FileOptions*) other)->_custom;
 }
 
 size_t FileOptions::hashValue() const {
@@ -422,10 +471,16 @@ size_t FileOptions::hashValue() const {
   coda::runtime::hash_combine(hash, coda::runtime::hash(_outerClass));
   coda::runtime::hash_combine(hash, coda::runtime::hash(_filepath));
   coda::runtime::hash_combine(hash, coda::runtime::hash(_imports));
+  coda::runtime::hash_combine(hash, coda::runtime::hash(_custom));
   return hash;
 }
 
 void FileOptions::freezeImpl() {
+  for (std::vector<CustomOption*>::const_iterator it = _custom.begin(), itEnd = _custom.end(); it != itEnd; ++it) {
+    if ((*it)->isMutable()) {
+      (*it)->freeze();
+    }
+  }
 }
 
 void FileOptions::beginWrite(coda::io::Encoder* encoder) const {
@@ -436,7 +491,7 @@ void FileOptions::endWrite(coda::io::Encoder* encoder) const {
   if (!_package.empty()) {
     encoder->writeFieldHeader("package", 1);
     encoder->writeBeginMap(coda::descriptors::TYPE_KIND_STRING, coda::descriptors::TYPE_KIND_STRING, _package.size());
-    for (std::unordered_map<std::string, std::string >::const_iterator it = _package.begin(), itEnd = _package.end(); it != itEnd; ++it) {
+    for (std::unordered_map<std::string, std::string>::const_iterator it = _package.begin(), itEnd = _package.end(); it != itEnd; ++it) {
       encoder->writeString(it->first);
       encoder->writeString(it->second);
     }
@@ -445,7 +500,7 @@ void FileOptions::endWrite(coda::io::Encoder* encoder) const {
   if (!_outerClass.empty()) {
     encoder->writeFieldHeader("outerClass", 3);
     encoder->writeBeginMap(coda::descriptors::TYPE_KIND_STRING, coda::descriptors::TYPE_KIND_STRING, _outerClass.size());
-    for (std::unordered_map<std::string, std::string >::const_iterator it = _outerClass.begin(), itEnd = _outerClass.end(); it != itEnd; ++it) {
+    for (std::unordered_map<std::string, std::string>::const_iterator it = _outerClass.begin(), itEnd = _outerClass.end(); it != itEnd; ++it) {
       encoder->writeString(it->first);
       encoder->writeString(it->second);
     }
@@ -454,7 +509,7 @@ void FileOptions::endWrite(coda::io::Encoder* encoder) const {
   if (!_filepath.empty()) {
     encoder->writeFieldHeader("filepath", 4);
     encoder->writeBeginMap(coda::descriptors::TYPE_KIND_STRING, coda::descriptors::TYPE_KIND_STRING, _filepath.size());
-    for (std::unordered_map<std::string, std::string >::const_iterator it = _filepath.begin(), itEnd = _filepath.end(); it != itEnd; ++it) {
+    for (std::unordered_map<std::string, std::string>::const_iterator it = _filepath.begin(), itEnd = _filepath.end(); it != itEnd; ++it) {
       encoder->writeString(it->first);
       encoder->writeString(it->second);
     }
@@ -473,6 +528,14 @@ void FileOptions::endWrite(coda::io::Encoder* encoder) const {
     }
     encoder->writeEndMap();
   }
+  if (!_custom.empty()) {
+    encoder->writeFieldHeader("custom", 6);
+    encoder->writeBeginList(coda::descriptors::TYPE_KIND_STRUCT, _custom.size());
+    for (std::vector<CustomOption*>::const_iterator it = _custom.begin(), itEnd = _custom.end(); it != itEnd; ++it) {
+      encoder->writeStruct(*it, true);
+    }
+    encoder->writeEndList();
+  }
   encoder->writeEndSubtype();
 }
 
@@ -484,27 +547,38 @@ coda::descriptors::FieldDescriptor StructOptions::Field_allowSubtypes(
     "allowSubtypes", 1,
     coda::types::Boolean::DESCRIPTOR,
     coda::descriptors::FieldOptions::DEFAULT_INSTANCE,
-    CODA_OFFSET_OF(StructOptions, _allowSubtypes));
+    CODA_OFFSET_OF(StructOptions, _allowSubtypes),
+    StructOptions::HAS_ALLOW_SUBTYPES);
 coda::descriptors::FieldDescriptor StructOptions::Field_genClassName(
     "genClassName", 2,
     coda::types::Map<coda::types::String, coda::types::String >::DESCRIPTOR,
     coda::descriptors::FieldOptions::DEFAULT_INSTANCE,
-    CODA_OFFSET_OF(StructOptions, _genClassName));
+    CODA_OFFSET_OF(StructOptions, _genClassName),
+    (size_t)-1);
 coda::descriptors::FieldDescriptor StructOptions::Field_mixin(
     "mixin", 3,
     coda::types::Map<coda::types::String, coda::types::String >::DESCRIPTOR,
     coda::descriptors::FieldOptions::DEFAULT_INSTANCE,
-    CODA_OFFSET_OF(StructOptions, _mixin));
+    CODA_OFFSET_OF(StructOptions, _mixin),
+    (size_t)-1);
 coda::descriptors::FieldDescriptor StructOptions::Field_reference(
     "reference", 4,
     coda::types::Boolean::DESCRIPTOR,
     coda::descriptors::FieldOptions::DEFAULT_INSTANCE,
-    CODA_OFFSET_OF(StructOptions, _reference));
+    CODA_OFFSET_OF(StructOptions, _reference),
+    StructOptions::HAS_REFERENCE);
 coda::descriptors::FieldDescriptor StructOptions::Field_shared(
     "shared", 5,
     coda::types::Boolean::DESCRIPTOR,
     coda::descriptors::FieldOptions::DEFAULT_INSTANCE,
-    CODA_OFFSET_OF(StructOptions, _shared));
+    CODA_OFFSET_OF(StructOptions, _shared),
+    StructOptions::HAS_SHARED);
+coda::descriptors::FieldDescriptor StructOptions::Field_custom(
+    "custom", 6,
+    coda::types::List<CustomOption>::DESCRIPTOR,
+    coda::descriptors::FieldOptions::DEFAULT_INSTANCE,
+    CODA_OFFSET_OF(StructOptions, _custom),
+    (size_t)-1);
 
 coda::descriptors::FieldDescriptor* StructOptions::Fields[] = {
   &StructOptions::Field_allowSubtypes,
@@ -512,6 +586,7 @@ coda::descriptors::FieldDescriptor* StructOptions::Fields[] = {
   &StructOptions::Field_mixin,
   &StructOptions::Field_reference,
   &StructOptions::Field_shared,
+  &StructOptions::Field_custom,
 };
 
 const uint32_t StructOptions::TYPE_ID = 2;
@@ -527,7 +602,9 @@ coda::descriptors::StructDescriptor StructOptions::DESCRIPTOR(
   coda::descriptors::StaticArrayRef<coda::descriptors::StructDescriptor*>(),
   coda::descriptors::StaticArrayRef<coda::descriptors::EnumDescriptor*>(),
   StructOptions::Fields,
-  &coda::descriptors::StaticObjectBuilder<StructOptions>::create
+  &coda::descriptors::StaticObjectBuilder<StructOptions>::create,
+  (coda::descriptors::PresenceGetter) &StructOptions::isFieldPresent,
+  (coda::descriptors::PresenceSetter) &StructOptions::setFieldPresent
 );
 
 StructOptions StructOptions::DEFAULT_INSTANCE;
@@ -538,7 +615,8 @@ bool StructOptions::equals(const coda::runtime::Object* other) const {
         _genClassName == ((StructOptions*) other)->_genClassName &&
         _mixin == ((StructOptions*) other)->_mixin &&
         _reference == ((StructOptions*) other)->_reference &&
-        _shared == ((StructOptions*) other)->_shared;
+        _shared == ((StructOptions*) other)->_shared &&
+        _custom == ((StructOptions*) other)->_custom;
 }
 
 size_t StructOptions::hashValue() const {
@@ -548,10 +626,16 @@ size_t StructOptions::hashValue() const {
   coda::runtime::hash_combine(hash, coda::runtime::hash(_mixin));
   coda::runtime::hash_combine(hash, coda::runtime::hash(_reference));
   coda::runtime::hash_combine(hash, coda::runtime::hash(_shared));
+  coda::runtime::hash_combine(hash, coda::runtime::hash(_custom));
   return hash;
 }
 
 void StructOptions::freezeImpl() {
+  for (std::vector<CustomOption*>::const_iterator it = _custom.begin(), itEnd = _custom.end(); it != itEnd; ++it) {
+    if ((*it)->isMutable()) {
+      (*it)->freeze();
+    }
+  }
 }
 
 void StructOptions::beginWrite(coda::io::Encoder* encoder) const {
@@ -566,7 +650,7 @@ void StructOptions::endWrite(coda::io::Encoder* encoder) const {
   if (!_genClassName.empty()) {
     encoder->writeFieldHeader("genClassName", 2);
     encoder->writeBeginMap(coda::descriptors::TYPE_KIND_STRING, coda::descriptors::TYPE_KIND_STRING, _genClassName.size());
-    for (std::unordered_map<std::string, std::string >::const_iterator it = _genClassName.begin(), itEnd = _genClassName.end(); it != itEnd; ++it) {
+    for (std::unordered_map<std::string, std::string>::const_iterator it = _genClassName.begin(), itEnd = _genClassName.end(); it != itEnd; ++it) {
       encoder->writeString(it->first);
       encoder->writeString(it->second);
     }
@@ -575,7 +659,7 @@ void StructOptions::endWrite(coda::io::Encoder* encoder) const {
   if (!_mixin.empty()) {
     encoder->writeFieldHeader("mixin", 3);
     encoder->writeBeginMap(coda::descriptors::TYPE_KIND_STRING, coda::descriptors::TYPE_KIND_STRING, _mixin.size());
-    for (std::unordered_map<std::string, std::string >::const_iterator it = _mixin.begin(), itEnd = _mixin.end(); it != itEnd; ++it) {
+    for (std::unordered_map<std::string, std::string>::const_iterator it = _mixin.begin(), itEnd = _mixin.end(); it != itEnd; ++it) {
       encoder->writeString(it->first);
       encoder->writeString(it->second);
     }
@@ -589,6 +673,14 @@ void StructOptions::endWrite(coda::io::Encoder* encoder) const {
     encoder->writeFieldHeader("shared", 5);
     encoder->writeBoolean(_shared);
   }
+  if (!_custom.empty()) {
+    encoder->writeFieldHeader("custom", 6);
+    encoder->writeBeginList(coda::descriptors::TYPE_KIND_STRUCT, _custom.size());
+    for (std::vector<CustomOption*>::const_iterator it = _custom.begin(), itEnd = _custom.end(); it != itEnd; ++it) {
+      encoder->writeStruct(*it, true);
+    }
+    encoder->writeEndList();
+  }
   encoder->writeEndSubtype();
 }
 
@@ -600,37 +692,50 @@ coda::descriptors::FieldDescriptor FieldOptions::Field_nullable(
     "nullable", 1,
     coda::types::Boolean::DESCRIPTOR,
     coda::descriptors::FieldOptions::DEFAULT_INSTANCE,
-    CODA_OFFSET_OF(FieldOptions, _nullable));
+    CODA_OFFSET_OF(FieldOptions, _nullable),
+    FieldOptions::HAS_NULLABLE);
 coda::descriptors::FieldDescriptor FieldOptions::Field_deprecated(
     "deprecated", 3,
     coda::types::Boolean::DESCRIPTOR,
     coda::descriptors::FieldOptions::DEFAULT_INSTANCE,
-    CODA_OFFSET_OF(FieldOptions, _deprecated));
+    CODA_OFFSET_OF(FieldOptions, _deprecated),
+    FieldOptions::HAS_DEPRECATED);
 coda::descriptors::FieldDescriptor FieldOptions::Field_fixed(
     "fixed", 4,
     coda::types::Boolean::DESCRIPTOR,
     coda::descriptors::FieldOptions::DEFAULT_INSTANCE,
-    CODA_OFFSET_OF(FieldOptions, _fixed));
+    CODA_OFFSET_OF(FieldOptions, _fixed),
+    FieldOptions::HAS_FIXED);
 coda::descriptors::FieldDescriptor FieldOptions::Field_transient(
     "transient", 5,
     coda::types::Boolean::DESCRIPTOR,
     coda::descriptors::FieldOptions::DEFAULT_INSTANCE,
-    CODA_OFFSET_OF(FieldOptions, _transient));
+    CODA_OFFSET_OF(FieldOptions, _transient),
+    FieldOptions::HAS_TRANSIENT);
 coda::descriptors::FieldDescriptor FieldOptions::Field_ignore(
     "ignore", 6,
     coda::types::Map<coda::types::String, coda::types::Boolean>::DESCRIPTOR,
     coda::descriptors::FieldOptions::DEFAULT_INSTANCE,
-    CODA_OFFSET_OF(FieldOptions, _ignore));
+    CODA_OFFSET_OF(FieldOptions, _ignore),
+    (size_t)-1);
 coda::descriptors::FieldDescriptor FieldOptions::Field_default(
     "default", 7,
     Value::DESCRIPTOR,
     _options0,
-    CODA_OFFSET_OF(FieldOptions, _default));
+    CODA_OFFSET_OF(FieldOptions, _default),
+    FieldOptions::HAS_DEFAULT);
 coda::descriptors::FieldDescriptor FieldOptions::Field_novisit(
     "novisit", 8,
     coda::types::Boolean::DESCRIPTOR,
     coda::descriptors::FieldOptions::DEFAULT_INSTANCE,
-    CODA_OFFSET_OF(FieldOptions, _novisit));
+    CODA_OFFSET_OF(FieldOptions, _novisit),
+    FieldOptions::HAS_NOVISIT);
+coda::descriptors::FieldDescriptor FieldOptions::Field_custom(
+    "custom", 9,
+    coda::types::List<CustomOption>::DESCRIPTOR,
+    coda::descriptors::FieldOptions::DEFAULT_INSTANCE,
+    CODA_OFFSET_OF(FieldOptions, _custom),
+    (size_t)-1);
 
 coda::descriptors::FieldDescriptor* FieldOptions::Fields[] = {
   &FieldOptions::Field_nullable,
@@ -640,6 +745,7 @@ coda::descriptors::FieldDescriptor* FieldOptions::Fields[] = {
   &FieldOptions::Field_ignore,
   &FieldOptions::Field_default,
   &FieldOptions::Field_novisit,
+  &FieldOptions::Field_custom,
 };
 
 const uint32_t FieldOptions::TYPE_ID = 3;
@@ -655,7 +761,9 @@ coda::descriptors::StructDescriptor FieldOptions::DESCRIPTOR(
   coda::descriptors::StaticArrayRef<coda::descriptors::StructDescriptor*>(),
   coda::descriptors::StaticArrayRef<coda::descriptors::EnumDescriptor*>(),
   FieldOptions::Fields,
-  &coda::descriptors::StaticObjectBuilder<FieldOptions>::create
+  &coda::descriptors::StaticObjectBuilder<FieldOptions>::create,
+  (coda::descriptors::PresenceGetter) &FieldOptions::isFieldPresent,
+  (coda::descriptors::PresenceSetter) &FieldOptions::setFieldPresent
 );
 
 FieldOptions FieldOptions::DEFAULT_INSTANCE;
@@ -668,7 +776,8 @@ bool FieldOptions::equals(const coda::runtime::Object* other) const {
         _transient == ((FieldOptions*) other)->_transient &&
         _ignore == ((FieldOptions*) other)->_ignore &&
         _default == ((FieldOptions*) other)->_default &&
-        _novisit == ((FieldOptions*) other)->_novisit;
+        _novisit == ((FieldOptions*) other)->_novisit &&
+        _custom == ((FieldOptions*) other)->_custom;
 }
 
 size_t FieldOptions::hashValue() const {
@@ -680,12 +789,18 @@ size_t FieldOptions::hashValue() const {
   coda::runtime::hash_combine(hash, coda::runtime::hash(_ignore));
   coda::runtime::hash_combine(hash, coda::runtime::hash(_default));
   coda::runtime::hash_combine(hash, coda::runtime::hash(_novisit));
+  coda::runtime::hash_combine(hash, coda::runtime::hash(_custom));
   return hash;
 }
 
 void FieldOptions::freezeImpl() {
   if (_default && _default->isMutable()) {
     _default->freeze();
+  }
+  for (std::vector<CustomOption*>::const_iterator it = _custom.begin(), itEnd = _custom.end(); it != itEnd; ++it) {
+    if ((*it)->isMutable()) {
+      (*it)->freeze();
+    }
   }
 }
 
@@ -727,6 +842,14 @@ void FieldOptions::endWrite(coda::io::Encoder* encoder) const {
     encoder->writeFieldHeader("novisit", 8);
     encoder->writeBoolean(_novisit);
   }
+  if (!_custom.empty()) {
+    encoder->writeFieldHeader("custom", 9);
+    encoder->writeBeginList(coda::descriptors::TYPE_KIND_STRUCT, _custom.size());
+    for (std::vector<CustomOption*>::const_iterator it = _custom.begin(), itEnd = _custom.end(); it != itEnd; ++it) {
+      encoder->writeStruct(*it, true);
+    }
+    encoder->writeEndList();
+  }
   encoder->writeEndSubtype();
 }
 
@@ -735,13 +858,21 @@ void FieldOptions::endWrite(coda::io::Encoder* encoder) const {
 // ============================================================================
 
 coda::descriptors::FieldDescriptor MethodOptions::Field_const(
-    "const", 4,
+    "const", 1,
     coda::types::Boolean::DESCRIPTOR,
     coda::descriptors::FieldOptions::DEFAULT_INSTANCE,
-    CODA_OFFSET_OF(MethodOptions, _const));
+    CODA_OFFSET_OF(MethodOptions, _const),
+    MethodOptions::HAS_CONST);
+coda::descriptors::FieldDescriptor MethodOptions::Field_custom(
+    "custom", 2,
+    coda::types::List<CustomOption>::DESCRIPTOR,
+    coda::descriptors::FieldOptions::DEFAULT_INSTANCE,
+    CODA_OFFSET_OF(MethodOptions, _custom),
+    (size_t)-1);
 
 coda::descriptors::FieldDescriptor* MethodOptions::Fields[] = {
   &MethodOptions::Field_const,
+  &MethodOptions::Field_custom,
 };
 
 const uint32_t MethodOptions::TYPE_ID = 4;
@@ -757,23 +888,32 @@ coda::descriptors::StructDescriptor MethodOptions::DESCRIPTOR(
   coda::descriptors::StaticArrayRef<coda::descriptors::StructDescriptor*>(),
   coda::descriptors::StaticArrayRef<coda::descriptors::EnumDescriptor*>(),
   MethodOptions::Fields,
-  &coda::descriptors::StaticObjectBuilder<MethodOptions>::create
+  &coda::descriptors::StaticObjectBuilder<MethodOptions>::create,
+  (coda::descriptors::PresenceGetter) &MethodOptions::isFieldPresent,
+  (coda::descriptors::PresenceSetter) &MethodOptions::setFieldPresent
 );
 
 MethodOptions MethodOptions::DEFAULT_INSTANCE;
 
 bool MethodOptions::equals(const coda::runtime::Object* other) const {
   return Options::equals(other) &&
-        _const == ((MethodOptions*) other)->_const;
+        _const == ((MethodOptions*) other)->_const &&
+        _custom == ((MethodOptions*) other)->_custom;
 }
 
 size_t MethodOptions::hashValue() const {
   size_t hash = coda::runtime::Object::hashValue();
   coda::runtime::hash_combine(hash, coda::runtime::hash(_const));
+  coda::runtime::hash_combine(hash, coda::runtime::hash(_custom));
   return hash;
 }
 
 void MethodOptions::freezeImpl() {
+  for (std::vector<CustomOption*>::const_iterator it = _custom.begin(), itEnd = _custom.end(); it != itEnd; ++it) {
+    if ((*it)->isMutable()) {
+      (*it)->freeze();
+    }
+  }
 }
 
 void MethodOptions::beginWrite(coda::io::Encoder* encoder) const {
@@ -782,8 +922,16 @@ void MethodOptions::beginWrite(coda::io::Encoder* encoder) const {
 
 void MethodOptions::endWrite(coda::io::Encoder* encoder) const {
   if (hasConst()) {
-    encoder->writeFieldHeader("const", 4);
+    encoder->writeFieldHeader("const", 1);
     encoder->writeBoolean(_const);
+  }
+  if (!_custom.empty()) {
+    encoder->writeFieldHeader("custom", 2);
+    encoder->writeBeginList(coda::descriptors::TYPE_KIND_STRUCT, _custom.size());
+    for (std::vector<CustomOption*>::const_iterator it = _custom.begin(), itEnd = _custom.end(); it != itEnd; ++it) {
+      encoder->writeStruct(*it, true);
+    }
+    encoder->writeEndList();
   }
   encoder->writeEndSubtype();
 }
@@ -791,6 +939,17 @@ void MethodOptions::endWrite(coda::io::Encoder* encoder) const {
 // ============================================================================
 // EnumOptions
 // ============================================================================
+
+coda::descriptors::FieldDescriptor EnumOptions::Field_custom(
+    "custom", 1,
+    coda::types::List<CustomOption>::DESCRIPTOR,
+    coda::descriptors::FieldOptions::DEFAULT_INSTANCE,
+    CODA_OFFSET_OF(EnumOptions, _custom),
+    (size_t)-1);
+
+coda::descriptors::FieldDescriptor* EnumOptions::Fields[] = {
+  &EnumOptions::Field_custom,
+};
 
 const uint32_t EnumOptions::TYPE_ID = 5;
 
@@ -804,17 +963,45 @@ coda::descriptors::StructDescriptor EnumOptions::DESCRIPTOR(
   coda::descriptors::StructOptions::DEFAULT_INSTANCE,
   coda::descriptors::StaticArrayRef<coda::descriptors::StructDescriptor*>(),
   coda::descriptors::StaticArrayRef<coda::descriptors::EnumDescriptor*>(),
-  coda::descriptors::StaticArrayRef<coda::descriptors::FieldDescriptor*>(),
-  &coda::descriptors::StaticObjectBuilder<EnumOptions>::create
+  EnumOptions::Fields,
+  &coda::descriptors::StaticObjectBuilder<EnumOptions>::create,
+  NULL, NULL
 );
 
 EnumOptions EnumOptions::DEFAULT_INSTANCE;
+
+bool EnumOptions::equals(const coda::runtime::Object* other) const {
+  return Options::equals(other) &&
+        _custom == ((EnumOptions*) other)->_custom;
+}
+
+size_t EnumOptions::hashValue() const {
+  size_t hash = coda::runtime::Object::hashValue();
+  coda::runtime::hash_combine(hash, coda::runtime::hash(_custom));
+  return hash;
+}
+
+void EnumOptions::freezeImpl() {
+  for (std::vector<CustomOption*>::const_iterator it = _custom.begin(), itEnd = _custom.end(); it != itEnd; ++it) {
+    if ((*it)->isMutable()) {
+      (*it)->freeze();
+    }
+  }
+}
 
 void EnumOptions::beginWrite(coda::io::Encoder* encoder) const {
   encoder->writeSubtypeHeader("EnumOptions", coda::descriptors::TYPE_KIND_STRING);
 }
 
 void EnumOptions::endWrite(coda::io::Encoder* encoder) const {
+  if (!_custom.empty()) {
+    encoder->writeFieldHeader("custom", 1);
+    encoder->writeBeginList(coda::descriptors::TYPE_KIND_STRUCT, _custom.size());
+    for (std::vector<CustomOption*>::const_iterator it = _custom.begin(), itEnd = _custom.end(); it != itEnd; ++it) {
+      encoder->writeStruct(*it, true);
+    }
+    encoder->writeEndList();
+  }
   encoder->writeEndSubtype();
 }
 
@@ -835,7 +1022,8 @@ coda::descriptors::StructDescriptor Type::DESCRIPTOR(
   coda::descriptors::StaticArrayRef<coda::descriptors::StructDescriptor*>(),
   coda::descriptors::StaticArrayRef<coda::descriptors::EnumDescriptor*>(),
   coda::descriptors::StaticArrayRef<coda::descriptors::FieldDescriptor*>(),
-  &coda::descriptors::StaticObjectBuilder<Type>::create
+  &coda::descriptors::StaticObjectBuilder<Type>::create,
+  NULL, NULL
 );
 
 Type Type::DEFAULT_INSTANCE;
@@ -857,7 +1045,8 @@ coda::descriptors::StructDescriptor BooleanType::DESCRIPTOR(
   coda::descriptors::StaticArrayRef<coda::descriptors::StructDescriptor*>(),
   coda::descriptors::StaticArrayRef<coda::descriptors::EnumDescriptor*>(),
   coda::descriptors::StaticArrayRef<coda::descriptors::FieldDescriptor*>(),
-  &coda::descriptors::StaticObjectBuilder<BooleanType>::create
+  &coda::descriptors::StaticObjectBuilder<BooleanType>::create,
+  NULL, NULL
 );
 
 BooleanType BooleanType::DEFAULT_INSTANCE;
@@ -878,7 +1067,8 @@ coda::descriptors::FieldDescriptor IntegerType::Field_bits(
     "bits", 1,
     coda::types::Integer32::DESCRIPTOR,
     coda::descriptors::FieldOptions::DEFAULT_INSTANCE,
-    CODA_OFFSET_OF(IntegerType, _bits));
+    CODA_OFFSET_OF(IntegerType, _bits),
+    IntegerType::HAS_BITS);
 
 coda::descriptors::FieldDescriptor* IntegerType::Fields[] = {
   &IntegerType::Field_bits,
@@ -897,7 +1087,9 @@ coda::descriptors::StructDescriptor IntegerType::DESCRIPTOR(
   coda::descriptors::StaticArrayRef<coda::descriptors::StructDescriptor*>(),
   coda::descriptors::StaticArrayRef<coda::descriptors::EnumDescriptor*>(),
   IntegerType::Fields,
-  &coda::descriptors::StaticObjectBuilder<IntegerType>::create
+  &coda::descriptors::StaticObjectBuilder<IntegerType>::create,
+  (coda::descriptors::PresenceGetter) &IntegerType::isFieldPresent,
+  (coda::descriptors::PresenceSetter) &IntegerType::setFieldPresent
 );
 
 IntegerType IntegerType::DEFAULT_INSTANCE;
@@ -945,7 +1137,8 @@ coda::descriptors::StructDescriptor FloatType::DESCRIPTOR(
   coda::descriptors::StaticArrayRef<coda::descriptors::StructDescriptor*>(),
   coda::descriptors::StaticArrayRef<coda::descriptors::EnumDescriptor*>(),
   coda::descriptors::StaticArrayRef<coda::descriptors::FieldDescriptor*>(),
-  &coda::descriptors::StaticObjectBuilder<FloatType>::create
+  &coda::descriptors::StaticObjectBuilder<FloatType>::create,
+  NULL, NULL
 );
 
 FloatType FloatType::DEFAULT_INSTANCE;
@@ -975,7 +1168,8 @@ coda::descriptors::StructDescriptor DoubleType::DESCRIPTOR(
   coda::descriptors::StaticArrayRef<coda::descriptors::StructDescriptor*>(),
   coda::descriptors::StaticArrayRef<coda::descriptors::EnumDescriptor*>(),
   coda::descriptors::StaticArrayRef<coda::descriptors::FieldDescriptor*>(),
-  &coda::descriptors::StaticObjectBuilder<DoubleType>::create
+  &coda::descriptors::StaticObjectBuilder<DoubleType>::create,
+  NULL, NULL
 );
 
 DoubleType DoubleType::DEFAULT_INSTANCE;
@@ -1005,7 +1199,8 @@ coda::descriptors::StructDescriptor StringType::DESCRIPTOR(
   coda::descriptors::StaticArrayRef<coda::descriptors::StructDescriptor*>(),
   coda::descriptors::StaticArrayRef<coda::descriptors::EnumDescriptor*>(),
   coda::descriptors::StaticArrayRef<coda::descriptors::FieldDescriptor*>(),
-  &coda::descriptors::StaticObjectBuilder<StringType>::create
+  &coda::descriptors::StaticObjectBuilder<StringType>::create,
+  NULL, NULL
 );
 
 StringType StringType::DEFAULT_INSTANCE;
@@ -1035,7 +1230,8 @@ coda::descriptors::StructDescriptor BytesType::DESCRIPTOR(
   coda::descriptors::StaticArrayRef<coda::descriptors::StructDescriptor*>(),
   coda::descriptors::StaticArrayRef<coda::descriptors::EnumDescriptor*>(),
   coda::descriptors::StaticArrayRef<coda::descriptors::FieldDescriptor*>(),
-  &coda::descriptors::StaticObjectBuilder<BytesType>::create
+  &coda::descriptors::StaticObjectBuilder<BytesType>::create,
+  NULL, NULL
 );
 
 BytesType BytesType::DEFAULT_INSTANCE;
@@ -1065,7 +1261,8 @@ coda::descriptors::StructDescriptor CollectionType::DESCRIPTOR(
   coda::descriptors::StaticArrayRef<coda::descriptors::StructDescriptor*>(),
   coda::descriptors::StaticArrayRef<coda::descriptors::EnumDescriptor*>(),
   coda::descriptors::StaticArrayRef<coda::descriptors::FieldDescriptor*>(),
-  &coda::descriptors::StaticObjectBuilder<CollectionType>::create
+  &coda::descriptors::StaticObjectBuilder<CollectionType>::create,
+  NULL, NULL
 );
 
 CollectionType CollectionType::DEFAULT_INSTANCE;
@@ -1086,7 +1283,8 @@ coda::descriptors::FieldDescriptor ListType::Field_elementType(
     "elementType", 1,
     coda::types::Modified<Type, false, true>::DESCRIPTOR,
     coda::descriptors::FieldOptions::DEFAULT_INSTANCE,
-    CODA_OFFSET_OF(ListType, _elementType));
+    CODA_OFFSET_OF(ListType, _elementType),
+    ListType::HAS_ELEMENT_TYPE);
 
 coda::descriptors::FieldDescriptor* ListType::Fields[] = {
   &ListType::Field_elementType,
@@ -1105,7 +1303,9 @@ coda::descriptors::StructDescriptor ListType::DESCRIPTOR(
   coda::descriptors::StaticArrayRef<coda::descriptors::StructDescriptor*>(),
   coda::descriptors::StaticArrayRef<coda::descriptors::EnumDescriptor*>(),
   ListType::Fields,
-  &coda::descriptors::StaticObjectBuilder<ListType>::create
+  &coda::descriptors::StaticObjectBuilder<ListType>::create,
+  (coda::descriptors::PresenceGetter) &ListType::isFieldPresent,
+  (coda::descriptors::PresenceSetter) &ListType::setFieldPresent
 );
 
 ListType ListType::DEFAULT_INSTANCE;
@@ -1152,7 +1352,8 @@ coda::descriptors::FieldDescriptor SetType::Field_elementType(
     "elementType", 1,
     coda::types::Modified<Type, false, true>::DESCRIPTOR,
     coda::descriptors::FieldOptions::DEFAULT_INSTANCE,
-    CODA_OFFSET_OF(SetType, _elementType));
+    CODA_OFFSET_OF(SetType, _elementType),
+    SetType::HAS_ELEMENT_TYPE);
 
 coda::descriptors::FieldDescriptor* SetType::Fields[] = {
   &SetType::Field_elementType,
@@ -1171,7 +1372,9 @@ coda::descriptors::StructDescriptor SetType::DESCRIPTOR(
   coda::descriptors::StaticArrayRef<coda::descriptors::StructDescriptor*>(),
   coda::descriptors::StaticArrayRef<coda::descriptors::EnumDescriptor*>(),
   SetType::Fields,
-  &coda::descriptors::StaticObjectBuilder<SetType>::create
+  &coda::descriptors::StaticObjectBuilder<SetType>::create,
+  (coda::descriptors::PresenceGetter) &SetType::isFieldPresent,
+  (coda::descriptors::PresenceSetter) &SetType::setFieldPresent
 );
 
 SetType SetType::DEFAULT_INSTANCE;
@@ -1218,12 +1421,14 @@ coda::descriptors::FieldDescriptor MapType::Field_keyType(
     "keyType", 1,
     coda::types::Modified<Type, false, true>::DESCRIPTOR,
     coda::descriptors::FieldOptions::DEFAULT_INSTANCE,
-    CODA_OFFSET_OF(MapType, _keyType));
+    CODA_OFFSET_OF(MapType, _keyType),
+    MapType::HAS_KEY_TYPE);
 coda::descriptors::FieldDescriptor MapType::Field_valueType(
     "valueType", 2,
     coda::types::Modified<Type, false, true>::DESCRIPTOR,
     coda::descriptors::FieldOptions::DEFAULT_INSTANCE,
-    CODA_OFFSET_OF(MapType, _valueType));
+    CODA_OFFSET_OF(MapType, _valueType),
+    MapType::HAS_VALUE_TYPE);
 
 coda::descriptors::FieldDescriptor* MapType::Fields[] = {
   &MapType::Field_keyType,
@@ -1243,7 +1448,9 @@ coda::descriptors::StructDescriptor MapType::DESCRIPTOR(
   coda::descriptors::StaticArrayRef<coda::descriptors::StructDescriptor*>(),
   coda::descriptors::StaticArrayRef<coda::descriptors::EnumDescriptor*>(),
   MapType::Fields,
-  &coda::descriptors::StaticObjectBuilder<MapType>::create
+  &coda::descriptors::StaticObjectBuilder<MapType>::create,
+  (coda::descriptors::PresenceGetter) &MapType::isFieldPresent,
+  (coda::descriptors::PresenceSetter) &MapType::setFieldPresent
 );
 
 MapType MapType::DEFAULT_INSTANCE;
@@ -1300,17 +1507,20 @@ coda::descriptors::FieldDescriptor ModifiedType::Field_elementType(
     "elementType", 1,
     coda::types::Modified<Type, false, true>::DESCRIPTOR,
     coda::descriptors::FieldOptions::DEFAULT_INSTANCE,
-    CODA_OFFSET_OF(ModifiedType, _elementType));
+    CODA_OFFSET_OF(ModifiedType, _elementType),
+    ModifiedType::HAS_ELEMENT_TYPE);
 coda::descriptors::FieldDescriptor ModifiedType::Field_const(
     "const", 2,
     coda::types::Boolean::DESCRIPTOR,
     coda::descriptors::FieldOptions::DEFAULT_INSTANCE,
-    CODA_OFFSET_OF(ModifiedType, _const));
+    CODA_OFFSET_OF(ModifiedType, _const),
+    ModifiedType::HAS_CONST);
 coda::descriptors::FieldDescriptor ModifiedType::Field_shared(
     "shared", 3,
     coda::types::Boolean::DESCRIPTOR,
     coda::descriptors::FieldOptions::DEFAULT_INSTANCE,
-    CODA_OFFSET_OF(ModifiedType, _shared));
+    CODA_OFFSET_OF(ModifiedType, _shared),
+    ModifiedType::HAS_SHARED);
 
 coda::descriptors::FieldDescriptor* ModifiedType::Fields[] = {
   &ModifiedType::Field_elementType,
@@ -1331,7 +1541,9 @@ coda::descriptors::StructDescriptor ModifiedType::DESCRIPTOR(
   coda::descriptors::StaticArrayRef<coda::descriptors::StructDescriptor*>(),
   coda::descriptors::StaticArrayRef<coda::descriptors::EnumDescriptor*>(),
   ModifiedType::Fields,
-  &coda::descriptors::StaticObjectBuilder<ModifiedType>::create
+  &coda::descriptors::StaticObjectBuilder<ModifiedType>::create,
+  (coda::descriptors::PresenceGetter) &ModifiedType::isFieldPresent,
+  (coda::descriptors::PresenceSetter) &ModifiedType::setFieldPresent
 );
 
 ModifiedType ModifiedType::DEFAULT_INSTANCE;
@@ -1392,22 +1604,26 @@ coda::descriptors::FieldDescriptor DeclType::Field_file(
     "file", 2,
     coda::types::Modified<FileDescriptor, false, true>::DESCRIPTOR,
     _options0,
-    CODA_OFFSET_OF(DeclType, _file));
+    CODA_OFFSET_OF(DeclType, _file),
+    DeclType::HAS_FILE);
 coda::descriptors::FieldDescriptor DeclType::Field_enclosingType(
     "enclosingType", 3,
     coda::types::Modified<StructType, false, true>::DESCRIPTOR,
     _options0,
-    CODA_OFFSET_OF(DeclType, _enclosingType));
+    CODA_OFFSET_OF(DeclType, _enclosingType),
+    DeclType::HAS_ENCLOSING_TYPE);
 coda::descriptors::FieldDescriptor DeclType::Field_name(
     "name", 4,
     coda::types::String::DESCRIPTOR,
     coda::descriptors::FieldOptions::DEFAULT_INSTANCE,
-    CODA_OFFSET_OF(DeclType, _name));
+    CODA_OFFSET_OF(DeclType, _name),
+    DeclType::HAS_NAME);
 coda::descriptors::FieldDescriptor DeclType::Field_sourceLine(
     "sourceLine", 5,
     coda::types::Integer32::DESCRIPTOR,
     coda::descriptors::FieldOptions::DEFAULT_INSTANCE,
-    CODA_OFFSET_OF(DeclType, _sourceLine));
+    CODA_OFFSET_OF(DeclType, _sourceLine),
+    DeclType::HAS_SOURCE_LINE);
 
 coda::descriptors::FieldDescriptor* DeclType::Fields[] = {
   &DeclType::Field_file,
@@ -1429,7 +1645,9 @@ coda::descriptors::StructDescriptor DeclType::DESCRIPTOR(
   coda::descriptors::StaticArrayRef<coda::descriptors::StructDescriptor*>(),
   coda::descriptors::StaticArrayRef<coda::descriptors::EnumDescriptor*>(),
   DeclType::Fields,
-  &coda::descriptors::StaticObjectBuilder<DeclType>::create
+  &coda::descriptors::StaticObjectBuilder<DeclType>::create,
+  (coda::descriptors::PresenceGetter) &DeclType::isFieldPresent,
+  (coda::descriptors::PresenceSetter) &DeclType::setFieldPresent
 );
 
 DeclType DeclType::DEFAULT_INSTANCE;
@@ -1492,47 +1710,56 @@ coda::descriptors::FieldDescriptor StructType::Field_options(
     "options", 1,
     coda::types::Modified<StructOptions, false, true>::DESCRIPTOR,
     coda::descriptors::FieldOptions::DEFAULT_INSTANCE,
-    CODA_OFFSET_OF(StructType, _options));
+    CODA_OFFSET_OF(StructType, _options),
+    StructType::HAS_OPTIONS);
 coda::descriptors::FieldDescriptor StructType::Field_baseType(
     "baseType", 3,
     coda::types::Modified<StructType, false, true>::DESCRIPTOR,
     _options0,
-    CODA_OFFSET_OF(StructType, _baseType));
+    CODA_OFFSET_OF(StructType, _baseType),
+    StructType::HAS_BASE_TYPE);
 coda::descriptors::FieldDescriptor StructType::Field_typeId(
     "typeId", 4,
     coda::types::Integer32::DESCRIPTOR,
     coda::descriptors::FieldOptions::DEFAULT_INSTANCE,
-    CODA_OFFSET_OF(StructType, _typeId));
+    CODA_OFFSET_OF(StructType, _typeId),
+    StructType::HAS_TYPE_ID);
 coda::descriptors::FieldDescriptor StructType::Field_fields(
     "fields", 5,
     coda::types::List<StructType::Field>::DESCRIPTOR,
     coda::descriptors::FieldOptions::DEFAULT_INSTANCE,
-    CODA_OFFSET_OF(StructType, _fields));
+    CODA_OFFSET_OF(StructType, _fields),
+    (size_t)-1);
 coda::descriptors::FieldDescriptor StructType::Field_structs(
     "structs", 6,
     coda::types::List<coda::types::Modified<StructType, false, true> >::DESCRIPTOR,
     coda::descriptors::FieldOptions::DEFAULT_INSTANCE,
-    CODA_OFFSET_OF(StructType, _structs));
+    CODA_OFFSET_OF(StructType, _structs),
+    (size_t)-1);
 coda::descriptors::FieldDescriptor StructType::Field_enums(
     "enums", 7,
     coda::types::List<coda::types::Modified<EnumType, false, true> >::DESCRIPTOR,
     coda::descriptors::FieldOptions::DEFAULT_INSTANCE,
-    CODA_OFFSET_OF(StructType, _enums));
+    CODA_OFFSET_OF(StructType, _enums),
+    (size_t)-1);
 coda::descriptors::FieldDescriptor StructType::Field_extensions(
     "extensions", 8,
     coda::types::List<ExtensionField>::DESCRIPTOR,
     coda::descriptors::FieldOptions::DEFAULT_INSTANCE,
-    CODA_OFFSET_OF(StructType, _extensions));
+    CODA_OFFSET_OF(StructType, _extensions),
+    (size_t)-1);
 coda::descriptors::FieldDescriptor StructType::Field_minExtension(
     "minExtension", 9,
     coda::types::Integer32::DESCRIPTOR,
     coda::descriptors::FieldOptions::DEFAULT_INSTANCE,
-    CODA_OFFSET_OF(StructType, _minExtension));
+    CODA_OFFSET_OF(StructType, _minExtension),
+    StructType::HAS_MIN_EXTENSION);
 coda::descriptors::FieldDescriptor StructType::Field_maxExtension(
     "maxExtension", 10,
     coda::types::Integer32::DESCRIPTOR,
     coda::descriptors::FieldOptions::DEFAULT_INSTANCE,
-    CODA_OFFSET_OF(StructType, _maxExtension));
+    CODA_OFFSET_OF(StructType, _maxExtension),
+    StructType::HAS_MAX_EXTENSION);
 
 static coda::descriptors::StructDescriptor* StructType_Structs[] = {
   &StructType::Field::DESCRIPTOR,
@@ -1565,7 +1792,9 @@ coda::descriptors::StructDescriptor StructType::DESCRIPTOR(
   StructType_Structs,
   coda::descriptors::StaticArrayRef<coda::descriptors::EnumDescriptor*>(),
   StructType::Fields,
-  &coda::descriptors::StaticObjectBuilder<StructType>::create
+  &coda::descriptors::StaticObjectBuilder<StructType>::create,
+  (coda::descriptors::PresenceGetter) &StructType::isFieldPresent,
+  (coda::descriptors::PresenceSetter) &StructType::setFieldPresent
 );
 
 StructType StructType::DEFAULT_INSTANCE;
@@ -1578,22 +1807,26 @@ coda::descriptors::FieldDescriptor StructType::Field::Field_name(
     "name", 1,
     coda::types::String::DESCRIPTOR,
     coda::descriptors::FieldOptions::DEFAULT_INSTANCE,
-    CODA_OFFSET_OF(StructType::Field, _name));
+    CODA_OFFSET_OF(StructType::Field, _name),
+    StructType::Field::HAS_NAME);
 coda::descriptors::FieldDescriptor StructType::Field::Field_type(
     "type", 2,
     coda::types::Modified<Type, false, true>::DESCRIPTOR,
     coda::descriptors::FieldOptions::DEFAULT_INSTANCE,
-    CODA_OFFSET_OF(StructType::Field, _type));
+    CODA_OFFSET_OF(StructType::Field, _type),
+    StructType::Field::HAS_TYPE);
 coda::descriptors::FieldDescriptor StructType::Field::Field_id(
     "id", 3,
     coda::types::Integer32::DESCRIPTOR,
     coda::descriptors::FieldOptions::DEFAULT_INSTANCE,
-    CODA_OFFSET_OF(StructType::Field, _id));
+    CODA_OFFSET_OF(StructType::Field, _id),
+    StructType::Field::HAS_ID);
 coda::descriptors::FieldDescriptor StructType::Field::Field_options(
     "options", 4,
     coda::types::Modified<FieldOptions, false, true>::DESCRIPTOR,
     coda::descriptors::FieldOptions::DEFAULT_INSTANCE,
-    CODA_OFFSET_OF(StructType::Field, _options));
+    CODA_OFFSET_OF(StructType::Field, _options),
+    StructType::Field::HAS_OPTIONS);
 
 coda::descriptors::FieldDescriptor* StructType::Field::Fields[] = {
   &StructType::Field::Field_name,
@@ -1615,7 +1848,9 @@ coda::descriptors::StructDescriptor StructType::Field::DESCRIPTOR(
   coda::descriptors::StaticArrayRef<coda::descriptors::StructDescriptor*>(),
   coda::descriptors::StaticArrayRef<coda::descriptors::EnumDescriptor*>(),
   Field::Fields,
-  &coda::descriptors::StaticObjectBuilder<StructType::Field>::create
+  &coda::descriptors::StaticObjectBuilder<StructType::Field>::create,
+  (coda::descriptors::PresenceGetter) &StructType::Field::isFieldPresent,
+  (coda::descriptors::PresenceSetter) &StructType::Field::setFieldPresent
 );
 
 StructType::Field StructType::Field::DEFAULT_INSTANCE;
@@ -1680,12 +1915,14 @@ coda::descriptors::FieldDescriptor StructType::Param::Field_name(
     "name", 1,
     coda::types::String::DESCRIPTOR,
     coda::descriptors::FieldOptions::DEFAULT_INSTANCE,
-    CODA_OFFSET_OF(StructType::Param, _name));
+    CODA_OFFSET_OF(StructType::Param, _name),
+    StructType::Param::HAS_NAME);
 coda::descriptors::FieldDescriptor StructType::Param::Field_type(
     "type", 2,
     coda::types::Modified<Type, false, true>::DESCRIPTOR,
     coda::descriptors::FieldOptions::DEFAULT_INSTANCE,
-    CODA_OFFSET_OF(StructType::Param, _type));
+    CODA_OFFSET_OF(StructType::Param, _type),
+    StructType::Param::HAS_TYPE);
 
 coda::descriptors::FieldDescriptor* StructType::Param::Fields[] = {
   &StructType::Param::Field_name,
@@ -1705,7 +1942,9 @@ coda::descriptors::StructDescriptor StructType::Param::DESCRIPTOR(
   coda::descriptors::StaticArrayRef<coda::descriptors::StructDescriptor*>(),
   coda::descriptors::StaticArrayRef<coda::descriptors::EnumDescriptor*>(),
   Param::Fields,
-  &coda::descriptors::StaticObjectBuilder<StructType::Param>::create
+  &coda::descriptors::StaticObjectBuilder<StructType::Param>::create,
+  (coda::descriptors::PresenceGetter) &StructType::Param::isFieldPresent,
+  (coda::descriptors::PresenceSetter) &StructType::Param::setFieldPresent
 );
 
 StructType::Param StructType::Param::DEFAULT_INSTANCE;
@@ -1753,27 +1992,32 @@ coda::descriptors::FieldDescriptor StructType::Method::Field_name(
     "name", 1,
     coda::types::String::DESCRIPTOR,
     coda::descriptors::FieldOptions::DEFAULT_INSTANCE,
-    CODA_OFFSET_OF(StructType::Method, _name));
+    CODA_OFFSET_OF(StructType::Method, _name),
+    StructType::Method::HAS_NAME);
 coda::descriptors::FieldDescriptor StructType::Method::Field_params(
     "params", 2,
     coda::types::List<StructType::Param>::DESCRIPTOR,
     coda::descriptors::FieldOptions::DEFAULT_INSTANCE,
-    CODA_OFFSET_OF(StructType::Method, _params));
+    CODA_OFFSET_OF(StructType::Method, _params),
+    (size_t)-1);
 coda::descriptors::FieldDescriptor StructType::Method::Field_returnType(
     "returnType", 3,
     coda::types::Modified<Type, false, true>::DESCRIPTOR,
     coda::descriptors::FieldOptions::DEFAULT_INSTANCE,
-    CODA_OFFSET_OF(StructType::Method, _returnType));
+    CODA_OFFSET_OF(StructType::Method, _returnType),
+    StructType::Method::HAS_RETURN_TYPE);
 coda::descriptors::FieldDescriptor StructType::Method::Field_id(
     "id", 4,
     coda::types::Integer32::DESCRIPTOR,
     coda::descriptors::FieldOptions::DEFAULT_INSTANCE,
-    CODA_OFFSET_OF(StructType::Method, _id));
+    CODA_OFFSET_OF(StructType::Method, _id),
+    StructType::Method::HAS_ID);
 coda::descriptors::FieldDescriptor StructType::Method::Field_options(
     "options", 5,
     coda::types::Modified<MethodOptions, false, true>::DESCRIPTOR,
     coda::descriptors::FieldOptions::DEFAULT_INSTANCE,
-    CODA_OFFSET_OF(StructType::Method, _options));
+    CODA_OFFSET_OF(StructType::Method, _options),
+    StructType::Method::HAS_OPTIONS);
 
 coda::descriptors::FieldDescriptor* StructType::Method::Fields[] = {
   &StructType::Method::Field_name,
@@ -1796,7 +2040,9 @@ coda::descriptors::StructDescriptor StructType::Method::DESCRIPTOR(
   coda::descriptors::StaticArrayRef<coda::descriptors::StructDescriptor*>(),
   coda::descriptors::StaticArrayRef<coda::descriptors::EnumDescriptor*>(),
   Method::Fields,
-  &coda::descriptors::StaticObjectBuilder<StructType::Method>::create
+  &coda::descriptors::StaticObjectBuilder<StructType::Method>::create,
+  (coda::descriptors::PresenceGetter) &StructType::Method::isFieldPresent,
+  (coda::descriptors::PresenceSetter) &StructType::Method::setFieldPresent
 );
 
 StructType::Method StructType::Method::DEFAULT_INSTANCE;
@@ -2004,12 +2250,14 @@ coda::descriptors::FieldDescriptor EnumType::Field_options(
     "options", 1,
     coda::types::Modified<EnumOptions, false, true>::DESCRIPTOR,
     coda::descriptors::FieldOptions::DEFAULT_INSTANCE,
-    CODA_OFFSET_OF(EnumType, _options));
+    CODA_OFFSET_OF(EnumType, _options),
+    EnumType::HAS_OPTIONS);
 coda::descriptors::FieldDescriptor EnumType::Field_values(
     "values", 2,
     coda::types::List<EnumType::Value>::DESCRIPTOR,
     coda::descriptors::FieldOptions::DEFAULT_INSTANCE,
-    CODA_OFFSET_OF(EnumType, _values));
+    CODA_OFFSET_OF(EnumType, _values),
+    (size_t)-1);
 
 static coda::descriptors::StructDescriptor* EnumType_Structs[] = {
   &EnumType::Value::DESCRIPTOR,
@@ -2033,7 +2281,9 @@ coda::descriptors::StructDescriptor EnumType::DESCRIPTOR(
   EnumType_Structs,
   coda::descriptors::StaticArrayRef<coda::descriptors::EnumDescriptor*>(),
   EnumType::Fields,
-  &coda::descriptors::StaticObjectBuilder<EnumType>::create
+  &coda::descriptors::StaticObjectBuilder<EnumType>::create,
+  (coda::descriptors::PresenceGetter) &EnumType::isFieldPresent,
+  (coda::descriptors::PresenceSetter) &EnumType::setFieldPresent
 );
 
 EnumType EnumType::DEFAULT_INSTANCE;
@@ -2046,12 +2296,14 @@ coda::descriptors::FieldDescriptor EnumType::Value::Field_name(
     "name", 1,
     coda::types::String::DESCRIPTOR,
     coda::descriptors::FieldOptions::DEFAULT_INSTANCE,
-    CODA_OFFSET_OF(EnumType::Value, _name));
+    CODA_OFFSET_OF(EnumType::Value, _name),
+    EnumType::Value::HAS_NAME);
 coda::descriptors::FieldDescriptor EnumType::Value::Field_value(
     "value", 2,
     coda::types::Integer32::DESCRIPTOR,
     coda::descriptors::FieldOptions::DEFAULT_INSTANCE,
-    CODA_OFFSET_OF(EnumType::Value, _value));
+    CODA_OFFSET_OF(EnumType::Value, _value),
+    EnumType::Value::HAS_VALUE);
 
 coda::descriptors::FieldDescriptor* EnumType::Value::Fields[] = {
   &EnumType::Value::Field_name,
@@ -2071,7 +2323,9 @@ coda::descriptors::StructDescriptor EnumType::Value::DESCRIPTOR(
   coda::descriptors::StaticArrayRef<coda::descriptors::StructDescriptor*>(),
   coda::descriptors::StaticArrayRef<coda::descriptors::EnumDescriptor*>(),
   Value::Fields,
-  &coda::descriptors::StaticObjectBuilder<EnumType::Value>::create
+  &coda::descriptors::StaticObjectBuilder<EnumType::Value>::create,
+  (coda::descriptors::PresenceGetter) &EnumType::Value::isFieldPresent,
+  (coda::descriptors::PresenceSetter) &EnumType::Value::setFieldPresent
 );
 
 EnumType::Value EnumType::Value::DEFAULT_INSTANCE;
@@ -2163,37 +2417,44 @@ coda::descriptors::FieldDescriptor ExtensionField::Field_file(
     "file", 1,
     coda::types::Modified<FileDescriptor, false, true>::DESCRIPTOR,
     _options0,
-    CODA_OFFSET_OF(ExtensionField, _file));
+    CODA_OFFSET_OF(ExtensionField, _file),
+    ExtensionField::HAS_FILE);
 coda::descriptors::FieldDescriptor ExtensionField::Field_enclosingType(
     "enclosingType", 2,
     StructType::DESCRIPTOR,
     coda::descriptors::FieldOptions::DEFAULT_INSTANCE,
-    CODA_OFFSET_OF(ExtensionField, _enclosingType));
+    CODA_OFFSET_OF(ExtensionField, _enclosingType),
+    ExtensionField::HAS_ENCLOSING_TYPE);
 coda::descriptors::FieldDescriptor ExtensionField::Field_sourceLine(
     "sourceLine", 3,
     coda::types::Integer32::DESCRIPTOR,
     coda::descriptors::FieldOptions::DEFAULT_INSTANCE,
-    CODA_OFFSET_OF(ExtensionField, _sourceLine));
+    CODA_OFFSET_OF(ExtensionField, _sourceLine),
+    ExtensionField::HAS_SOURCE_LINE);
 coda::descriptors::FieldDescriptor ExtensionField::Field_extends(
     "extends", 4,
     coda::types::Modified<StructType, false, true>::DESCRIPTOR,
     coda::descriptors::FieldOptions::DEFAULT_INSTANCE,
-    CODA_OFFSET_OF(ExtensionField, _extends));
+    CODA_OFFSET_OF(ExtensionField, _extends),
+    ExtensionField::HAS_EXTENDS);
 coda::descriptors::FieldDescriptor ExtensionField::Field_name(
     "name", 5,
     coda::types::String::DESCRIPTOR,
     coda::descriptors::FieldOptions::DEFAULT_INSTANCE,
-    CODA_OFFSET_OF(ExtensionField, _name));
+    CODA_OFFSET_OF(ExtensionField, _name),
+    ExtensionField::HAS_NAME);
 coda::descriptors::FieldDescriptor ExtensionField::Field_id(
     "id", 6,
     coda::types::Integer32::DESCRIPTOR,
     coda::descriptors::FieldOptions::DEFAULT_INSTANCE,
-    CODA_OFFSET_OF(ExtensionField, _id));
+    CODA_OFFSET_OF(ExtensionField, _id),
+    ExtensionField::HAS_ID);
 coda::descriptors::FieldDescriptor ExtensionField::Field_type(
     "type", 7,
     coda::types::Modified<Type, false, true>::DESCRIPTOR,
     coda::descriptors::FieldOptions::DEFAULT_INSTANCE,
-    CODA_OFFSET_OF(ExtensionField, _type));
+    CODA_OFFSET_OF(ExtensionField, _type),
+    ExtensionField::HAS_TYPE);
 
 coda::descriptors::FieldDescriptor* ExtensionField::Fields[] = {
   &ExtensionField::Field_file,
@@ -2218,7 +2479,9 @@ coda::descriptors::StructDescriptor ExtensionField::DESCRIPTOR(
   coda::descriptors::StaticArrayRef<coda::descriptors::StructDescriptor*>(),
   coda::descriptors::StaticArrayRef<coda::descriptors::EnumDescriptor*>(),
   ExtensionField::Fields,
-  &coda::descriptors::StaticObjectBuilder<ExtensionField>::create
+  &coda::descriptors::StaticObjectBuilder<ExtensionField>::create,
+  (coda::descriptors::PresenceGetter) &ExtensionField::isFieldPresent,
+  (coda::descriptors::PresenceSetter) &ExtensionField::setFieldPresent
 );
 
 ExtensionField ExtensionField::DEFAULT_INSTANCE;
@@ -2310,42 +2573,50 @@ coda::descriptors::FieldDescriptor FileDescriptor::Field_name(
     "name", 1,
     coda::types::String::DESCRIPTOR,
     coda::descriptors::FieldOptions::DEFAULT_INSTANCE,
-    CODA_OFFSET_OF(FileDescriptor, _name));
+    CODA_OFFSET_OF(FileDescriptor, _name),
+    FileDescriptor::HAS_NAME);
 coda::descriptors::FieldDescriptor FileDescriptor::Field_directory(
     "directory", 2,
     coda::types::String::DESCRIPTOR,
     coda::descriptors::FieldOptions::DEFAULT_INSTANCE,
-    CODA_OFFSET_OF(FileDescriptor, _directory));
+    CODA_OFFSET_OF(FileDescriptor, _directory),
+    FileDescriptor::HAS_DIRECTORY);
 coda::descriptors::FieldDescriptor FileDescriptor::Field_package(
     "package", 3,
     coda::types::String::DESCRIPTOR,
     coda::descriptors::FieldOptions::DEFAULT_INSTANCE,
-    CODA_OFFSET_OF(FileDescriptor, _package));
+    CODA_OFFSET_OF(FileDescriptor, _package),
+    FileDescriptor::HAS_PACKAGE);
 coda::descriptors::FieldDescriptor FileDescriptor::Field_options(
     "options", 4,
     FileOptions::DESCRIPTOR,
     coda::descriptors::FieldOptions::DEFAULT_INSTANCE,
-    CODA_OFFSET_OF(FileDescriptor, _options));
+    CODA_OFFSET_OF(FileDescriptor, _options),
+    FileDescriptor::HAS_OPTIONS);
 coda::descriptors::FieldDescriptor FileDescriptor::Field_structs(
     "structs", 5,
     coda::types::List<coda::types::Modified<StructType, false, true> >::DESCRIPTOR,
     coda::descriptors::FieldOptions::DEFAULT_INSTANCE,
-    CODA_OFFSET_OF(FileDescriptor, _structs));
+    CODA_OFFSET_OF(FileDescriptor, _structs),
+    (size_t)-1);
 coda::descriptors::FieldDescriptor FileDescriptor::Field_enums(
     "enums", 6,
     coda::types::List<coda::types::Modified<EnumType, false, true> >::DESCRIPTOR,
     coda::descriptors::FieldOptions::DEFAULT_INSTANCE,
-    CODA_OFFSET_OF(FileDescriptor, _enums));
+    CODA_OFFSET_OF(FileDescriptor, _enums),
+    (size_t)-1);
 coda::descriptors::FieldDescriptor FileDescriptor::Field_extensions(
     "extensions", 7,
     coda::types::List<coda::types::Modified<ExtensionField, false, true> >::DESCRIPTOR,
     coda::descriptors::FieldOptions::DEFAULT_INSTANCE,
-    CODA_OFFSET_OF(FileDescriptor, _extensions));
+    CODA_OFFSET_OF(FileDescriptor, _extensions),
+    (size_t)-1);
 coda::descriptors::FieldDescriptor FileDescriptor::Field_imports(
     "imports", 8,
     coda::types::List<FileDescriptor::Import>::DESCRIPTOR,
     coda::descriptors::FieldOptions::DEFAULT_INSTANCE,
-    CODA_OFFSET_OF(FileDescriptor, _imports));
+    CODA_OFFSET_OF(FileDescriptor, _imports),
+    (size_t)-1);
 
 static coda::descriptors::StructDescriptor* FileDescriptor_Structs[] = {
   &FileDescriptor::Import::DESCRIPTOR,
@@ -2375,7 +2646,9 @@ coda::descriptors::StructDescriptor FileDescriptor::DESCRIPTOR(
   FileDescriptor_Structs,
   coda::descriptors::StaticArrayRef<coda::descriptors::EnumDescriptor*>(),
   FileDescriptor::Fields,
-  &coda::descriptors::StaticObjectBuilder<FileDescriptor>::create
+  &coda::descriptors::StaticObjectBuilder<FileDescriptor>::create,
+  (coda::descriptors::PresenceGetter) &FileDescriptor::isFieldPresent,
+  (coda::descriptors::PresenceSetter) &FileDescriptor::setFieldPresent
 );
 
 FileDescriptor FileDescriptor::DEFAULT_INSTANCE;
@@ -2388,12 +2661,14 @@ coda::descriptors::FieldDescriptor FileDescriptor::Import::Field_path(
     "path", 1,
     coda::types::String::DESCRIPTOR,
     coda::descriptors::FieldOptions::DEFAULT_INSTANCE,
-    CODA_OFFSET_OF(FileDescriptor::Import, _path));
+    CODA_OFFSET_OF(FileDescriptor::Import, _path),
+    FileDescriptor::Import::HAS_PATH);
 coda::descriptors::FieldDescriptor FileDescriptor::Import::Field_package(
     "package", 2,
     coda::types::Map<coda::types::String, coda::types::String >::DESCRIPTOR,
     coda::descriptors::FieldOptions::DEFAULT_INSTANCE,
-    CODA_OFFSET_OF(FileDescriptor::Import, _package));
+    CODA_OFFSET_OF(FileDescriptor::Import, _package),
+    (size_t)-1);
 
 coda::descriptors::FieldDescriptor* FileDescriptor::Import::Fields[] = {
   &FileDescriptor::Import::Field_path,
@@ -2413,7 +2688,9 @@ coda::descriptors::StructDescriptor FileDescriptor::Import::DESCRIPTOR(
   coda::descriptors::StaticArrayRef<coda::descriptors::StructDescriptor*>(),
   coda::descriptors::StaticArrayRef<coda::descriptors::EnumDescriptor*>(),
   Import::Fields,
-  &coda::descriptors::StaticObjectBuilder<FileDescriptor::Import>::create
+  &coda::descriptors::StaticObjectBuilder<FileDescriptor::Import>::create,
+  (coda::descriptors::PresenceGetter) &FileDescriptor::Import::isFieldPresent,
+  (coda::descriptors::PresenceSetter) &FileDescriptor::Import::setFieldPresent
 );
 
 FileDescriptor::Import FileDescriptor::Import::DEFAULT_INSTANCE;
@@ -2442,7 +2719,7 @@ void FileDescriptor::Import::endWrite(coda::io::Encoder* encoder) const {
   if (!_package.empty()) {
     encoder->writeFieldHeader("package", 2);
     encoder->writeBeginMap(coda::descriptors::TYPE_KIND_STRING, coda::descriptors::TYPE_KIND_STRING, _package.size());
-    for (std::unordered_map<std::string, std::string >::const_iterator it = _package.begin(), itEnd = _package.end(); it != itEnd; ++it) {
+    for (std::unordered_map<std::string, std::string>::const_iterator it = _package.begin(), itEnd = _package.end(); it != itEnd; ++it) {
       encoder->writeString(it->first);
       encoder->writeString(it->second);
     }
@@ -2568,6 +2845,7 @@ static coda::descriptors::StructDescriptor* FILE_Structs[] = {
   &StringValue::DESCRIPTOR,
   &ListValue::DESCRIPTOR,
   &Options::DESCRIPTOR,
+  &CustomOption::DESCRIPTOR,
   &FileOptions::DESCRIPTOR,
   &StructOptions::DESCRIPTOR,
   &FieldOptions::DESCRIPTOR,

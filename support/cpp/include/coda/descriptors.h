@@ -28,6 +28,9 @@ class EnumDescriptor;
 // Macro for computing field offsets
 #define CODA_OFFSET_OF(ty, fld) ((size_t)&((ty*)0)->fld)
 
+typedef bool (runtime::Object::*PresenceGetter)(size_t index) const;
+typedef void (runtime::Object::*PresenceSetter)(size_t index, bool present);
+
 // ============================================================================
 // FieldDecriptor
 // ============================================================================
@@ -36,12 +39,18 @@ class FieldDescriptor : public StructType::Field {
 public:
   friend class coda::io::AbstractDecoder;
 
-  FieldDescriptor(const char* name, int32_t id, Type& type, FieldOptions& options, size_t offset) {
+  FieldDescriptor(
+      const char* name,
+      int32_t id, Type& type,
+      FieldOptions& options,
+      size_t offset,
+      size_t presBit) {
     setName(name);
     setType(&type);
     setId(id);
     setOptions(&options);
     fieldOffset = offset;
+    presenceBit = presBit;
   }
 
   // Interface for setting scalar and object values
@@ -59,12 +68,16 @@ public:
   // of the appropriate type.
   void setList(runtime::Object* instance, void* begin, void* end) const;
 
+  /** Return the index of the bit that indicates whether this field is present. */
+  size_t getPresenceBit() const { return presenceBit; }
+
 private:
   void* fieldAddress(runtime::Object* instance) const {
     return (void*) ((uint8_t*)instance + fieldOffset);
   }
 
   size_t fieldOffset;
+  size_t presenceBit;
 };
 
 // ============================================================================
@@ -86,9 +99,13 @@ public:
       StaticArrayRef<StructDescriptor*> structs,
       StaticArrayRef<EnumDescriptor*> enums,
       StaticArrayRef<FieldDescriptor*> fields,
-      runtime::Object* (*createFn)())
+      runtime::Object* (*createFn)(),
+      PresenceGetter presGetter,
+      PresenceSetter presSetter)
     : defaultInstance(staticDefaultInstance)
     , create(createFn)
+    , presenceGetter(presGetter)
+    , presenceSetter(presSetter)
   {
     setName(name);
     setTypeId((uint32_t) typeId);
@@ -118,11 +135,20 @@ public:
   void* makeTemp() const { return new (runtime::Object*); }
   void freeTemp(void* ptr) const { delete (runtime::Object**) ptr; }
 
+  bool isFieldPresent(const runtime::Object* instance, size_t index) const {
+    return (instance->*presenceGetter)(index);
+  }
+  void setFieldPresent(runtime::Object* instance, size_t index, bool present) const {
+    (instance->*presenceSetter)(index, present);
+  }
+
 private:
   friend class coda::descriptors::StaticFileDescriptor;
 
   runtime::Object* defaultInstance;
   runtime::Object* (*create)();
+  PresenceGetter presenceGetter;
+  PresenceSetter presenceSetter;
 
   // Only freeze objects known to be defined in the same file.
   void freezeLocal();
