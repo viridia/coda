@@ -49,6 +49,7 @@ struct Options {
   options { allowSubtypes = true; }
 }
 
+# Base class for custom option values, which can be added to any options object.
 struct CustomOption {}
 
 struct FileOptions(Options) = 1 {
@@ -379,6 +380,7 @@ struct EnumType(DeclType) = TypeKind.ENUM {
 # Extension field descriptor
 # ============================================================================
 
+# Deprecated, do not use.
 struct ExtensionField {
   # File in which this extension was defined
   file : shared FileDescriptor = 1 [nullable];
@@ -435,7 +437,7 @@ struct FileDescriptor {
   enums : list[shared EnumType] = 6;
 
   # List of extensions defined within this file
-  'extensions' : list[shared ExtensionField] = 7;
+  # 'extensions' : list[shared ExtensionField] = 7;
 
   # List of imported files
   imports : list[Import] = 8;

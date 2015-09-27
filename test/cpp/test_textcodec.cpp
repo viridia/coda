@@ -162,6 +162,87 @@ TYPED_TEST(CodecTest, TestDecodeSample) {
 
   const sample::S1* s1 = result->getLeft();
   ASSERT_THAT(s1, ::testing::NotNull());
+
+  // scalarBoolean
+  ASSERT_TRUE(s1->hasScalarBoolean());
+  ASSERT_TRUE(s1->isScalarBoolean());
+
+  // scalarBoolean
+  ASSERT_TRUE(s1->hasScalarBoolean());
+  ASSERT_TRUE(s1->isScalarBoolean());
+
+  // scalarI16
+  ASSERT_TRUE(s1->hasScalarI16());
+  ASSERT_EQ(11, s1->getScalarI16());
+
+  // scalarI32
+  ASSERT_TRUE(s1->hasScalarI32());
+  ASSERT_EQ(12, s1->getScalarI32());
+
+  // scalarI64
+  ASSERT_TRUE(s1->hasScalarI64());
+  ASSERT_EQ(13, s1->getScalarI64());
+
+  // scalarFixedI16
+  ASSERT_TRUE(s1->hasScalarFixedI16());
+  ASSERT_EQ(14, s1->getScalarFixedI16());
+
+  // scalarFixedI32
+  ASSERT_TRUE(s1->hasScalarFixedI32());
+  ASSERT_EQ(15, s1->getScalarFixedI32());
+
+  // scalarFixedI64
+  ASSERT_TRUE(s1->hasScalarFixedI64());
+  ASSERT_EQ(16, s1->getScalarFixedI64());
+
+  // scalarFloat
+  ASSERT_TRUE(s1->hasScalarFloat());
+  ASSERT_EQ(55.0, s1->getScalarFloat());
+
+  // scalarDouble
+  ASSERT_TRUE(s1->hasScalarDouble());
+  ASSERT_EQ(56.0, s1->getScalarDouble());
+
+  // scalarString
+  ASSERT_TRUE(s1->hasScalarString());
+  ASSERT_EQ("alpha\n\t", s1->getScalarString());
+
+  // scalarBytes
+  ASSERT_TRUE(s1->hasScalarBytes());
+  ASSERT_EQ("beta", s1->getScalarBytes());
+
+  // scalarEnum
+  ASSERT_TRUE(s1->hasScalarEnum());
+  ASSERT_EQ(sample::E_E1, s1->getScalarEnum());
+
+  // Lists
+  ASSERT_THAT(s1->getListBoolean(), testing::ElementsAre(true, false, true));
+  ASSERT_THAT(s1->getListInt(), testing::ElementsAre(100, 101, 102));
+  ASSERT_THAT(s1->getListFloat(), testing::ElementsAre(110.0, 110.1, 110.2));
+// The decoder actually works correctly, but the embedded null in the string below doesn't.
+//  ASSERT_THAT(s1->getListString(), testing::ElementsAre("beta", "delta\0", "yin-yan: ☯"));
+  ASSERT_THAT(s1->getListEnum(), testing::ElementsAre(sample::E_E1, sample::E_E2, sample::E_E1));
+
+  // Sets
+  ASSERT_THAT(s1->getSetInt(), testing::UnorderedElementsAre(200, 201, 202));
+  ASSERT_THAT(s1->getSetString(),
+      testing::UnorderedElementsAre("gamma", "\'single-quoted\'", "\"double-quoted\""));
+  ASSERT_THAT(s1->getSetEnum(), testing::UnorderedElementsAre(sample::E_E1, sample::E_E2));
+
+  // Maps
+  ASSERT_EQ(2, s1->getMapIntString().size());
+  ASSERT_THAT(s1->getMapIntString().at(300), testing::Eq("three_oh_oh"));
+  ASSERT_THAT(s1->getMapIntString().at(301), testing::Eq("three_oh_one"));
+  ASSERT_EQ(2, s1->getMapStringInt().size());
+  ASSERT_THAT(s1->getMapStringInt().at("three_oh_oh"), testing::Eq(300));
+  ASSERT_THAT(s1->getMapStringInt().at("three_oh_one"), testing::Eq(301));
+  ASSERT_EQ(2, s1->getMapEnumStruct().size());
+  ASSERT_THAT(s1->getMapEnumStruct().at(sample::E_E1), ::testing::NotNull());
+  ASSERT_THAT(s1->getMapEnumStruct().at(sample::E_E2), ::testing::NotNull());
+
+  // Unused
+  ASSERT_FALSE(s1->hasUnused());
+
 }
 
 }
